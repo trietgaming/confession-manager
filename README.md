@@ -1,6 +1,10 @@
-# Confession Manager 📝
+# Confession Manager
 
-A web application that helps users to create and manage confession posts that are published on Facebook. The application uses the Google Sheets API v4 to manage all the confessions in specific sheets in a centralized spreadsheet. The application provides an easy-to-use interface that allows users to create, edit, and delete confession posts, as well as view all existing posts in a simple and organized format.
+![GitHub package.json version](https://img.shields.io/github/package-json/v/trietgaming/confession-manager?color=white) ![GitHub](https://img.shields.io/github/license/trietgaming/confession-manager?color=black) ![GitHub issues](https://img.shields.io/github/issues/trietgaming/confession-manager) ![GitHub Release Date](https://img.shields.io/github/release-date/trietgaming/confession-manager?color=blue)
+
+> Using Google Sheet API and Facebook API to easily manage confessions right on the browser
+
+Confession Manager is a web application that helps users to create and manage confession posts that are published on Facebook. The application uses the Google Sheets API v4 to manage all the confessions in specific sheets in a centralized spreadsheet. The application provides an easy-to-use interface that allows users to create, edit, and delete confession posts, as well as view all existing posts in a simple and organized format.
 
 ## Features 🚀
 
@@ -32,14 +36,14 @@ A web application that helps users to create and manage confession posts that ar
 
 To use this application, you will need to log in to your Google account that contains a spreadsheet which stores all the replies from a Google Form that is collecting confessions.
 
-## License 📜
+## Issues 🐛
 
-This application is licensed under the MIT license. You are free to use, modify, and distribute the source code as long as you include the license file with any distributed copies.
+If you encounter any issues or bugs while using the application, please feel free to open an issue on the repository. We will take a look at it as soon as possible. 😊
 
 ## Contact 📩
 
 If you have any questions or feedback about this application, please feel free to contact us at [triet123vn@gmail.com](mailto:triet123vn@gmail.com).
 
-## Issues 🐛
+## License 📜
 
-If you encounter any issues or bugs while using the application, please feel free to open an issue on the repository. We will take a look at it as soon as possible. 😊
+This application is licensed under the MIT license. You are free to use, modify, and distribute the source code as long as you include the license file with any distributed copies.
