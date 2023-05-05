@@ -1,8 +1,8 @@
-# Confession Manager
+# Confession Manager 📝
 
 A web application that helps users to create and manage confession posts that are published on Facebook. The application uses the Google Sheets API v4 to manage all the confessions in specific sheets in a centralized spreadsheet. The application provides an easy-to-use interface that allows users to create, edit, and delete confession posts, as well as view all existing posts in a simple and organized format.
 
-## Features
+## Features 🚀
 
 - **Google Sheets Integration:** This application integrates with the Google Sheets API v4 to store and manage all confession posts in specific sheets such as "posted" sheet, "accepted" sheet, "declined" sheet and "pending" sheet. This ensures that all data is securely stored and easily to handle from anywhere.
 
@@ -22,19 +22,24 @@ A web application that helps users to create and manage confession posts that ar
 
 - **Open-Source:** The application's source code is available for anyone to view, modify, and distribute under an open-source license. This allows developers to contribute to the application's development and improve its functionality.
 
+- **High Performance:** The application is built on top of the SolidJs library with optimized code that runs incredibly fast, providing instant response times and smooth user experience.
+
 - **Beautiful and User-Friendly Interface:** The application features a modern and visually appealing interface, with easy-to-use controls and intuitive navigation. This ensures that users can easily accomplish their tasks without any confusion or frustration.
 
 - **Secure and Private:** The application is designed with security and privacy in mind. All data is stored securely on the user's Google account, and the application does not store any personal information or data. Additionally, the application uses Google's OAuth authentication protocol to ensure that only authorized users can access the application.
 
-## Usage
+## Usage 💻
 
 To use this application, you will need to log in to your Google account that contains a spreadsheet which stores all the replies from a Google Form that is collecting confessions.
 
-## License
+## License 📜
 
 This application is licensed under the MIT license. You are free to use, modify, and distribute the source code as long as you include the license file with any distributed copies.
 
-## Contact
+## Contact 📩
 
 If you have any questions or feedback about this application, please feel free to contact us at [triet123vn@gmail.com](mailto:triet123vn@gmail.com).
-Feel free to open an issue on the repository if you encounter any issues or bugs while using the application. We will take a look at it as soon as possible.
+
+## Issues 🐛
+
+If you encounter any issues or bugs while using the application, please feel free to open an issue on the repository. We will take a look at it as soon as possible. 😊
