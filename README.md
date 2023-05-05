@@ -1,6 +1,9 @@
 # Confession Manager
 
-![GitHub package.json version](https://img.shields.io/github/package-json/v/trietgaming/confession-manager?color=white) ![GitHub](https://img.shields.io/github/license/trietgaming/confession-manager?color=black) ![GitHub issues](https://img.shields.io/github/issues/trietgaming/confession-manager) ![GitHub Release Date](https://img.shields.io/github/release-date/trietgaming/confession-manager?color=blue)
+[![GitHub package.json version][version-shield]][version-url]
+[![GitHub license][license-shield]][license-url]
+[![GitHub issues][issues-shield]][issues-url]
+[![GitHub Release Date][release-shield]][release-url]
 
 > Using Google Sheet API and Facebook API to easily manage confessions right on the browser
 
@@ -47,3 +50,14 @@ If you have any questions or feedback about this application, please feel free t
 ## License 📜
 
 This application is licensed under the MIT license. You are free to use, modify, and distribute the source code as long as you include the license file with any distributed copies.
+
+<!--VARIABLES-->
+
+[version-shield]: https://img.shields.io/github/package-json/v/trietgaming/confession-manager?color=white
+[version-url]: https://github.com/trietgaming/confession-manager/releases
+[license-shield]: https://img.shields.io/github/license/trietgaming/confession-manager?color=black
+[license-url]: https://github.com/trietgaming/confession-manager/blob/master/LICENSE
+[issues-shield]: https://img.shields.io/github/issues/trietgaming/confession-manager
+[issues-url]: https://github.com/trietgaming/confession-manager/issues
+[release-shield]: https://img.shields.io/github/release-date/trietgaming/confession-manager?color=blue
+[release-url]: https://github.com/trietgaming/confession-manager/releases
