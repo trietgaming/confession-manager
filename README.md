@@ -23,7 +23,7 @@ Confession Manager is a web application that helps users to create and manage co
 
 - **Easy Content Review and Removal:** The application provides a simple and efficient way for users to review and remove confessions. Users can easily browse through all existing confessions as well as pending confessions, and remove any confessions that they no longer wish to have on their Facebook page.
 
-- **Automatic Hashtagging:** The application automatically generates hashtags for each new confession post, based on the time and order in which they are approved in the application of the post. This helps to ensure a properly and orderly publishing process, without the need for manual numbering or management.
+- **Automatic Hashtagging:** The application automatically generates hashtags for each new confession post, based on the time and order in which they are approved the application of the post. This helps to ensure a properly and orderly publishing process, without the need for manual numbering or management.
 
 - **Free to Use, No Ads:** The application is completely free to use, without any hidden costs or fees. Additionally, the application is ad-free, ensuring that users are not bombarded with unwanted advertisements.
 

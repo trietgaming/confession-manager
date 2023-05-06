@@ -24,7 +24,7 @@ const SelectSpreadsheet: Component = () => {
         setConfessionSpreadsheet(result);
         initConfessionSpreadsheetMetadata();
       });
-      console.log(confessionSpreadsheet());
+      console.log(confessionSpreadsheet);
     };
 
     if (cachedSpreadsheetId !== null) {

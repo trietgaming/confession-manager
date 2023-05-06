@@ -1,4 +1,12 @@
-import { Component, For, createSignal, Show } from "solid-js";
+import {
+  Component,
+  For,
+  createSignal,
+  Show,
+  batch,
+  onMount,
+  createMemo,
+} from "solid-js";
 import { confessionSpreadsheet, setConfessionSpreadsheet } from "store/index";
 import { ConfessionSpreadsheetMetadata } from "types";
 import Button from "ui-components/Button";
@@ -6,13 +14,13 @@ import { Portal } from "solid-js/web";
 import {
   CONFESSION_SHEET_TYPE_METADATA_KEY,
   LOCAL_KEY_CONFESSION_SPREADSHEET_ID,
-} from "../constants";
+} from "app-constants";
 import initConfessionSpreadsheetMetadata from "methods/initConfessionSpreadsheetMetadata";
 import LoadingCircle from "ui-components/LoadingCircle";
 
 const selectElementsPayload: {
   title: string;
-  key: keyof ConfessionSpreadsheetMetadata;
+  key: SheetTypeKeys;
 }[] = [
   {
     title: "Chọn trang tính nhận phản hồi Confession",
@@ -39,32 +47,34 @@ const numberOfSelected = (selected: Record<any, any>) =>
     0
   );
 
-const findExistedMetadataIndex = (
-  sheets: gapi.client.sheets.Sheet[],
-  typeValue: keyof ConfessionSpreadsheetMetadata
-) => {
-  const res = sheets.findIndex((sheet) =>
-    sheet.developerMetadata?.some(
-      (metadata) =>
-        metadata.metadataKey === CONFESSION_SHEET_TYPE_METADATA_KEY &&
-        metadata.metadataValue === typeValue
-    )
-  );
-  return res === -1 ? null : res;
+type SheetTypeKeys = keyof Omit<ConfessionSpreadsheetMetadata, "inited">;
+type SelectedObject = Record<SheetTypeKeys, number | null>;
+
+const initExistedMetadataSheets = (sheets: gapi.client.sheets.Sheet[]) => {
+  const preProcessObject: Record<string, any> = {};
+  sheets.forEach((sheet, index) => {
+    const metadata = sheet.developerMetadata?.find(
+      (metadata) => metadata.metadataKey === CONFESSION_SHEET_TYPE_METADATA_KEY
+    );
+    if (!!metadata) preProcessObject[metadata.metadataValue!] = index;
+  });
+  const selectedObject: SelectedObject = {
+    acceptedSheet: preProcessObject.acceptedSheet ?? null,
+    declinedSheet: preProcessObject.declinedSheet ?? null,
+    postedSheet: preProcessObject.postedSheet ?? null,
+    pendingSheet: preProcessObject.pendingSheet ?? null,
+  };
+  return selectedObject;
 };
 
 const SelectSheets: Component = () => {
-  const [sheets, setSheets] = createSignal(
-    confessionSpreadsheet()!.sheets || []
+  const [sheets, setSheets] = createSignal(confessionSpreadsheet!.sheets || []);
+  const existedMetadataSheets = initExistedMetadataSheets(
+    confessionSpreadsheet!.sheets || []
   );
-  const [selected, setSelected] = createSignal<
-    Record<keyof ConfessionSpreadsheetMetadata, number | null>
-  >({
-    acceptedSheet: findExistedMetadataIndex(sheets(), "acceptedSheet"),
-    declinedSheet: findExistedMetadataIndex(sheets(), "declinedSheet"),
-    pendingSheet: findExistedMetadataIndex(sheets(), "pendingSheet"),
-    postedSheet: findExistedMetadataIndex(sheets(), "postedSheet"),
-  });
+  const [selected, setSelected] = createSignal<SelectedObject>(
+    existedMetadataSheets
+  );
   const [isEmpty, setEmpty] = createSignal(false);
   const [isCreateSheetModalOpen, setCreateSheetModalOpen] = createSignal<
     string | boolean
@@ -72,6 +82,10 @@ const SelectSheets: Component = () => {
   const [isProcessing, setProcessing] = createSignal(false);
   ///@ts-ignore
   let sheetTitleInputRef: HTMLInputElement;
+
+  onMount(() => {
+    handleEmpty();
+  });
 
   const handleEmpty = () => {
     if (numberOfSelected(selected()) === sheets().length) {
@@ -81,10 +95,7 @@ const SelectSheets: Component = () => {
     }
   };
 
-  const handleChange = (
-    index: number,
-    key: keyof ConfessionSpreadsheetMetadata
-  ) => {
+  const handleChange = (index: number, key: SheetTypeKeys) => {
     setSelected((prev) => {
       for (const metaKey in prev) {
         /// @ts-ignore
@@ -105,15 +116,15 @@ const SelectSheets: Component = () => {
     const title = sheetTitleInputRef.value;
     if (!title) return;
 
-    setSheets((prev) => [...prev, { properties: { title } }]);
-    setCreateSheetModalOpen(false);
+    batch(() => {
+      setSheets((prev) => [...prev, { properties: { title } }]);
+      setCreateSheetModalOpen(false);
+    });
     if (typeof key === "string")
-      return handleChange(
-        sheets().length - 1,
-        key as keyof ConfessionSpreadsheetMetadata
-      );
+      return handleChange(sheets().length - 1, key as SheetTypeKeys);
     handleEmpty();
   };
+
   const handleSubmit = async () => {
     setProcessing(true);
     const currentSheetsState = sheets();
@@ -126,7 +137,7 @@ const SelectSheets: Component = () => {
       try {
         const batchUpdateResult = (
           await gapi.client.sheets.spreadsheets.batchUpdate(
-            { spreadsheetId: confessionSpreadsheet()!.spreadsheetId! },
+            { spreadsheetId: confessionSpreadsheet!.spreadsheetId! },
             {
               includeSpreadsheetInResponse: false,
               requests: [
@@ -154,7 +165,20 @@ const SelectSheets: Component = () => {
         sheetId: number;
         sheetTypeValue: string;
       }[] = [];
+      const sheetsNeedRemoveMetadata: typeof sheetsNeedUpdateMetadata = [];
       const sheetsNeedCreateMetadata: typeof sheetsNeedUpdateMetadata = [];
+
+      const selectedValues = Object.values(currentSelectedState);
+      for (const [sheetTypeValue, index] of Object.entries(
+        existedMetadataSheets
+      )) {
+        // If not selected but existed metadata then delete
+        if (index === null || selectedValues.includes(index)) continue;
+        sheetsNeedRemoveMetadata.push({
+          sheetId: currentSheetsState[index].properties!.sheetId!,
+          sheetTypeValue: sheetTypeValue,
+        });
+      }
 
       for (const entry of Object.entries(currentSelectedState)) {
         const sheet = currentSheetsState[entry[1]!];
@@ -163,13 +187,21 @@ const SelectSheets: Component = () => {
           sheetTypeValue: entry[0],
         };
         if (
-          sheet.developerMetadata?.some(
+          // not have metadataKey = type defined key?
+          !sheet.developerMetadata ||
+          sheet.developerMetadata.some(
             (metadata) =>
               metadata.metadataKey === CONFESSION_SHEET_TYPE_METADATA_KEY
-          )
+          ) === false
+        )
+          sheetsNeedCreateMetadata.push(sheetForBatchObject);
+        else if (
+          // is metadata not as same as pending change?
+          sheet.developerMetadata.some(
+            (metadata) => metadata.metadataValue === entry[0]
+          ) === false
         )
           sheetsNeedUpdateMetadata.push(sheetForBatchObject);
-        else sheetsNeedCreateMetadata.push(sheetForBatchObject);
       }
       const batchRequests: gapi.client.sheets.Request[] = [];
       sheetsNeedCreateMetadata.forEach(({ sheetId, sheetTypeValue }) => {
@@ -197,6 +229,7 @@ const SelectSheets: Component = () => {
                   metadataLocation: {
                     sheetId,
                   },
+
                   visibility: "DOCUMENT",
                 },
               },
@@ -208,12 +241,29 @@ const SelectSheets: Component = () => {
           },
         });
       });
-      // console.log(batchRequests);
+      sheetsNeedRemoveMetadata.forEach(({ sheetId, sheetTypeValue }) => {
+        batchRequests.push({
+          deleteDeveloperMetadata: {
+            dataFilter: {
+              developerMetadataLookup: {
+                locationType: "SHEET",
+                metadataKey: CONFESSION_SHEET_TYPE_METADATA_KEY,
+                metadataLocation: {
+                  sheetId,
+                },
+                metadataValue: sheetTypeValue,
+                visibility: "DOCUMENT",
+              },
+            },
+          },
+        });
+      });
+      console.log(batchRequests);
 
       // console.log(
       await gapi.client.sheets.spreadsheets.batchUpdate(
         {
-          spreadsheetId: confessionSpreadsheet()!.spreadsheetId!,
+          spreadsheetId: confessionSpreadsheet!.spreadsheetId!,
         },
         {
           includeSpreadsheetInResponse: false,
@@ -224,7 +274,7 @@ const SelectSheets: Component = () => {
       setConfessionSpreadsheet(
         (
           await gapi.client.sheets.spreadsheets.get({
-            spreadsheetId: confessionSpreadsheet()!.spreadsheetId!,
+            spreadsheetId: confessionSpreadsheet!.spreadsheetId!,
           })
         ).result
       );
@@ -283,7 +333,7 @@ const SelectSheets: Component = () => {
           class="mr-3 bg-slate-500 hover:bg-slate-600"
           onClick={() => {
             localStorage.removeItem(LOCAL_KEY_CONFESSION_SPREADSHEET_ID);
-            setConfessionSpreadsheet(null);
+            setConfessionSpreadsheet({});
           }}
         >
           Quay lại

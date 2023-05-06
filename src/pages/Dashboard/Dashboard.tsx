@@ -9,6 +9,7 @@ import {
   createMemo,
 } from "solid-js";
 import {
+  confessionMetadata,
   confessionSpreadsheet,
   pendingChanges,
   scrollY,
@@ -21,15 +22,16 @@ import { FETCH_TRIGGER_Y_OFFSET, MAX_CFS_PER_LOAD } from "../../constants";
 
 const Dashboard: Component = () => {
   const [confessions, setConfessions] = createSignal<Confession[]>(
-    confessionCached.get()
+    confessionCached.get(),
+    { equals: false }
   );
-  const [lastestCfsRow, setLastestCfsRow] = createSignal(1);
+  const [nextFirstCfsRow, setNextFirstCfsRow] = createSignal(2); // 1: title of row, 2: first reply of the table
   const [isFetching, setFetching] = createSignal(false);
   const [isEnd, setEnd] = createSignal(false);
 
   let cfsContainer: HTMLUListElement | undefined;
 
-  const handleScroll = createMemo(() => async () => {
+  const handleScroll = async () => {
     if (isFetching() || isEnd()) return;
     if (
       scrollY() + window.innerHeight >=
@@ -38,34 +40,38 @@ const Dashboard: Component = () => {
         cfsContainer!.offsetTop
     ) {
       setFetching(true);
-      const range: string[] = [];
-      for (let i = 1; i <= MAX_CFS_PER_LOAD; ++i) {
-        range.push(`A${i + lastestCfsRow()}:B${i + lastestCfsRow()}`);
-      }
+      const currentFirstCfsRow = nextFirstCfsRow();
+
+      const range: string = `'${
+        confessionMetadata!.pendingSheet!.properties!.title
+      }'!A${currentFirstCfsRow}:B${currentFirstCfsRow + MAX_CFS_PER_LOAD - 1}`;
+
       try {
-        const response = await gapi.client.sheets.spreadsheets.values.batchGet({
-          spreadsheetId: confessionSpreadsheet()!.spreadsheetId!,
-          ranges: range,
+        const response = await gapi.client.sheets.spreadsheets.values.get({
+          spreadsheetId: confessionSpreadsheet!.spreadsheetId!,
+          range,
         });
-        const result = response.result;
-        const valueRanges = result.valueRanges;
-        if (!valueRanges) return setEnd(true);
+        const values = response.result.values;
+        if (!values) return setEnd(true);
 
         const nextConfessions: Confession[] = [];
-        for (const valueRange of valueRanges) {
-          if (!valueRange.values) continue;
+        for (let i = 0; i < MAX_CFS_PER_LOAD; ++i) {
+          const value = values[i];
+          if (!value || !value.length) continue;
           nextConfessions.push({
-            data: valueRange.values[0][1],
-            date: valueRange.values[0][0],
-            /// @ts-ignore next-line
-            row: +valueRange.range[valueRange.range.length - 1],
+            data: value[1],
+            date: value[0],
+            row: i + currentFirstCfsRow,
           });
         }
         batch(() => {
           setConfessions((confessions) => {
-            return [...confessions, ...nextConfessions];
+            for (const nextConfession of nextConfessions) {
+              confessions.push(nextConfession);
+            }
+            return confessions;
           });
-          setLastestCfsRow((last) => last + MAX_CFS_PER_LOAD);
+          setNextFirstCfsRow((last) => last + MAX_CFS_PER_LOAD);
         });
         confessionCached.set(confessions());
       } catch (err: any) {
@@ -75,17 +81,16 @@ const Dashboard: Component = () => {
       }
       setFetching(false);
     }
-  })();
+  };
 
   createEffect(handleScroll);
 
-  const handleAction = createMemo<HandleAction>(
-    () => (actionType, confession) => {
-      /// @ts-ignore
-      setPendingChanges(actionType, (prev) => [...prev, confession]);
-      handleScroll();
-    }
-  )();
+  const handleAction: HandleAction = (actionType, confession, ref) => {
+    /// @ts-ignore
+    setPendingChanges(actionType, (prev) => [...prev, { confession, ref }]);
+    handleScroll();
+    ref.hidden = true;
+  };
 
   return (
     <div class="flex flex-col">

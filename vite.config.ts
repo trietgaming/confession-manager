@@ -26,6 +26,7 @@ export default defineConfig({
       { find: "methods", replacement: "/src/methods" },
       { find: "components", replacement: "/src/components" },
       { find: "types", replacement: "/src/types" },
+      { find: "app-constants", replacement: "/src/constants" },
     ],
   },
 });

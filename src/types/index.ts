@@ -1,11 +1,9 @@
-import { Component, Setter } from "solid-js";
 import { PENDING_CONFESSION_ACTION } from "../constants";
 
 export interface Confession {
   row: number;
   data: string;
   date: string;
-  ref?: Component;
 }
 
 export interface ConfessionSpreadsheetMetadata {
@@ -13,16 +11,21 @@ export interface ConfessionSpreadsheetMetadata {
   declinedSheet?: gapi.client.sheets.Sheet;
   postedSheet?: gapi.client.sheets.Sheet;
   pendingSheet?: gapi.client.sheets.Sheet;
+  inited?: boolean;
+}
+
+export interface ConfessionElement extends Confession {
+  ref: HTMLLIElement;
 }
 
 export interface PendingChanges {
-  accepts?: Confession[];
-  declines?: Confession[];
-  post?: Confession[];
-  addSheet?: {
+  accepts?: ConfessionElement[];
+  declines?: ConfessionElement[];
+  post?: ConfessionElement[];
+  addSheets?: {
     type: keyof ConfessionSpreadsheetMetadata;
     title: string;
-  };
+  }[];
   updateSheetMetadata?: {
     sheetId: number;
     newType: keyof ConfessionSpreadsheetMetadata;
@@ -32,8 +35,8 @@ export interface PendingChanges {
 export type HandleAction = (
   actionType: `${PENDING_CONFESSION_ACTION}`,
   confession: Confession,
-  setHidden: Setter<boolean>
-) => any
+  ref: HTMLLIElement
+) => any;
 // export interface ConfessionSheets {
 //   accepted:
 // }
