@@ -12,6 +12,7 @@
   "devDependencies": {
     "@types/gapi": "^0.0.44",
     "@types/gapi.auth2": "^0.0.57",
+    "@types/gapi.client.forms-v1": "^0.0.1",
     "@types/gapi.client.sheets-v4": "^0.0.1",
     "@types/google.accounts": "^0.0.7",
     "@types/google.picker": "^0.0.39",

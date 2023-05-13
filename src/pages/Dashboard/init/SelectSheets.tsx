@@ -17,6 +17,7 @@ import {
 } from "app-constants";
 import initConfessionSpreadsheetMetadata from "methods/initConfessionSpreadsheetMetadata";
 import LoadingCircle from "ui-components/LoadingCircle";
+import { reconcile } from "solid-js/store";
 
 const selectElementsPayload: {
   title: string;
@@ -115,6 +116,10 @@ const SelectSheets: Component = () => {
     const key = isCreateSheetModalOpen();
     const title = sheetTitleInputRef.value;
     if (!title) return;
+    if (sheets().some((sheet) => sheet.properties?.title === title))
+      return alert(
+        "Đã tồn tại trang tính có cùng tiêu đề! Vui lòng đặt tiêu đề khác."
+      );
 
     batch(() => {
       setSheets((prev) => [...prev, { properties: { title } }]);
@@ -285,6 +290,12 @@ const SelectSheets: Component = () => {
     setProcessing(false);
   };
 
+  /// TODO: OPTIMIZE THIS
+  const handleGoBack = () => {
+    localStorage.removeItem(LOCAL_KEY_CONFESSION_SPREADSHEET_ID);
+    setConfessionSpreadsheet(reconcile({}));
+  };
+
   return (
     <div>
       <For each={selectElementsPayload}>
@@ -331,10 +342,7 @@ const SelectSheets: Component = () => {
       <div class="flex justify-center w-full mt-10">
         <Button
           class="mr-3 bg-slate-500 hover:bg-slate-600"
-          onClick={() => {
-            localStorage.removeItem(LOCAL_KEY_CONFESSION_SPREADSHEET_ID);
-            setConfessionSpreadsheet({});
-          }}
+          onClick={handleGoBack}
         >
           Quay lại
         </Button>

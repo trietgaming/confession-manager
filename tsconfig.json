@@ -13,7 +13,8 @@
       "gapi",
       "google.accounts",
       "gapi.client.sheets-v4",
-      "google.picker"
+      "google.picker",
+      "gapi.client.forms-v1"
     ],
     "noEmit": true,
     "isolatedModules": true,

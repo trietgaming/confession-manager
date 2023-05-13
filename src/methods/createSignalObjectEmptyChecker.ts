@@ -5,7 +5,7 @@ import isObjectEmpty from "./isObjectEmpty";
 export default function createSignalObjectEmptyChecker(
   obj: Accessor<Object> | Store<Object>
 ) {
-  return createMemo(() =>
+  return createMemo<boolean>(() =>
     isObjectEmpty(typeof obj === "object" ? obj : (obj as Accessor<Object>)())
   );
 }

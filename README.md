@@ -7,7 +7,7 @@
 
 > Using Google Sheet API and Facebook API to easily manage confessions right on the browser
 
-Confession Manager is a web application that helps users to create and manage confession posts that are published on Facebook. The application uses the Google Sheets API v4 to manage all the confessions in specific sheets in a centralized spreadsheet. The application provides an easy-to-use interface that allows users to create, edit, and delete confession posts, as well as view all existing posts in a simple and organized format.
+Confession Manager is a web application that helps users to create and manage confession posts that are published on Facebook. The application uses the [Google Sheet API V4][gsheet-api-link] to manage all the confessions in specific sheets in a centralized spreadsheet. The application provides an easy-to-use interface that allows users to create, edit, and delete confession posts, as well as view all existing posts in a simple and organized format.
 
 ## Features 🚀
 
@@ -27,7 +27,7 @@ Confession Manager is a web application that helps users to create and manage co
 
 - **Free to Use, No Ads:** The application is completely free to use, without any hidden costs or fees. Additionally, the application is ad-free, ensuring that users are not bombarded with unwanted advertisements.
 
-- **Open-Source:** The application's source code is available for anyone to view, modify, and distribute under an open-source license. This allows developers to contribute to the application's development and improve its functionality.
+- **Open-Source:** The application's source code is available for anyone to view, modify, and distribute under [MIT license][license-url]. This allows developers to contribute to the application's development and improve its functionality.
 
 - **High Performance:** The application is built on top of the SolidJs library with optimized code that runs incredibly fast, providing instant response times and smooth user experience.
 
@@ -49,7 +49,7 @@ If you have any questions or feedback about this application, please feel free t
 
 ## License 📜
 
-This application is licensed under the MIT license. You are free to use, modify, and distribute the source code as long as you include the license file with any distributed copies.
+This application is licensed under the [MIT license][license-url]. You are free to use, modify, and distribute the source code as long as you include the license file with any distributed copies.
 
 <!--VARIABLES-->
 
@@ -61,3 +61,4 @@ This application is licensed under the MIT license. You are free to use, modify,
 [issues-url]: https://github.com/trietgaming/confession-manager/issues
 [release-shield]: https://img.shields.io/github/release-date/trietgaming/confession-manager?color=blue
 [release-url]: https://github.com/trietgaming/confession-manager/releases
+[gsheet-api-link]: [https://developers.google.com/sheets/api/guides/concepts]

@@ -1,12 +1,11 @@
 import { confessionSpreadsheet, setConfessionMetadata } from "store/index";
 import { CONFESSION_SHEET_TYPE_METADATA_KEY } from "../constants";
+import { ConfessionSpreadsheetMetadata } from "types";
 
 export default function initConfessionSpreadsheetMetadata() {
-  /// @ts-ignore
   const sheetsMetadata: ConfessionSpreadsheetMetadata = {};
 
-  /// @ts-ignore
-  for (const sheet of confessionSpreadsheet!.sheets) {
+  for (const sheet of confessionSpreadsheet!.sheets!) {
     if (!sheet.developerMetadata) continue;
     for (const metadata of sheet.developerMetadata) {
       if (metadata.metadataKey === CONFESSION_SHEET_TYPE_METADATA_KEY) {
