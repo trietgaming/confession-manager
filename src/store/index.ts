@@ -24,6 +24,8 @@ export const [pendingChanges, setPendingChanges] = createStore<PendingChanges>({
   post: [],
 });
 
+export const [isGapiLoaded, setGapiLoaded] = createSignal(false);
+
 window.addEventListener("scroll", () => {
   setScrollY(window.scrollY);
 });

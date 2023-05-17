@@ -1,5 +1,5 @@
 import handlePick from "methods/handlePick";
-import { Component, batch, onMount } from "solid-js";
+import { Component, Show, batch, createSignal, onMount } from "solid-js";
 import Button from "ui-components/Button";
 import {
   confessionSpreadsheet,
@@ -7,10 +7,17 @@ import {
   setPicker,
   setConfessionSpreadsheet,
 } from "store";
-import LoadingCircle from "ui-components/LoadingCircle";
+import SelectSpreadsheetComponent from "./SelectSpreadsheet";
 import initConfessionSpreadsheetMetadata from "methods/initConfessionSpreadsheetMetadata";
+import NoSpreadsheetLinked from "./NoSpreadsheetLinked";
 
 const SelectSpreadsheet: Component = () => {
+  const [isNoSpreadsheet, setNoSpreadSheet] = createSignal(false);
+  const [isLoading, setLoading] = createSignal(true);
+  const [formObj, setformObj] = createSignal<gapi.client.forms.Form | null>(
+    null
+  );
+
   onMount(async () => {
     const cachedSpreadsheetId = localStorage.getItem("confessionSpreadsheetId");
 
@@ -35,9 +42,10 @@ const SelectSpreadsheet: Component = () => {
     // }
     gapi.load("picker", async () => {
       const pickerCallback = async (res: google.picker.ResponseObject) => {
+        setLoading(true);
         if (res[google.picker.Response.ACTION] == google.picker.Action.PICKED) {
           console.log(res);
-          let spreadsheetId = res.docs[0].id;
+          let spreadsheetId = null;
           /// @ts-ignore
           if (res.docs[0].serviceId === "form") {
             try {
@@ -57,17 +65,24 @@ const SelectSpreadsheet: Component = () => {
               if (json.linkedSheetId) {
                 spreadsheetId = json.linkedSheetId;
               } else {
-                ///TODO: redirect user to create and link spreadsheet, and provide a way how to do that.
-                /// The APIs are not possible to link form with a spreadsheet
-                return alert("Biểu mẫu này chưa có trang tính")
+                /// The APIs are not possible to link form to a spreadsheet
+                batch(() => {
+                  setNoSpreadSheet(true);
+                  setformObj(json);
+                });
               }
             } catch (err) {
               console.error(err);
             }
+          } else {
+            spreadsheetId = res.docs[0].id;
           }
-          await fetchAndInitSpreadsheet(spreadsheetId);
-          localStorage.setItem("confessionSpreadsheetId", res.docs[0].id);
+          if (spreadsheetId !== null) {
+            await fetchAndInitSpreadsheet(spreadsheetId);
+            localStorage.setItem("confessionSpreadsheetId", res.docs[0].id);
+          }
         }
+        setLoading(false);
       };
       setPicker(
         new google.picker.PickerBuilder()
@@ -82,25 +97,26 @@ const SelectSpreadsheet: Component = () => {
           )
           .build()
       );
+      setLoading(false);
     });
   });
 
+  const handleReturn = () => {
+    setNoSpreadSheet(false);
+  };
+
   return (
-    <div class="flex flex-col justify-center h-full">
-      <div class="flex px-4 flex-col items-center justify-center">
-        <h1 class="text-2xl mb-10">
-          Chọn một trang tính chứa câu trả lời Confession hoặc biểu mẫu nhận
-          Confession để bắt đầu
-        </h1>
-        <Button
-          onClick={handlePick}
-          disabled={!picker()}
-          class="text-xl text-white bg-[#4285F4] hover:bg-[#4285F4]/90 px-7 py-5 text-center inline-flex items-center"
-        >
-          {picker() ? "Chọn trang tính hoặc biểu mẫu" : <LoadingCircle />}
-        </Button>
-      </div>
-    </div>
+    <Show
+      when={isNoSpreadsheet()}
+      fallback={
+        <SelectSpreadsheetComponent
+          handlePick={handlePick}
+          isLoading={isLoading()}
+        />
+      }
+    >
+      <NoSpreadsheetLinked handleReturn={handleReturn} formObj={formObj()!} />
+    </Show>
   );
 };
 

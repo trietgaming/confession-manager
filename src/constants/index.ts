@@ -40,3 +40,16 @@ export const PENDING_CHANGES_CONFESSION_ARRAY_KEYS: (keyof PendingChanges)[] = [
   "accepts",
   "declines",
 ];
+
+export const DISCOVERY_DOCS = [
+  "https://sheets.googleapis.com/$discovery/rest?version=v4",
+];
+
+export const SCOPES =
+  "https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive.readonly";
+
+export const APP_SERVER_URL =
+  "https://confession-manager-server.trietgaming.repl.co";
+
+export const BASE_URL =
+  import.meta.env.MODE === "development" ? "https://localhost:8080" : "";

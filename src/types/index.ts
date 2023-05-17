@@ -37,6 +37,3 @@ export type HandleAction = (
   confession: Confession,
   ref: HTMLLIElement
 ) => any;
-// export interface ConfessionSheets {
-//   accepted:
-// }
