@@ -6,8 +6,10 @@
     "start": "vite",
     "dev": "vite",
     "build": "vite build",
-    "serve": "vite preview"
+    "serve": "vite preview",
+    "deploy": "npm run build&&sh deploy.sh"
   },
+  "type": "module",
   "license": "MIT",
   "devDependencies": {
     "@types/gapi": "^0.0.44",
@@ -29,6 +31,7 @@
     "@solidjs/router": "^0.8.2",
     "axios": "^1.4.0",
     "firebase": "^9.22.0",
+    "localforage": "^1.10.0",
     "solid-js": "^1.6.10",
     "tailwind-merge": "^1.12.0"
   }

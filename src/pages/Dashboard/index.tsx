@@ -21,7 +21,7 @@ const Dashboard: Component = () => {
       <Match when={isConfessionMetadataEmpty()}>
         <SelectSheets />
       </Match>
-      <Match
+      {/* <Match
         when={
           !confessionSpreadsheet!.developerMetadata ||
           confessionSpreadsheet!.developerMetadata!.some(
@@ -32,7 +32,7 @@ const Dashboard: Component = () => {
         }
       >
         <InitSheets />
-      </Match>
+      </Match> */}
       <Match
         when={
           !isConfessionSpreadsheetObjEmpty() && !isConfessionMetadataEmpty()

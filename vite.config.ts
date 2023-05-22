@@ -1,6 +1,6 @@
 import { defineConfig } from "vite";
 import solidPlugin from "vite-plugin-solid";
-import basicSsl from '@vitejs/plugin-basic-ssl'
+import fs from "fs";
 
 export default defineConfig({
   esbuild: {
@@ -11,13 +11,18 @@ export default defineConfig({
     minifyWhitespace: true,
     sourcesContent: false,
   },
-  plugins: [solidPlugin(), basicSsl()],
+  plugins: [solidPlugin()],
   server: {
     port: 8080,
     host: "0.0.0.0",
+    https: {
+      key: fs.readFileSync("localhost-key.pem"),
+      cert: fs.readFileSync("localhost.pem"),
+    },
   },
   build: {
     target: "esnext",
+    minify: true,
   },
   resolve: {
     alias: [

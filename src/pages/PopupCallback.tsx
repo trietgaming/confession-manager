@@ -15,7 +15,6 @@ const PopupCallback: Component = () => {
       window.opener.postMessage(accessToken);
       // close the popup
       window.close();
-      navigate("/");
     }
   });
   return <CenteredLoadingCircle />;

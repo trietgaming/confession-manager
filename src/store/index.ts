@@ -26,6 +26,9 @@ export const [pendingChanges, setPendingChanges] = createStore<PendingChanges>({
 
 export const [isGapiLoaded, setGapiLoaded] = createSignal(false);
 
+export const [isServiceWorkerRegistered, setServiceWorkerRegistered] = createSignal(false);
+export const [isNotificationSubscribed, setNotificationSubscribed] = createSignal(false);
+
 window.addEventListener("scroll", () => {
   setScrollY(window.scrollY);
 });

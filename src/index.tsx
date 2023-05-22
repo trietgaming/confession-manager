@@ -6,6 +6,8 @@ import App from "./App";
 
 const root = document.getElementById("root");
 
+//TODO: type check all request to server
+
 render(
   () => (
     <Router>

@@ -18,6 +18,7 @@ import {
 import initConfessionSpreadsheetMetadata from "methods/initConfessionSpreadsheetMetadata";
 import LoadingCircle from "ui-components/LoadingCircle";
 import { reconcile } from "solid-js/store";
+import localforage from "localforage";
 
 const selectElementsPayload: {
   title: string;
@@ -291,8 +292,8 @@ const SelectSheets: Component = () => {
   };
 
   /// TODO: OPTIMIZE THIS
-  const handleGoBack = () => {
-    localStorage.removeItem(LOCAL_KEY_CONFESSION_SPREADSHEET_ID);
+  const handleGoBack = async () => {
+    await localforage.removeItem(LOCAL_KEY_CONFESSION_SPREADSHEET_ID);
     setConfessionSpreadsheet(reconcile({}));
   };
 

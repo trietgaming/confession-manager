@@ -10,6 +10,12 @@ import {
 import SelectSpreadsheetComponent from "./SelectSpreadsheet";
 import initConfessionSpreadsheetMetadata from "methods/initConfessionSpreadsheetMetadata";
 import NoSpreadsheetLinked from "./NoSpreadsheetLinked";
+import axios from "axios";
+import localforage from "localforage";
+import {
+  LOCAL_KEY_CONFESSION_FORM_ID,
+  LOCAL_KEY_CONFESSION_SPREADSHEET_ID,
+} from "app-constants";
 
 const SelectSpreadsheet: Component = () => {
   const [isNoSpreadsheet, setNoSpreadSheet] = createSignal(false);
@@ -19,7 +25,9 @@ const SelectSpreadsheet: Component = () => {
   );
 
   onMount(async () => {
-    const cachedSpreadsheetId = localStorage.getItem("confessionSpreadsheetId");
+    const cachedSpreadsheetId: string | null = await localforage.getItem(
+      LOCAL_KEY_CONFESSION_SPREADSHEET_ID
+    );
 
     const fetchAndInitSpreadsheet = async (spreadsheetId: string) => {
       const result = (
@@ -36,10 +44,10 @@ const SelectSpreadsheet: Component = () => {
 
     /// REMOVE THIS AFTER DEBUG
 
-    // if (cachedSpreadsheetId !== null) {
-    //   await fetchAndInitSpreadsheet(cachedSpreadsheetId);
-    //   return;
-    // }
+    if (cachedSpreadsheetId !== null) {
+      await fetchAndInitSpreadsheet(cachedSpreadsheetId);
+      return;
+    }
     gapi.load("picker", async () => {
       const pickerCallback = async (res: google.picker.ResponseObject) => {
         setLoading(true);
@@ -49,26 +57,19 @@ const SelectSpreadsheet: Component = () => {
           /// @ts-ignore
           if (res.docs[0].serviceId === "form") {
             try {
-              const response = await fetch(
-                "https://forms.googleapis.com/v1/forms/" + res.docs[0].id,
-                {
-                  headers: {
-                    Authorization: `Bearer ${
-                      gapi.client.getToken().access_token
-                    }`,
-                    Accept: "application/json",
-                  },
-                }
-              );
+              const response = await gapi.client.forms.forms.get({
+                formId: res.docs[0].id,
+              });
               console.log(response);
-              const json: gapi.client.forms.Form = await response.json();
-              if (json.linkedSheetId) {
-                spreadsheetId = json.linkedSheetId;
+              const form: gapi.client.forms.Form = response.result;
+              if (form.linkedSheetId) {
+                spreadsheetId = form.linkedSheetId;
+                localforage.setItem(LOCAL_KEY_CONFESSION_FORM_ID, form.formId);
               } else {
                 /// The APIs are not possible to link form to a spreadsheet
                 batch(() => {
                   setNoSpreadSheet(true);
-                  setformObj(json);
+                  setformObj(form);
                 });
               }
             } catch (err) {
@@ -79,7 +80,10 @@ const SelectSpreadsheet: Component = () => {
           }
           if (spreadsheetId !== null) {
             await fetchAndInitSpreadsheet(spreadsheetId);
-            localStorage.setItem("confessionSpreadsheetId", res.docs[0].id);
+            await localforage.setItem(
+              LOCAL_KEY_CONFESSION_SPREADSHEET_ID,
+              spreadsheetId
+            );
           }
         }
         setLoading(false);

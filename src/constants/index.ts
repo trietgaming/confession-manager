@@ -27,7 +27,7 @@ export const MAX_CFS_PER_LOAD = 100;
 
 export const FETCH_TRIGGER_Y_OFFSET = 1500;
 
-export const LOCAL_KEY_CONFESSION_SPREADSHEET_ID = "confessionSpreadsheetId";
+export const LOCAL_KEY_CONFESSION_SPREADSHEET_ID = "confession_spreadsheet_id";
 
 export const IS_SHEETS_INITED_METADATA_KEY = "confession_manager_inited";
 
@@ -43,13 +43,23 @@ export const PENDING_CHANGES_CONFESSION_ARRAY_KEYS: (keyof PendingChanges)[] = [
 
 export const DISCOVERY_DOCS = [
   "https://sheets.googleapis.com/$discovery/rest?version=v4",
+  "https://forms.googleapis.com/$discovery/rest?version=v1",
 ];
 
-export const SCOPES =
-  "https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive.readonly";
+export const SCOPES = "https://www.googleapis.com/auth/drive";
 
-export const APP_SERVER_URL =
-  "https://confession-manager-server.trietgaming.repl.co";
+export const IS_DEV = import.meta.env.MODE === "development";
 
-export const BASE_URL =
-  import.meta.env.MODE === "development" ? "https://localhost:8080" : "";
+export const APP_SERVER_URL = IS_DEV
+  ? "https://localhost:3000"
+  : "https://confession-manager-server.trietgaming.repl.co";
+
+export const BASE_URL = IS_DEV
+  ? "https://localhost:8080"
+  : "https://unhealthy-monkey.surge.sh";
+
+export const LOCAL_KEY_NOTIFICATION_TOKEN = "notification_token";
+export const LOCAL_KEY_CONFESSION_FORM_ID = "confession_form_id";
+
+export const NOTIFICATION_TOPIC =
+  "projects/confession-manager/topics/confession-notification";

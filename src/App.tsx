@@ -1,23 +1,31 @@
 import { Component, Match, Switch, onMount } from "solid-js";
-import { loggedIn, setGapiLoaded, isGapiLoaded } from "./store";
+import {
+  loggedIn,
+  setGapiLoaded,
+  isGapiLoaded,
+  setServiceWorkerRegistered,
+  // setPushEnabled,
+} from "./store";
 import { Routes, Route } from "@solidjs/router";
 import Login from "./pages/Login";
 import Dashboard from "pages/Dashboard";
 import ChangesPanel from "components/ChangesPanel";
-import LoadingCircle from "ui-components/LoadingCircle";
-// import { initializeApp } from "firebase/app";
-// import {
-//   initializeAuth,
-//   browserPopupRedirectResolver,
-//   browserLocalPersistence,
-// } from "firebase/auth";
-import { APP_SERVER_URL, DISCOVERY_DOCS } from "app-constants";
+// import LoadingCircle from "ui-components/LoadingCircle";
+import { initializeApp } from "firebase/app";
+import { getMessaging, getToken, onMessage } from "firebase/messaging";
+import {
+  APP_SERVER_URL,
+  DISCOVERY_DOCS,
+  LOCAL_KEY_CONFESSION_FORM_ID,
+  LOCAL_KEY_NOTIFICATION_TOKEN,
+} from "app-constants";
 import axios from "axios";
 import CenteredLoadingCircle from "ui-components/CenteredLoadingCircle";
 import PopupCallback from "pages/PopupCallback";
 import createGoogleApi from "app-hooks/createGoogleApi";
 import setAccessToken from "methods/setAccessToken";
 import NavBar from "pages/NavBar";
+import localforage from "localforage";
 
 const App: Component = () => {
   let existed_access_token: string | null = null;
@@ -54,6 +62,72 @@ const App: Component = () => {
     } catch (err) {
       return console.error(err);
     }
+  });
+
+  onMount(async () => {
+    const app = initializeApp({
+      apiKey: "AIzaSyAnPO6_ZDiVdNOOYEZShljjd8cdqKyNlAc",
+      authDomain: "confession-manager.firebaseapp.com",
+      projectId: "confession-manager",
+      storageBucket: "confession-manager.appspot.com",
+      messagingSenderId: "1041449841105",
+      appId: "1:1041449841105:web:43b9b359bea7eb95afb0f0",
+      measurementId: "G-Z8MBF96X25",
+    });
+
+    const messaging = getMessaging(app);
+    if ("serviceWorker" in navigator) {
+      await navigator.serviceWorker.register("firebase-messaging-sw.js", {
+        type: "module",
+      });
+    } else {
+      return;
+    }
+
+    const serviceWorkerRegistration = await navigator.serviceWorker.ready;
+
+    const messagingToken = await getToken(messaging, {
+      vapidKey: import.meta.env.VITE_VAPID_PUBLIC_KEY,
+      serviceWorkerRegistration,
+    });
+    setServiceWorkerRegistered(true);
+
+    // TODO: Handle update and focus new confession when notification is pushed
+    onMessage(messaging, (payload) => {
+      console.log("MESSAGE: ", payload);
+    });
+
+    let localNotificationKey = await localforage.getItem(
+      LOCAL_KEY_NOTIFICATION_TOKEN
+    );
+
+    if (localNotificationKey !== messagingToken) {
+      const localNotificationFormId = await localforage.getItem(
+        LOCAL_KEY_CONFESSION_FORM_ID
+      );
+      if (!localNotificationFormId) {
+        return;
+      }
+      // TODO: handle send new token key to server
+    }
+
+    if (localNotificationKey === null) {
+      await localforage.setItem(LOCAL_KEY_NOTIFICATION_TOKEN, messagingToken);
+    }
+
+    // try {
+    //   const serviceWorkerRegistration = await navigator.serviceWorker.ready;
+    //   const subscription =
+    //     await serviceWorkerRegistration.pushManager.getSubscription();
+
+    //   if (!subscription) {
+    //     return;
+    //   }
+
+    //   setPushEnabled(true);
+    // } catch (err) {
+    //   console.warn("Error during getSubscription()", err);
+    // }
   });
 
   return (

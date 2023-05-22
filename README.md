@@ -7,15 +7,15 @@
 
 > Using Google Sheet API and Facebook API to easily manage confessions right on the browser
 
-Confession Manager is a web application that helps users to create and manage confession posts that are published on Facebook. The application uses the [Google Sheet API V4][gsheet-api-link] to manage all the confessions in specific sheets in a centralized spreadsheet. The application provides an easy-to-use interface that allows users to create, edit, and delete confession posts, as well as view all existing posts in a simple and organized format.
+[Confession Manager](unhealthy-monkey.surge.sh) is a web application that helps users to create and manage confession posts that are published on Facebook. The application uses the [Google Sheet API V4][gsheet-api-link] to manage all the confessions in specific sheets in a centralized spreadsheet. The application provides an easy-to-use interface that allows users to create, edit, and delete confession posts, as well as view all existing posts in a simple and organized format.
 
 ## Features 🚀
 
 - **Google Sheets Integration:** This application integrates with the Google Sheets API v4 to store and manage all confession posts in specific sheets such as "posted" sheet, "accepted" sheet, "declined" sheet and "pending" sheet. This ensures that all data is securely stored and easily to handle from anywhere.
 
-- **User Authentication:** The application requires users to sign in using their Google account. This provides an additional layer of security and ensures that only authorized users can access and modify the confession posts.
-
 - **Post Management:** The application allows users to create new confession posts, edit existing posts and delete posts that are no longer needed. Users can create a template for their posts and view all existing posts in a simple and organized format, making it easy to keep track of all posts.
+
+- **Notification for new confessions**: You will receive notifications on your device when a new confession is posted on your form, ensuring that you can stay updated and respond promptly to new submissions.
 
 - **Facebook Integration:** The application provides a seamless integration with Facebook, allowing users to easily publish new confession posts directly from the application without the need to switch between multiple applications or platforms.
 
@@ -50,6 +50,18 @@ If you have any questions or feedback about this application, please feel free t
 ## License 📜
 
 This application is licensed under the [MIT license][license-url]. You are free to use, modify, and distribute the source code as long as you include the license file with any distributed copies.
+
+## Support Us ❤️
+
+Our application is provided completely free of charge and does not generate any profit. To contribute to the maintenance of servers and the development of the application, you can support us financially through the following methods:
+
+- PayPal: [paypal.me/trietgaming](https://paypal.me/trietgaming)
+- Momo: [me.momo.vn/dQIMuOU6TyIQT5txiGf5](https://me.momo.vn/dQIMuOU6TyIQT5txiGf5)
+
+As a token of our gratitude, if you donate $10 or more, your name will be listed in the repository and the official application as a special supporter. Please leave your contact information when supporting us so that we can personally thank you and use it to acknowledge your support.
+
+Any support you provide is greatly appreciated and will help us continue improving the application for all users.
+
 
 <!--VARIABLES-->
 
