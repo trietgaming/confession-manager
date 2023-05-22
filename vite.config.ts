@@ -1,8 +1,10 @@
 import { defineConfig } from "vite";
 import solidPlugin from "vite-plugin-solid";
 import fs from "fs";
+import { VitePWA } from "vite-plugin-pwa";
 
 export default defineConfig({
+  base: "",
   esbuild: {
     legalComments: "none",
     sourcemap: false,
@@ -10,6 +12,7 @@ export default defineConfig({
     minifySyntax: true,
     minifyWhitespace: true,
     sourcesContent: false,
+    include: ["./firebase-messaging-sw.js"],
   },
   plugins: [solidPlugin()],
   server: {
@@ -23,6 +26,19 @@ export default defineConfig({
   build: {
     target: "esnext",
     minify: true,
+    rollupOptions: {
+      input: {
+        app: "/index.html",
+        "firebase-messaging-sw.js": "/firebase-messaging-sw.js",
+      },
+      output: {
+        entryFileNames: (assetInfo) => {
+          return assetInfo.name === "firebase-messaging-sw.js"
+            ? "[name]" // put service worker in root
+            : "assets/js/[name]-[hash].js"; // others in `assets/js/`
+        },
+      },
+    },
   },
   resolve: {
     alias: [

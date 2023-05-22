@@ -14,7 +14,8 @@
       "google.accounts",
       "gapi.client.sheets-v4",
       "google.picker",
-      "gapi.client.forms-v1"
+      "gapi.client.forms-v1",
+      "vite-plugin-pwa/client"
     ],
     "noEmit": true,
     "isolatedModules": true,

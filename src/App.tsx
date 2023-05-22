@@ -76,58 +76,54 @@ const App: Component = () => {
     });
 
     const messaging = getMessaging(app);
-    if ("serviceWorker" in navigator) {
-      await navigator.serviceWorker.register("firebase-messaging-sw.js", {
-        type: "module",
+
+    window.addEventListener("message", async () => {
+      const serviceWorkerRegistration = await navigator.serviceWorker.ready;
+
+      const messagingToken = await getToken(messaging, {
+        vapidKey: import.meta.env.VITE_VAPID_PUBLIC_KEY,
+        serviceWorkerRegistration,
       });
-    } else {
-      return;
-    }
+      setServiceWorkerRegistered(true);
 
-    const serviceWorkerRegistration = await navigator.serviceWorker.ready;
+      // TODO: Handle update and focus new confession when notification is pushed
+      onMessage(messaging, (payload) => {
+        console.log("MESSAGE: ", payload);
+      });
 
-    const messagingToken = await getToken(messaging, {
-      vapidKey: import.meta.env.VITE_VAPID_PUBLIC_KEY,
-      serviceWorkerRegistration,
-    });
-    setServiceWorkerRegistered(true);
-
-    // TODO: Handle update and focus new confession when notification is pushed
-    onMessage(messaging, (payload) => {
-      console.log("MESSAGE: ", payload);
-    });
-
-    let localNotificationKey = await localforage.getItem(
-      LOCAL_KEY_NOTIFICATION_TOKEN
-    );
-
-    if (localNotificationKey !== messagingToken) {
-      const localNotificationFormId = await localforage.getItem(
-        LOCAL_KEY_CONFESSION_FORM_ID
+      let localNotificationKey = await localforage.getItem(
+        LOCAL_KEY_NOTIFICATION_TOKEN
       );
-      if (!localNotificationFormId) {
-        return;
+
+      if (localNotificationKey !== messagingToken) {
+        await localforage.setItem(LOCAL_KEY_NOTIFICATION_TOKEN, messagingToken);
+        const localNotificationFormId = await localforage.getItem(
+          LOCAL_KEY_CONFESSION_FORM_ID
+        );
+        if (!localNotificationFormId) {
+          return;
+        }
+        // TODO: handle send new token key to server
       }
-      // TODO: handle send new token key to server
-    }
 
-    if (localNotificationKey === null) {
-      await localforage.setItem(LOCAL_KEY_NOTIFICATION_TOKEN, messagingToken);
-    }
+      if (localNotificationKey === null) {
+        await localforage.setItem(LOCAL_KEY_NOTIFICATION_TOKEN, messagingToken);
+      }
 
-    // try {
-    //   const serviceWorkerRegistration = await navigator.serviceWorker.ready;
-    //   const subscription =
-    //     await serviceWorkerRegistration.pushManager.getSubscription();
+      // try {
+      //   const serviceWorkerRegistration = await navigator.serviceWorker.ready;
+      //   const subscription =
+      //     await serviceWorkerRegistration.pushManager.getSubscription();
 
-    //   if (!subscription) {
-    //     return;
-    //   }
+      //   if (!subscription) {
+      //     return;
+      //   }
 
-    //   setPushEnabled(true);
-    // } catch (err) {
-    //   console.warn("Error during getSubscription()", err);
-    // }
+      //   setPushEnabled(true);
+      // } catch (err) {
+      //   console.warn("Error during getSubscription()", err);
+      // }
+    });
   });
 
   return (
