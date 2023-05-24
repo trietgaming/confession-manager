@@ -10,12 +10,12 @@ const NoSpreadsheetLinked: Component<{
       <div class="flex px-4 flex-col items-center justify-center">
         <h1 class="text-2xl mb-10 text-center">
           Biểu mẫu <i>{formObj.info?.documentTitle}</i> <br /> chưa liên kết với
-          bất kì trang tính nào.
+          bất kì bảng tính nào.
         </h1>
         <p>
-          Trước khi bắt đầu, bạn cần liên kết biểu mẫu này với một trang tính để
+          Trước khi bắt đầu, bạn cần liên kết biểu mẫu này với một bảng tính để
           ứng dụng có thể lưu trữ và quản lí các confession, hoặc bạn có thể
-          chọn một trang tính hay biểu mẫu khác.
+          chọn một bảng tính hay biểu mẫu khác.
         </p>
         <p>
           Để liên kết, nhấn vào nút liên kết ngay bên dưới, sau đó ấn vào nút

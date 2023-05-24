@@ -6,7 +6,8 @@ const initCache = () => {
   return {
     get: () => confessions,
     add: (val: Confession[]) => confessions = [...confessions, ...val],
-    set: (val: Confession[]) => confessions = [...val]
+    set: (val: Confession[]) => confessions = [...val],
+    // event: new Event
   }
 };
 

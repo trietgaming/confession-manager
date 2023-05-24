@@ -97,7 +97,7 @@ const SelectSpreadsheet: Component = () => {
           .setDeveloperKey(import.meta.env.VITE_GOOGLE_API_KEY)
           .setCallback(pickerCallback)
           .setTitle(
-            "Chọn trang tính hoặc biểu mẫu nhận câu trả lời Confession của bạn"
+            "Chọn bảng tính hoặc biểu mẫu nhận câu trả lời Confession của bạn"
           )
           .build()
       );

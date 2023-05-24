@@ -15,7 +15,7 @@ export default async function subscribeToNotification() {
   if (localFormId === null) {
     // TODO: render picker for user to choose and handle it (check if chosen form.linkedsheetId === currentSheetId)
     return alert(
-      "Vui lòng chọn một biểu mẫu confession thay vì trang tính để nhận thông báo!"
+      "Vui lòng chọn một biểu mẫu confession thay vì bảng tính để nhận thông báo!"
     );
   }
   // Check if a watch is existed

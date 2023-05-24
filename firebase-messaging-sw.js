@@ -38,29 +38,30 @@ onBackgroundMessage(messaging, async (payload) => {
       });
       const authData = await authResponse.json();
 
-      if (!authData.ok) return;
-
       const accessToken = authData.access_token;
 
-      const response = await fetch(
-        "https://forms.googleapis.com/v1/forms/" + payload.data.formId,
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            Accept: "application/json",
-          },
+      if (accessToken) {
+        const response = await fetch(
+          "https://forms.googleapis.com/v1/forms/" + payload.data.formId,
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+              Accept: "application/json",
+            },
+          }
+        );
+        const responseData = await response.json();
+        if (!responseData.error) {
+          confessionTitle = responseData.info.documentTitle;
+          localforage.setItem(
+            payload.data.formId + FORM_DOCUMENT_TITLE_LOCAL_KEY_PREFIX,
+            responseData.info.documentTitle
+          );
         }
-      );
-      const responseData = await response.json();
-      if (responseData.error) return;
-      confessionTitle = responseData.info.documentTitle;
-      localforage.setItem(
-        payload.data.formId + FORM_DOCUMENT_TITLE_LOCAL_KEY_PREFIX,
-        responseData.info.documentTitle
-      );
+      }
     }
 
-    notificationTitle = confessionTitle;
+    notificationTitle = confessionTitle || notificationTitle;
     notificationOptions = {
       body: "Có câu trả lời mới đến Confession của bạn",
       icon: "/assets/favicon.ico",

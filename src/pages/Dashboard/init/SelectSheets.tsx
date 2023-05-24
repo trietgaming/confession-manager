@@ -19,13 +19,15 @@ import initConfessionSpreadsheetMetadata from "methods/initConfessionSpreadsheet
 import LoadingCircle from "ui-components/LoadingCircle";
 import { reconcile } from "solid-js/store";
 import localforage from "localforage";
+import MainTitle from "ui-components/MainTitle";
+import Modal from "ui-components/Modal";
 
 const selectElementsPayload: {
   title: string;
   key: SheetTypeKeys;
 }[] = [
   {
-    title: "Chọn trang tính nhận phản hồi Confession",
+    title: "Chọn trang tính nhận phản hồi Confession (liên kết với biểu mẫu)",
     key: "pendingSheet",
   },
   {
@@ -299,6 +301,7 @@ const SelectSheets: Component = () => {
 
   return (
     <div>
+      <MainTitle>Định nghĩa các trang tính</MainTitle>
       <For each={selectElementsPayload}>
         {(payload) => (
           <div class="max-w-2xl mx-auto mt-10">
@@ -370,67 +373,25 @@ const SelectSheets: Component = () => {
           </div>
         </Button>
       </div>
-      <Show when={isCreateSheetModalOpen()}>
-        <Portal>
-          <div
-            class="relative z-10"
-            aria-labelledby="modal-title"
-            role="dialog"
-            aria-modal="true"
-          >
-            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
-
-            <div class="fixed inset-0 z-10 overflow-y-auto">
-              <div class="flex flex-col h-full justify-center p-4 text-center sm:items-center sm:p-0">
-                <div class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
-                  <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
-                    <div class="flex flex-col">
-                      <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
-                        <h3
-                          class="text-xl font-semibold leading-6 text-gray-900"
-                          id="modal-title"
-                        >
-                          Tạo trang tính mới
-                        </h3>
-                        <div class="mt-2">
-                          <label
-                            for="title-input"
-                            class="block mb-2 text-sm font-medium text-gray-900"
-                          >
-                            Tiêu đề trang tính
-                          </label>
-                          <input
-                            type="text"
-                            id="title-input"
-                            class="block w-full p-4 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 sm:text-md focus:ring-blue-500 focus:border-blue-500"
-                            ref={sheetTitleInputRef!}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
-                    <button
-                      type="button"
-                      class="inline-flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 sm:ml-3 sm:w-auto"
-                      onClick={handleCreateNewSheet}
-                    >
-                      Tạo
-                    </button>
-                    <button
-                      type="button"
-                      class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
-                      onClick={() => setCreateSheetModalOpen(false)}
-                    >
-                      Hủy
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </Portal>
-      </Show>
+      <Modal
+        title="Tạo trang tính mới"
+        isShow={!!isCreateSheetModalOpen()}
+        handleClose={() => setCreateSheetModalOpen(false)}
+        handleSubmit={handleCreateNewSheet}
+      >
+        <label
+          for="title-input"
+          class="block mb-2 text-sm font-medium text-gray-900"
+        >
+          Tiêu đề trang tính
+        </label>
+        <input
+          type="text"
+          id="title-input"
+          class="block w-full p-4 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 sm:text-md focus:ring-blue-500 focus:border-blue-500"
+          ref={sheetTitleInputRef!}
+        />
+      </Modal>
     </div>
   );
 };

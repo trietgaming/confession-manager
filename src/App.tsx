@@ -78,6 +78,11 @@ const App: Component = () => {
     const messaging = getMessaging(app);
 
     window.addEventListener("message", async () => {
+      if ("serviceWorker" in navigator) {
+        await navigator.serviceWorker.register("/firebase-messaging-sw.js", {
+          type: "module",
+        });
+      }
       const serviceWorkerRegistration = await navigator.serviceWorker.ready;
 
       const messagingToken = await getToken(messaging, {
@@ -88,6 +93,8 @@ const App: Component = () => {
 
       // TODO: Handle update and focus new confession when notification is pushed
       onMessage(messaging, (payload) => {
+        if (payload.data?.attributes) {
+        }
         console.log("MESSAGE: ", payload);
       });
 
@@ -109,31 +116,17 @@ const App: Component = () => {
       if (localNotificationKey === null) {
         await localforage.setItem(LOCAL_KEY_NOTIFICATION_TOKEN, messagingToken);
       }
-
-      // try {
-      //   const serviceWorkerRegistration = await navigator.serviceWorker.ready;
-      //   const subscription =
-      //     await serviceWorkerRegistration.pushManager.getSubscription();
-
-      //   if (!subscription) {
-      //     return;
-      //   }
-
-      //   setPushEnabled(true);
-      // } catch (err) {
-      //   console.warn("Error during getSubscription()", err);
-      // }
     });
   });
 
   return (
-    <Switch fallback={<CenteredLoadingCircle />}>
-      <Match when={isGapiLoaded()}>
-        <Routes>
-          <Route path={"/about"} element={<div>hello</div>} />
+    <Routes>
+      <Route path={"/callback"} element={<PopupCallback />} />
+      <Route path={"/about"} element={<div>hello</div>} />
+      <Switch fallback={<CenteredLoadingCircle />}>
+        <Match when={isGapiLoaded()}>
           <Switch>
             <Match when={!loggedIn()}>
-              <Route path={"/callback"} element={<PopupCallback />} />
               <Route path={"/*"} element={<Login />} />
             </Match>
             <Match when={loggedIn()}>
@@ -142,9 +135,9 @@ const App: Component = () => {
               <ChangesPanel />
             </Match>
           </Switch>
-        </Routes>
-      </Match>
-    </Switch>
+        </Match>
+      </Switch>
+    </Routes>
   );
 };
 
