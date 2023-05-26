@@ -1,4 +1,5 @@
 import { Component, createEffect, createSignal, JSX } from "solid-js";
+import { confessionMetadata, confessionSpreadsheet } from "store/index";
 import Modal from "ui-components/Modal";
 
 const FreshStartModal: Component<{
@@ -7,18 +8,42 @@ const FreshStartModal: Component<{
   handleClose?: () => any;
 }> = (props) => {
   const [sheetTitle, setSheetTitle] = createSignal("");
+  const [isLoading, setLoading] = createSignal(false);
 
   const handleChange: JSX.ChangeEventHandler<HTMLInputElement, Event> = (e) => {
     setSheetTitle(e.target.value);
   };
 
-  const handleSubmit = () => {};
+  const handleSubmit = async () => {
+    setLoading(true);
+    const archiveSheetTitle = sheetTitle();
+    const addSheetResult = (await gapi.client.sheets.spreadsheets.batchUpdate(
+      {
+        spreadsheetId: confessionSpreadsheet.spreadsheetId!,
+      },
+      {
+        requests: [
+          {
+            addSheet: {
+              properties: {
+                title: sheetTitle(),
+              },
+            },
+          },
+        ],
+      }
+    )).result;
+    confessionMetadata.pendingSheet;
+    setLoading(false);
+  };
 
   return (
     <Modal
       title={props.title}
       isShow={props.isShow}
       handleClose={props.handleClose}
+      handleSubmit={handleSubmit}
+      loading={isLoading()}
     >
       <label
         for="title-input"
