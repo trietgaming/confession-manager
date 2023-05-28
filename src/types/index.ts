@@ -11,6 +11,7 @@ export interface ConfessionSpreadsheetMetadata {
   declinedSheet?: gapi.client.sheets.Sheet;
   postedSheet?: gapi.client.sheets.Sheet;
   pendingSheet?: gapi.client.sheets.Sheet;
+  archivedSheet?: gapi.client.sheets.Sheet;
   inited?: boolean;
 }
 
@@ -38,3 +39,8 @@ export type HandleAction = (
   ref: HTMLLIElement
 ) => any;
 
+export type RGB = {
+  red: number,
+  green: number,
+  blue: number
+}

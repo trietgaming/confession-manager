@@ -6,7 +6,7 @@ import {
   setServiceWorkerRegistered,
   // setPushEnabled,
 } from "./store";
-import { Routes, Route } from "@solidjs/router";
+import { Routes, Route, Outlet } from "@solidjs/router";
 import Login from "./pages/Login";
 import Dashboard from "pages/Dashboard";
 import ChangesPanel from "components/ChangesPanel";
@@ -26,6 +26,14 @@ import createGoogleApi from "app-hooks/createGoogleApi";
 import setAccessToken from "methods/setAccessToken";
 import NavBar from "pages/NavBar";
 import localforage from "localforage";
+
+const NavBarWrapper: Component = () => {
+  return (
+    <div class="md:translate-y-10">
+      <Outlet />
+    </div>
+  );
+};
 
 const App: Component = () => {
   let existed_access_token: string | null = null;
@@ -79,9 +87,13 @@ const App: Component = () => {
 
     window.addEventListener("message", async () => {
       if ("serviceWorker" in navigator) {
-        await navigator.serviceWorker.register("/firebase-messaging-sw.js", {
-          type: "module",
-        });
+        try {
+          await navigator.serviceWorker.register("/firebase-messaging-sw.js", {
+            type: "module",
+          });
+        } catch (err) {
+          console.error(err);
+        }
       }
       const serviceWorkerRegistration = await navigator.serviceWorker.ready;
 
@@ -130,7 +142,9 @@ const App: Component = () => {
               <Route path={"/*"} element={<Login />} />
             </Match>
             <Match when={loggedIn()}>
-              <Route path={"/"} element={<Dashboard />} />
+              <Route path={"/*"} element={<NavBarWrapper />}>
+                <Route path={"/"} element={<Dashboard />} />
+              </Route>
               <NavBar />
               <ChangesPanel />
             </Match>

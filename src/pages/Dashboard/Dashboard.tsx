@@ -52,28 +52,29 @@ const Dashboard: Component = () => {
           range,
         });
         const values = response.result.values;
-        if (!values) return setEnd(true);
-
-        const nextConfessions: Confession[] = [];
-        for (let i = 0; i < MAX_CFS_PER_LOAD; ++i) {
-          const value = values[i];
-          if (!value || !value.length) continue;
-          nextConfessions.push({
-            data: value[1],
-            date: value[0],
-            row: i + currentFirstCfsRow,
+        if (!values) setEnd(true);
+        else {
+          const nextConfessions: Confession[] = [];
+          for (let i = 0; i < MAX_CFS_PER_LOAD; ++i) {
+            const value = values[i];
+            if (!value || !value.length) continue;
+            nextConfessions.push({
+              data: value[1],
+              date: value[0],
+              row: i + currentFirstCfsRow,
+            });
+          }
+          batch(() => {
+            setConfessions((confessions) => {
+              for (const nextConfession of nextConfessions) {
+                confessions.push(nextConfession);
+              }
+              return confessions;
+            });
+            setNextFirstCfsRow((last) => last + MAX_CFS_PER_LOAD);
           });
+          confessionCached.set(confessions());
         }
-        batch(() => {
-          setConfessions((confessions) => {
-            for (const nextConfession of nextConfessions) {
-              confessions.push(nextConfession);
-            }
-            return confessions;
-          });
-          setNextFirstCfsRow((last) => last + MAX_CFS_PER_LOAD);
-        });
-        confessionCached.set(confessions());
       } catch (err: any) {
         if (err?.result?.error.status === "INVALID_ARGUMENT") {
           setEnd(true);

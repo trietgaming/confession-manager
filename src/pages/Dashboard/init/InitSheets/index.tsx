@@ -22,7 +22,7 @@ const InitSheets: Component = () => {
     {
       title: "💻 Lọc có điều kiện",
       description:
-        "Tự động sao chép các câu trả lời confession trước đó sang các trang tính được định nghĩa, dựa trên các điều kiện bạn đưa ra như định dạng, màu nền,... của các ô trong trang tính chứa câu trả lời ban đầu.",
+        "Tự động sao chép các câu trả lời confession trước đó sang các trang tính được định nghĩa, dựa trên các điều kiện bạn đưa ra như định dạng, màu nền,... của các hàng trong trang tính chứa câu trả lời ban đầu.",
       modal: ConditionalFilteringModal,
     },
   ];

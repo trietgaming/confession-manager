@@ -36,6 +36,11 @@ export enum PENDING_CONFESSION_ACTION {
   DECLINE = "declines",
 }
 
+export enum SHEETS_INITED_TYPES {
+  FRESH = "fresh",
+  FILTERED = "filtered",
+}
+
 export const PENDING_CHANGES_CONFESSION_ARRAY_KEYS: (keyof PendingChanges)[] = [
   "accepts",
   "declines",

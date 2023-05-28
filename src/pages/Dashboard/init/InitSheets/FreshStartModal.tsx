@@ -1,3 +1,10 @@
+import {
+  CONFESSION_SHEET_TYPE_METADATA_KEY,
+  IS_SHEETS_INITED_METADATA_KEY,
+  SHEETS_INITED_TYPES,
+} from "app-constants";
+import refreshSpreadsheet from "methods/refreshSpreadsheet";
+import setConfessionInited from "methods/setConfessionInited";
 import { Component, createEffect, createSignal, JSX } from "solid-js";
 import { confessionMetadata, confessionSpreadsheet } from "store/index";
 import Modal from "ui-components/Modal";
@@ -16,24 +23,78 @@ const FreshStartModal: Component<{
 
   const handleSubmit = async () => {
     setLoading(true);
-    const archiveSheetTitle = sheetTitle();
-    const addSheetResult = (await gapi.client.sheets.spreadsheets.batchUpdate(
-      {
-        spreadsheetId: confessionSpreadsheet.spreadsheetId!,
-      },
-      {
-        requests: [
+    const archivedSheetTitle = sheetTitle();
+    try {
+      const duplicateSheetResult = (
+        await gapi.client.sheets.spreadsheets.batchUpdate(
           {
-            addSheet: {
-              properties: {
-                title: sheetTitle(),
+            spreadsheetId: confessionSpreadsheet.spreadsheetId!,
+          },
+          {
+            requests: [
+              {
+                duplicateSheet: {
+                  insertSheetIndex: confessionSpreadsheet.sheets?.length,
+                  newSheetName: archivedSheetTitle,
+                  sourceSheetId:
+                    confessionMetadata.pendingSheet!.properties!.sheetId!,
+                },
+              },
+            ],
+          }
+        )
+      ).result;
+
+      const archivedSheetId = (
+        duplicateSheetResult.replies as gapi.client.sheets.Response[]
+      )[0].duplicateSheet!.properties!.sheetId!;
+
+      console.log(duplicateSheetResult);
+      if (!duplicateSheetResult.replies) {
+        throw "unexpected";
+      }
+      await gapi.client.sheets.spreadsheets.batchUpdate(
+        {
+          spreadsheetId: confessionSpreadsheet.spreadsheetId!,
+        },
+        {
+          includeSpreadsheetInResponse: false,
+          requests: [
+            {
+              createDeveloperMetadata: {
+                developerMetadata: {
+                  location: {
+                    sheetId: archivedSheetId,
+                  },
+                  metadataKey: CONFESSION_SHEET_TYPE_METADATA_KEY,
+                  metadataValue: "archivedSheet",
+                  visibility: "PROJECT",
+                },
               },
             },
-          },
-        ],
-      }
-    )).result;
-    confessionMetadata.pendingSheet;
+            {
+              deleteDimension: {
+                range: {
+                  dimension: "ROWS",
+                  startIndex: 1,
+                  endIndex:
+                    confessionMetadata.pendingSheet?.properties?.gridProperties!
+                      .rowCount! - 1,
+                  sheetId:
+                    confessionMetadata.pendingSheet?.properties?.sheetId!,
+                },
+              },
+            },
+          ],
+        }
+      );
+
+      await refreshSpreadsheet(
+        await setConfessionInited(SHEETS_INITED_TYPES.FRESH)
+      );
+    } catch (err) {
+      console.error(err);
+    }
     setLoading(false);
   };
 
@@ -58,6 +119,10 @@ const FreshStartModal: Component<{
         value={sheetTitle()}
         onInput={handleChange}
       />
+      <p class="mt-2">
+        Vui lòng duyệt hoặc đăng bài các confession đã lưu trữ một cách thủ công
+        trước khi bắt đầu sử dụng ứng dụng.
+      </p>
     </Modal>
   );
 };

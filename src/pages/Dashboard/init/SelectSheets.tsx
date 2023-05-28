@@ -21,6 +21,7 @@ import { reconcile } from "solid-js/store";
 import localforage from "localforage";
 import MainTitle from "ui-components/MainTitle";
 import Modal from "ui-components/Modal";
+import refreshSpreadsheet from "methods/refreshSpreadsheet";
 
 const selectElementsPayload: {
   title: string;
@@ -51,7 +52,10 @@ const numberOfSelected = (selected: Record<any, any>) =>
     0
   );
 
-type SheetTypeKeys = keyof Omit<ConfessionSpreadsheetMetadata, "inited">;
+type SheetTypeKeys = keyof Omit<
+  ConfessionSpreadsheetMetadata,
+  "inited" | "archivedSheet"
+>;
 type SelectedObject = Record<SheetTypeKeys, number | null>;
 
 const initExistedMetadataSheets = (sheets: gapi.client.sheets.Sheet[]) => {
@@ -221,7 +225,7 @@ const SelectSheets: Component = () => {
               },
               metadataKey: CONFESSION_SHEET_TYPE_METADATA_KEY,
               metadataValue: sheetTypeValue,
-              visibility: "DOCUMENT",
+              visibility: "PROJECT",
             },
           },
         });
@@ -238,7 +242,7 @@ const SelectSheets: Component = () => {
                     sheetId,
                   },
 
-                  visibility: "DOCUMENT",
+                  visibility: "PROJECT",
                 },
               },
             ],
@@ -260,7 +264,7 @@ const SelectSheets: Component = () => {
                   sheetId,
                 },
                 metadataValue: sheetTypeValue,
-                visibility: "DOCUMENT",
+                visibility: "PROJECT",
               },
             },
           },
@@ -279,14 +283,7 @@ const SelectSheets: Component = () => {
         }
       );
       // );
-      setConfessionSpreadsheet(
-        (
-          await gapi.client.sheets.spreadsheets.get({
-            spreadsheetId: confessionSpreadsheet!.spreadsheetId!,
-          })
-        ).result
-      );
-      initConfessionSpreadsheetMetadata();
+      await refreshSpreadsheet();
     } catch (err) {
       console.error(err);
     }

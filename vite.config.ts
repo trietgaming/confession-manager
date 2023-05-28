@@ -1,7 +1,6 @@
 import { defineConfig } from "vite";
 import solidPlugin from "vite-plugin-solid";
 import fs from "fs";
-import { VitePWA } from "vite-plugin-pwa";
 
 export default defineConfig({
   base: "",

@@ -5,3 +5,5 @@ dist
 deploy.sh
 localhost.pem
 localhost-key.pem
+localhost.cer
+localhost-key.pkey
