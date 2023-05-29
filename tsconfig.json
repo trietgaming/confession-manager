@@ -28,7 +28,8 @@
       "methods/*": ["./src/methods/*"],
       "components/*": ["./src/components/*"],
       "types": ["./src/types/index.ts"],
-      "app-constants": ["./src/constants/index.ts"]
+      "app-constants": ["./src/constants/index.ts"],
+      "classes/*": ["./src/classes/*"]
     }
   }
 }

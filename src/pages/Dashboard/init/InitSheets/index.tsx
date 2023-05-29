@@ -1,16 +1,46 @@
-import { Component, For, createSignal, JSXElement, Show } from "solid-js";
+import {
+  Component,
+  For,
+  createSignal,
+  JSXElement,
+  Show,
+  createContext,
+  useContext,
+  onMount,
+} from "solid-js";
 import MainTitle from "ui-components/MainTitle";
 import FreshStartModal from "./FreshStartModal";
 import ConditionalFilteringModal from "./ConditionalFilteringModal";
-import { Portal } from "solid-js/web";
 import { createStore, produce } from "solid-js/store";
-import Modal from "ui-components/Modal";
+import { confessionMetadata, confessionSpreadsheet } from "store/index";
+import { RGB, TextFormat, ThemeMap } from "types";
+import rgbToHex from "methods/rgbToHex";
+import Color from "classes/Color";
+import hexToRgb from "methods/hexToRgb";
 
 type InitOptionsMetadatas = {
   title: string;
   description: string;
   modal: typeof FreshStartModal | typeof ConditionalFilteringModal;
 }[];
+
+function setFrom<T extends unknown[]>(
+  arr: T,
+  diff: (prev: (typeof arr)[number], cur: (typeof arr)[number]) => boolean
+) {
+  if (arr.length === 0) return [];
+  const result = [arr[0]] as T;
+  for (let i = 1, n = arr.length; i < n; ++i) {
+    const cur = arr[i];
+    const prev = arr[i - 1];
+    if (diff(prev, cur)) {
+      result.push(cur);
+    }
+  }
+  return result;
+}
+
+const SpreadsheetDataContext = createContext();
 
 const InitSheets: Component = () => {
   const initOptionsMetadatas: InitOptionsMetadatas = [
@@ -22,7 +52,7 @@ const InitSheets: Component = () => {
     {
       title: "💻 Lọc có điều kiện",
       description:
-        "Tự động sao chép các câu trả lời confession trước đó sang các trang tính được định nghĩa, dựa trên các điều kiện bạn đưa ra như định dạng, màu nền,... của các hàng trong trang tính chứa câu trả lời ban đầu.",
+        "Tự động sao chép các câu trả lời confession trước đó sang các trang tính được định nghĩa, dựa trên các điều kiện bạn đưa ra như kiểu chữ, màu chữ, màu nền của các ô trong các hàng thuộc trang tính chứa câu trả lời ban đầu.",
       modal: ConditionalFilteringModal,
     },
   ];
@@ -30,6 +60,10 @@ const InitSheets: Component = () => {
   const [modalShows, setModalShows] = createStore<boolean[]>(
     new Array(initOptionsMetadatas.length).fill(false)
   );
+
+  const [spreadsheetRowData, setSpreadsheetRowData] = createSignal<
+    gapi.client.sheets.RowData[] | null
+  >(null);
 
   const handleToggleModal = (index: number) => {
     setModalShows(
@@ -40,8 +74,148 @@ const InitSheets: Component = () => {
     // console.log(modalShows[index])
   };
 
+  // TODO: HEAVY TASKS, ALWAYS OPTIMIZE WHEN POSSIBLE!
+  onMount(async () => {
+    const getResult = (
+      await gapi.client.sheets.spreadsheets.getByDataFilter(
+        {
+          spreadsheetId: confessionSpreadsheet.spreadsheetId!,
+          fields:
+            "sheets/data/rowData/values(formattedValue,effectiveFormat(backgroundColorStyle,textFormat(bold,italic,underline,strikethrough,foregroundColorStyle)))",
+        },
+        {
+          includeGridData: true,
+          dataFilters: [
+            {
+              gridRange: {
+                startRowIndex: 1,
+                sheetId: confessionMetadata.pendingSheet?.properties?.sheetId,
+              },
+            },
+          ],
+        }
+      )
+    ).result;
+    const rowDatas = (
+      (getResult.sheets as gapi.client.sheets.Sheet[])[0]
+        .data as gapi.client.sheets.GridData[]
+    )[0].rowData as gapi.client.sheets.RowData[];
+
+    setSpreadsheetRowData(rowDatas);
+
+    // console.log(rowDatas);
+
+    // @ts-ignore
+    const themeMap: ThemeMap = {};
+    for (const colorPair of confessionSpreadsheet.properties!.spreadsheetTheme!
+      .themeColors!) {
+      themeMap[colorPair.colorType as string] = new Color(
+        colorPair.color!.rgbColor!
+      );
+    }
+
+    const backgroundColors: { color: Color; rowIndex: number }[] = [];
+    const foregroundColors: { color: Color; rowIndex: number }[] = [];
+    const textFormats: {
+      rowIndex: number;
+      format: { [K in TextFormat]: boolean };
+    }[] = [];
+
+    for (let i = 0, n = rowDatas.length; i < n; ++i) {
+      const row = rowDatas[i];
+      if (!row.values) continue;
+      for (const cell of row.values) {
+        if (!cell.formattedValue) continue;
+
+        const bgCellRGBColor = cell.effectiveFormat?.backgroundColorStyle
+          ?.rgbColor as gapi.client.sheets.Color;
+
+        const bgCellThemeColorType =
+          cell.effectiveFormat?.backgroundColorStyle?.themeColor;
+
+        const bgColor = bgCellThemeColorType
+          ? themeMap[bgCellThemeColorType]
+          : new Color(bgCellRGBColor);
+
+        backgroundColors.push({ color: bgColor, rowIndex: i });
+
+        const { foregroundColorStyle, ...textStyles } =
+          cell.effectiveFormat?.textFormat!;
+
+        const fgCellRGBColor = foregroundColorStyle!
+          .rgbColor as gapi.client.sheets.Color;
+
+        const fgCellThemeColorType = foregroundColorStyle!.themeColor;
+
+        const fgColor = fgCellThemeColorType
+          ? themeMap[fgCellThemeColorType]
+          : new Color(fgCellRGBColor);
+
+        foregroundColors.push({ color: fgColor, rowIndex: i });
+
+        for (const style of Object.values(textStyles)) {
+          if (style === true) {
+            // @ts-ignore
+            textFormats.push({ format: textStyles, rowIndex: i });
+            break;
+          }
+        }
+      }
+    }
+    const colorCmp = (
+      colorA: (typeof backgroundColors)[number],
+      colorB: (typeof backgroundColors)[number]
+    ) => {
+      if (colorA.color.hex < colorB.color.hex) return -1;
+      if (colorA.color.hex > colorB.color.hex) return 1;
+      return 0;
+    };
+    backgroundColors.sort(colorCmp);
+    foregroundColors.sort(colorCmp);
+    textFormats.sort((a, b) => {
+      if (a.format.bold === b.format.bold) {
+        if (a.format.italic === b.format.italic) {
+          if (a.format.strikethrough === b.format.strikethrough) {
+            if (a.format.underline === b.format.underline) return 0;
+            if (a.format.underline < b.format.underline) return -1;
+            return 1;
+          }
+          if (a.format.strikethrough < b.format.strikethrough) return -1;
+          return 1;
+        }
+        if (a.format.italic < b.format.italic) return -1;
+        return 1;
+      }
+      if (a.format.bold < b.format.bold) return -1;
+      return 1;
+    });
+
+    const backgroundColorSet = setFrom(
+        backgroundColors,
+        (prevColor, curColor) => prevColor.color.hex !== curColor.color.hex
+      ),
+      foregroundColorSet = setFrom(
+        foregroundColors,
+        (prevColor, curColor) => prevColor.color.hex !== curColor.color.hex
+      ),
+      textFormatSet: typeof textFormats = setFrom(
+        textFormats,
+        (prevFormat, curFormat) =>
+          prevFormat.format.bold !== curFormat.format.bold ||
+          prevFormat.format.italic !== curFormat.format.italic ||
+          prevFormat.format.strikethrough !== curFormat.format.strikethrough ||
+          prevFormat.format.underline !== curFormat.format.underline
+      );
+    if (!backgroundColors.length) return;
+
+    // console.log(backgroundColors);
+    console.log(backgroundColorSet);
+    console.log(foregroundColorSet);
+    console.log(textFormatSet);
+  });
+
   return (
-    <>
+    <SpreadsheetDataContext.Provider value={[spreadsheetRowData]}>
       <div class="text-center">
         <MainTitle>Cấu trúc hóa bảng tính</MainTitle>
         <p class="mx-4">
@@ -80,8 +254,9 @@ const InitSheets: Component = () => {
           chối"
         </p>
       </div>
-    </>
+    </SpreadsheetDataContext.Provider>
   );
 };
 
 export default InitSheets;
+export const useSpreadsheetData = () => useContext(SpreadsheetDataContext);

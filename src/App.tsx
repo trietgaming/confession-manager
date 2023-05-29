@@ -53,23 +53,32 @@ const App: Component = () => {
   };
 
   createGoogleApi(handleGapiLoaded);
-  onMount(async () => {
-    try {
-      const response = await axios.get(APP_SERVER_URL + "/auth", {
-        withCredentials: true,
-      });
+  onMount(() => {
+    const refreshAccessToken: () => any = async () => {
+      try {
+        const response = await axios.get(APP_SERVER_URL + "/auth", {
+          withCredentials: true,
+        });
 
-      /// TODO: check type of this
+        /// TODO: check type of this
 
-      const accessToken = response.data.access_token;
+        const accessToken = response.data.access_token;
 
-      if (response.data.ok) {
-        if (isGapiLoaded()) setAccessToken(accessToken);
-        else existed_access_token = accessToken;
+        if (response.data.ok) {
+          if (isGapiLoaded()) setAccessToken(accessToken);
+          else existed_access_token = accessToken;
+        }
+        return setTimeout(
+          refreshAccessToken,
+          // Refresh earlier than 30 second
+          (response.data.expires_in - 30) * 1000
+        );
+      } catch (err) {
+        return console.error(err);
       }
-    } catch (err) {
-      return console.error(err);
-    }
+    };
+
+    refreshAccessToken();
   });
 
   onMount(async () => {

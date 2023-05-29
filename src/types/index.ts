@@ -1,3 +1,4 @@
+import Color from "../classes/Color";
 import { PENDING_CONFESSION_ACTION } from "../constants";
 
 export interface Confession {
@@ -40,7 +41,22 @@ export type HandleAction = (
 ) => any;
 
 export type RGB = {
-  red: number,
-  green: number,
-  blue: number
+  red?: number;
+  green?: number;
+  blue?: number;
+} | gapi.client.sheets.Color;
+
+export interface ThemeMap {
+  TEXT: Color;
+  BACKGROUND: Color;
+  ACCENT1: Color;
+  ACCENT2: Color;
+  ACCENT3: Color;
+  ACCENT4: Color;
+  ACCENT5: Color;
+  ACCENT6: Color;
+  LINK: Color;
+  [key: string]: Color;
 }
+
+export type TextFormat = "bold" | "italic" | "underline" | "strikethrough";

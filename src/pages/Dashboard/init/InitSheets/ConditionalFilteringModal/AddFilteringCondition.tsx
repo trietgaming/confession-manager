@@ -2,11 +2,13 @@ import { Component, For, Show, createSignal } from "solid-js";
 import Button from "ui-components/Button";
 import DownArrowSvg from "ui-components/DownArrowSvg";
 import { FilteredSheetMetadata } from ".";
-import { RGB } from "types";
+import { RGB, TextFormat } from "types";
+import Color from "classes/Color";
 
 type Conditions = {
-  backgroundColor?: RGB;
-  textFormat?: "bold" | "italic" | "underlined";
+  backgroundColor?: Color;
+  textFormat?: TextFormat;
+  foregroundColor?: Color;
 };
 
 type ConditionMetadata = {
@@ -18,6 +20,10 @@ const conditionMetadatas: ConditionMetadata[] = [
   {
     key: "backgroundColor",
     title: "Màu nền",
+  },
+  {
+    key: "foregroundColor",
+    title: "Màu chữ",
   },
   {
     key: "textFormat",
@@ -40,9 +46,9 @@ const AddFilteringCondition: Component<{
   };
 
   return (
-    <div class="max-w-lg p-6 bg-white border border-gray-200 rounded-lg shadow md:mx-2 my-2">
+    <div class="w-full p-6 bg-white border border-gray-200 rounded-lg shadow my-2">
       <div class="flex justify-between">
-        <h5 class="my-auto text-sm">{props.metadata.title}</h5>
+        <h5 class="my-auto">{props.metadata.title}</h5>
         <div class="flex">
           <Button
             onClick={props.handleClose}
@@ -58,14 +64,14 @@ const AddFilteringCondition: Component<{
               Thêm điều kiện <DownArrowSvg />
             </Button>
             <Show when={isDropdownShow()}>
-              <div class="absolute z-10 bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
-                <ul class="py-2 text-sm text-gray-700 dark:text-gray-200">
+              <div class="absolute z-10 bg-white divide-y divide-gray-100 rounded-lg shadow w-44">
+                <ul class="py-2 text-sm text-gray-700">
                   <For each={conditionMetadatas}>
                     {(metadata) => (
                       <li>
                         <a
                           onClick={() => handleAddCondition(metadata)}
-                          class="hover:cursor-pointer block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                          class="hover:cursor-pointer block px-4 py-2 hover:bg-gray-100"
                         >
                           {metadata.title}
                         </a>

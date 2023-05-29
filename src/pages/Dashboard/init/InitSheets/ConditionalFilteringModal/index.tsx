@@ -1,4 +1,4 @@
-import { Component, For, Show, createMemo, createSignal } from "solid-js";
+import { Component, For, Show, createMemo, createSignal, createContext } from "solid-js";
 import { Portal } from "solid-js/web";
 import Button from "ui-components/Button";
 import Modal from "ui-components/Modal";
@@ -85,14 +85,14 @@ const ConditionalFilteringModal: Component<{
               </Button>
 
               <Show when={isAddFilteredSheetDropdownShow()}>
-                <div class="z-10 bg-white divide-y divide-gray-100 rounded-lg shadow w-60 dark:bg-gray-700 mb-2">
-                  <ul class="py-2 text-sm text-gray-700 dark:text-gray-200">
+                <div class="z-10 bg-white divide-y divide-gray-100 rounded-lg shadow w-60">
+                  <ul class="py-2 text-sm text-gray-700">
                     <For each={unselectedSheets()}>
                       {(metadata) => (
                         <li>
                           <a
                             onClick={() => handleSelectSheet(metadata)}
-                            class="hover:cursor-pointer block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                            class="hover:cursor-pointer block px-4 py-2 hover:bg-gray-100"
                           >
                             {metadata.title}
                           </a>
