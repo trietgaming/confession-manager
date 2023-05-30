@@ -48,6 +48,7 @@ const App: Component = () => {
       setGapiLoaded(true);
       if (existed_access_token !== null) {
         setAccessToken(existed_access_token);
+        existed_access_token = null;
       }
     });
   };
@@ -70,7 +71,7 @@ const App: Component = () => {
         }
         return setTimeout(
           refreshAccessToken,
-          // Refresh earlier than 30 second
+          // Refresh 30 second earlier 
           (response.data.expires_in - 30) * 1000
         );
       } catch (err) {

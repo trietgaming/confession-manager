@@ -1,7 +1,7 @@
 import { RGB } from "types";
 
 export default function hexToRgb(hex: string): RGB | null {
-  var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
   return result
     ? {
         red: Math.round(((parseInt(result[1], 16) / 255) * 1e8)) / 1e8,

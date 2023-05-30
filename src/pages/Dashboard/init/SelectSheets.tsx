@@ -8,7 +8,7 @@ import {
   createMemo,
 } from "solid-js";
 import { confessionSpreadsheet, setConfessionSpreadsheet } from "store/index";
-import { ConfessionSpreadsheetMetadata } from "types";
+import { ConfessionSpreadsheetMetadata, SelectedObject, SheetTypeKeys } from "types";
 import Button from "ui-components/Button";
 import { Portal } from "solid-js/web";
 import {
@@ -51,12 +51,6 @@ const numberOfSelected = (selected: Record<any, any>) =>
     (prev, cur) => (cur !== null ? prev + 1 : prev),
     0
   );
-
-type SheetTypeKeys = keyof Omit<
-  ConfessionSpreadsheetMetadata,
-  "inited" | "archivedSheet"
->;
-type SelectedObject = Record<SheetTypeKeys, number | null>;
 
 const initExistedMetadataSheets = (sheets: gapi.client.sheets.Sheet[]) => {
   const preProcessObject: Record<string, any> = {};

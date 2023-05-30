@@ -1,20 +1,8 @@
-import { Component, For, Show, createSignal } from "solid-js";
+import { Component, For, Show, createMemo, createSignal } from "solid-js";
 import Button from "ui-components/Button";
 import DownArrowSvg from "ui-components/DownArrowSvg";
-import { FilteredSheetMetadata } from ".";
-import { RGB, TextFormat } from "types";
-import Color from "classes/Color";
-
-type Conditions = {
-  backgroundColor?: Color;
-  textFormat?: TextFormat;
-  foregroundColor?: Color;
-};
-
-type ConditionMetadata = {
-  key: keyof Conditions;
-  title: string;
-};
+import { ConditionMetadata, FilteredSheetMetadata } from "types";
+import ConditionSelector from "./ConditionSelector";
 
 const conditionMetadatas: ConditionMetadata[] = [
   {
@@ -36,9 +24,19 @@ const AddFilteringCondition: Component<{
   handleClose: () => any;
 }> = (props) => {
   const [isDropdownShow, setDropdownShow] = createSignal(false);
+
   const [selectedConditions, setSelectedConditions] = createSignal<
     ConditionMetadata[]
   >([]);
+
+  const unselectedConditions = createMemo(() =>
+    conditionMetadatas.filter(
+      (metadata) =>
+        selectedConditions().findIndex(
+          (selected) => selected.key === metadata.key
+        ) === -1
+    )
+  );
 
   const handleAddCondition = (metadataObj: ConditionMetadata) => {
     setSelectedConditions((prev) => [...prev, metadataObj]);
@@ -46,7 +44,7 @@ const AddFilteringCondition: Component<{
   };
 
   return (
-    <div class="w-full p-6 bg-white border border-gray-200 rounded-lg shadow my-2">
+    <div class="w-full p-6 bg-white border border-gray-200 rounded-lg shadow mb-4">
       <div class="flex justify-between">
         <h5 class="my-auto">{props.metadata.title}</h5>
         <div class="flex">
@@ -66,7 +64,7 @@ const AddFilteringCondition: Component<{
             <Show when={isDropdownShow()}>
               <div class="absolute z-10 bg-white divide-y divide-gray-100 rounded-lg shadow w-44">
                 <ul class="py-2 text-sm text-gray-700">
-                  <For each={conditionMetadatas}>
+                  <For each={unselectedConditions()}>
                     {(metadata) => (
                       <li>
                         <a
@@ -86,13 +84,12 @@ const AddFilteringCondition: Component<{
       </div>
       <For each={selectedConditions()}>
         {(conditionMetadata) => {
-          switch (conditionMetadata.key) {
-            case "backgroundColor":
-              break;
-            case "textFormat":
-              break;
-          }
-          return <div class="mt-6">{conditionMetadata.title}</div>;
+          return (
+            <ConditionSelector
+              conditionMetadata={conditionMetadata}
+              sheetKey={props.metadata.key}
+            />
+          );
         }}
       </For>
     </div>

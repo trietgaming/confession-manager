@@ -7,22 +7,27 @@ import {
   createContext,
   useContext,
   onMount,
+  Accessor,
+  batch,
 } from "solid-js";
 import MainTitle from "ui-components/MainTitle";
 import FreshStartModal from "./FreshStartModal";
 import ConditionalFilteringModal from "./ConditionalFilteringModal";
-import { createStore, produce } from "solid-js/store";
+import { createMutable, createStore, produce } from "solid-js/store";
 import { confessionMetadata, confessionSpreadsheet } from "store/index";
-import { RGB, TextFormat, ThemeMap } from "types";
+import {
+  CellColor,
+  CellTextFormat,
+  ConfessionSpreadsheetGridData,
+  FilteredSheetMetadata,
+  InitOptionsMetadatas,
+  RGB,
+  TextFormat,
+  ThemeMap,
+} from "types";
 import rgbToHex from "methods/rgbToHex";
 import Color from "classes/Color";
 import hexToRgb from "methods/hexToRgb";
-
-type InitOptionsMetadatas = {
-  title: string;
-  description: string;
-  modal: typeof FreshStartModal | typeof ConditionalFilteringModal;
-}[];
 
 function setFrom<T extends unknown[]>(
   arr: T,
@@ -40,7 +45,9 @@ function setFrom<T extends unknown[]>(
   return result;
 }
 
-const SpreadsheetDataContext = createContext();
+const SpreadsheetDataContext = createContext<
+  ConfessionSpreadsheetGridData | { [key: string]: any }
+>({});
 
 const InitSheets: Component = () => {
   const initOptionsMetadatas: InitOptionsMetadatas = [
@@ -61,9 +68,9 @@ const InitSheets: Component = () => {
     new Array(initOptionsMetadatas.length).fill(false)
   );
 
-  const [spreadsheetRowData, setSpreadsheetRowData] = createSignal<
-    gapi.client.sheets.RowData[] | null
-  >(null);
+  const spreadsheetGridData = createMutable<
+    ConfessionSpreadsheetGridData | { [key: string]: any }
+  >({});
 
   const handleToggleModal = (index: number) => {
     setModalShows(
@@ -101,8 +108,6 @@ const InitSheets: Component = () => {
         .data as gapi.client.sheets.GridData[]
     )[0].rowData as gapi.client.sheets.RowData[];
 
-    setSpreadsheetRowData(rowDatas);
-
     // console.log(rowDatas);
 
     // @ts-ignore
@@ -114,12 +119,9 @@ const InitSheets: Component = () => {
       );
     }
 
-    const backgroundColors: { color: Color; rowIndex: number }[] = [];
-    const foregroundColors: { color: Color; rowIndex: number }[] = [];
-    const textFormats: {
-      rowIndex: number;
-      format: { [K in TextFormat]: boolean };
-    }[] = [];
+    const backgroundColors: CellColor[] = [];
+    const foregroundColors: CellColor[] = [];
+    const textFormats: CellTextFormat[] = [];
 
     for (let i = 0, n = rowDatas.length; i < n; ++i) {
       const row = rowDatas[i];
@@ -206,16 +208,37 @@ const InitSheets: Component = () => {
           prevFormat.format.strikethrough !== curFormat.format.strikethrough ||
           prevFormat.format.underline !== curFormat.format.underline
       );
-    if (!backgroundColors.length) return;
-
     // console.log(backgroundColors);
     console.log(backgroundColorSet);
     console.log(foregroundColorSet);
     console.log(textFormatSet);
+
+    batch(() => {
+      const gridData = spreadsheetGridData as ConfessionSpreadsheetGridData;
+      gridData.rowData = rowDatas;
+      gridData.backgroundColor = backgroundColorSet;
+      gridData.foregroundColor = foregroundColorSet;
+      gridData.textFormat = textFormatSet;
+      /// @ts-ignore
+      gridData.selected = {};
+      (
+        [
+          "acceptedSheet",
+          "declinedSheet",
+          "postedSheet",
+        ] as FilteredSheetMetadata["key"][]
+      ).forEach((key) => {
+        gridData.selected[key] = {
+          backgroundColor: [],
+          foregroundColor: [],
+          textFormat: [],
+        };
+      });
+    });
   });
 
   return (
-    <SpreadsheetDataContext.Provider value={[spreadsheetRowData]}>
+    <SpreadsheetDataContext.Provider value={spreadsheetGridData}>
       <div class="text-center">
         <MainTitle>Cấu trúc hóa bảng tính</MainTitle>
         <p class="mx-4">

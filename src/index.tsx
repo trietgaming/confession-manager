@@ -6,8 +6,9 @@ import App from "./App";
 
 const root = document.getElementById("root");
 
-//TODO: Clear out the flow of service worker (register issue - checkout index.html)
+// T//O//D//O: Clear out the flow of service worker (register issue - checkout index.html)
 //TODO: type check all request to server
+//TODO: Make all tailwind classes static (declare a class constant)
 
 render(
   () => (
