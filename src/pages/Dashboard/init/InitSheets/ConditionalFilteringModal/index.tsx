@@ -4,13 +4,10 @@ import {
   Show,
   createMemo,
   createSignal,
-  createContext,
-  createEffect,
 } from "solid-js";
-import { Portal } from "solid-js/web";
 import Button from "ui-components/Button";
 import Modal from "ui-components/Modal";
-import { ConfessionSpreadsheetMetadata, FilteredSheetMetadata } from "types";
+import { FilteredSheetMetadata } from "types";
 import DownArrowSvg from "ui-components/DownArrowSvg";
 import AddFilteringCondition from "./AddFilteringCondition";
 import { useSpreadsheetData } from "..";
@@ -66,11 +63,17 @@ const ConditionalFilteringModal: Component<{
     confessionSpreadsheetGridData
   );
 
+  // TODO: handle submit
+  const handleSubmit = () => {
+    console.log(confessionSpreadsheetGridData);
+  }
+
   return (
     <Modal
       title={props.title}
       isShow={props.isShow}
       handleClose={props.handleClose}
+      handleSubmit={handleSubmit}
     >
       <Show
         when={!isDataEmpty()}
