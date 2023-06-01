@@ -28,6 +28,7 @@ import {
 import rgbToHex from "methods/rgbToHex";
 import Color from "classes/Color";
 import hexToRgb from "methods/hexToRgb";
+import getColorFromCell from "methods/getColorFromCell";
 
 function setFrom<T extends unknown[]>(
   arr: T,
@@ -95,7 +96,7 @@ const InitSheets: Component = () => {
           dataFilters: [
             {
               gridRange: {
-                startRowIndex: 1,
+                startRowIndex: 0,
                 sheetId: confessionMetadata.pendingSheet?.properties?.sheetId,
               },
             },
@@ -123,37 +124,27 @@ const InitSheets: Component = () => {
     const foregroundColors: CellColor[] = [];
     const textFormats: CellTextFormat[] = [];
 
-    for (let i = 0, n = rowDatas.length; i < n; ++i) {
+    for (let i = 1, n = rowDatas.length; i < n; ++i) {
       const row = rowDatas[i];
       if (!row.values) continue;
       for (const cell of row.values) {
         if (!cell.formattedValue) continue;
 
-        const bgCellRGBColor = cell.effectiveFormat?.backgroundColorStyle
-          ?.rgbColor as gapi.client.sheets.Color;
-
-        const bgCellThemeColorType =
-          cell.effectiveFormat?.backgroundColorStyle?.themeColor;
-
-        const bgColor = bgCellThemeColorType
-          ? themeMap[bgCellThemeColorType]
-          : new Color(bgCellRGBColor);
-
-        backgroundColors.push({ color: bgColor, rowIndex: i });
+        backgroundColors.push({
+          color: getColorFromCell(
+            cell.effectiveFormat!.backgroundColorStyle!,
+            themeMap
+          ),
+          rowIndex: i,
+        });
 
         const { foregroundColorStyle, ...textStyles } =
           cell.effectiveFormat?.textFormat!;
 
-        const fgCellRGBColor = foregroundColorStyle!
-          .rgbColor as gapi.client.sheets.Color;
-
-        const fgCellThemeColorType = foregroundColorStyle!.themeColor;
-
-        const fgColor = fgCellThemeColorType
-          ? themeMap[fgCellThemeColorType]
-          : new Color(fgCellRGBColor);
-
-        foregroundColors.push({ color: fgColor, rowIndex: i });
+        foregroundColors.push({
+          color: getColorFromCell(foregroundColorStyle!, themeMap),
+          rowIndex: i,
+        });
 
         for (const style of Object.values(textStyles)) {
           if (style === true) {
@@ -209,9 +200,9 @@ const InitSheets: Component = () => {
           prevFormat.format.underline !== curFormat.format.underline
       );
     // console.log(backgroundColors);
-    console.log(backgroundColorSet);
-    console.log(foregroundColorSet);
-    console.log(textFormatSet);
+    // console.log(backgroundColorSet);
+    // console.log(foregroundColorSet);
+    // console.log(textFormatSet);
 
     batch(() => {
       const gridData = spreadsheetGridData as ConfessionSpreadsheetGridData;
@@ -234,6 +225,7 @@ const InitSheets: Component = () => {
           textFormat: [],
         };
       });
+      gridData.themeMap = themeMap;
     });
   });
 

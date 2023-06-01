@@ -1,6 +1,7 @@
 import { ParentComponent, Show } from "solid-js";
 import { Portal } from "solid-js/web";
 import Button from "./Button";
+import { twMerge } from "tailwind-merge";
 
 const Modal: ParentComponent<{
   title: string;
@@ -13,7 +14,7 @@ const Modal: ParentComponent<{
     <Show when={props.isShow}>
       <Portal>
         <div
-          class="relative z-10 overflow-hidden block"
+          class={"relative z-10 overflow-hidden block"}
           aria-labelledby="modal-title"
           role="dialog"
           aria-modal="true"

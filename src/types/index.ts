@@ -65,11 +65,15 @@ export interface ThemeMap {
 
 export type TextFormat = "bold" | "italic" | "underline" | "strikethrough";
 
-export type Conditions = {
+export type TextFormatObject = {
+  [key in TextFormat]: boolean;
+};
+
+export interface Conditions {
   backgroundColor?: Color;
   textFormat?: TextFormat;
   foregroundColor?: Color;
-};
+}
 
 export type ConditionMetadata = {
   key: keyof Conditions;
@@ -99,6 +103,7 @@ export type ConfessionSpreadsheetGridData = {
       textFormat: CellTextFormat[];
     };
   };
+  themeMap: ThemeMap;
 };
 
 export type FilteredSheetMetadata = {
@@ -114,3 +119,7 @@ export type SheetTypeKeys = keyof Omit<
   "inited" | "archivedSheet"
 >;
 export type SelectedObject = Record<SheetTypeKeys, number | null>;
+
+export type PreviewSheetKeys =
+  | keyof ConfessionSpreadsheetGridData["selected"]
+  | "pendingSheet";

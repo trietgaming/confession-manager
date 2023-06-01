@@ -59,7 +59,7 @@ const TextStyleElement: Component<{
   return (
     <div
       onClick={props.onClick}
-      class="cursor-pointer block rounded w-7 h-7 mx-1 border-2 border-solid border-black transition-all hover:bg-slate-300 text-center my-auto"
+      class="cursor-pointer block rounded w-7 h-7 mx-1 border-2 border-solid border-slate-500 transition-all hover:bg-slate-300 text-center my-auto"
     >
       {Style}
     </div>
@@ -71,7 +71,7 @@ const ColorElement: Component<{ color: Color; onClick?: () => any }> = (
 ) => {
   return (
     <div
-      class={`cursor-pointer block rounded w-6 h-6 mx-1 border-gray-500 border-solid border-2 transition-all hover:-translate-y-0.5`}
+      class={`cursor-pointer block rounded w-6 h-6 mx-1 border-slate-500 border-solid border-2 transition-all hover:-translate-y-0.5`}
       style={{ "background-color": props.color.hex }}
       onClick={props.onClick}
     ></div>
