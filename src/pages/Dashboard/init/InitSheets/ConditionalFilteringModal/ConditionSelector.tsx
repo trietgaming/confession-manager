@@ -19,11 +19,11 @@ const BoldSvg: Component = () => (
   </svg>
 );
 
-const BaseTextStyleElements: { [key in TextFormat]: JSX.Element } = {
-  bold: <b class="text-l">B</b>,
-  italic: <i class="text-l font-serif">I</i>,
-  underline: <p class="underline text-l">U</p>,
-  strikethrough: <p class="line-through text-l">S</p>,
+const BaseTextStyleComponents: { [key in TextFormat]: Component } = {
+  bold: () => <b class="text-l">B</b>,
+  italic: () => <i class="text-l font-serif">I</i>,
+  underline: () => <p class="underline text-l">U</p>,
+  strikethrough: () => <p class="line-through text-l">S</p>,
 };
 
 const TextStyleElement: Component<{
@@ -37,7 +37,7 @@ const TextStyleElement: Component<{
   ) as TextFormat[];
   const onlyOne = trueKeys.length === 1;
 
-  if (onlyOne) Style = BaseTextStyleElements[trueKeys[0]];
+  if (onlyOne) Style = BaseTextStyleComponents[trueKeys[0]]({});
   else {
     Style = (
       <div

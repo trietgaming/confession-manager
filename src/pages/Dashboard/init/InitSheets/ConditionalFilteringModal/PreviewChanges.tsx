@@ -29,10 +29,15 @@ const ColumnIndexes: Component<{
 
   const ths = [];
   // TODO: This runs too slow, optimze when possible!
-  for (let i = 0; i < numCol!; ++i) {
+  for (let i = 1; i <= numCol!; ++i) {
     ths.push(<th class="border">{columnToLetter(i)}</th>);
   }
-  return <tr>{ths}</tr>;
+  return (
+    <tr>
+      <th class="border" />
+      {ths}
+    </tr>
+  );
 };
 
 const PreviewChanges: Component<{
@@ -70,10 +75,10 @@ const PreviewChanges: Component<{
                       >
                         Xem trước các thay đổi
                       </h3>
-                      <div class="my-4 overflow-y-auto overflow-x-scroll max-h-[81vh] max-w-full">
+                      <div class="my-4 overflow-y-auto max-h-[81vh] max-w-full">
                         {/* table goes here */}
 
-                        <table class="w-full border border-collapse h-full">
+                        <table class="border border-collapse h-full">
                           {
                             <ColumnIndexes
                               sheetKey={currentSheetKey() as PreviewSheetKeys}
@@ -88,12 +93,27 @@ const PreviewChanges: Component<{
                             }
                           >
                             {(values, index) => {
+                              const ValuesElements = values.map((value) => {
+                                return (
+                                  <td class="border min-w-[2em]">{value}</td>
+                                );
+                              });
+                              for (
+                                let i = 0,
+                                  n =
+                                    confessionMetadata[
+                                      currentSheetKey() as PreviewSheetKeys
+                                    ]?.properties?.gridProperties
+                                      ?.columnCount! - values.length;
+                                i < n;
+                                ++i
+                              ) {
+                                ValuesElements.push(<td class="border" />);
+                              }
                               return (
                                 <tr class="">
-                                  <td class="border">{index()}</td>
-                                  {values.map((value) => {
-                                    return <td class="border">{value}</td>;
-                                  })}
+                                  <td class="border min-w-[2em]">{index()}</td>
+                                  {ValuesElements}
                                 </tr>
                               );
                             }}
