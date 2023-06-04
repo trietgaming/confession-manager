@@ -154,6 +154,7 @@ const ConditionalFilteringModal: Component<{
     }
 
     console.log(styleMap);
+    console.log(gridData.rowData[1]);
 
     for (let i = 1, n = gridData.rowData.length; i < n; ++i) {
       const rowData = gridData.rowData[i];

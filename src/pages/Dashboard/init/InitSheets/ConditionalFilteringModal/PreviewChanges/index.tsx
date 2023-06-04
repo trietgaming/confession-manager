@@ -6,14 +6,11 @@ import {
   createEffect,
   createMemo,
   createSignal,
+  onMount,
 } from "solid-js";
 import { createMutable } from "solid-js/store";
 import { Portal } from "solid-js/web";
-import {
-  confessionMetadata,
-  confessionSpreadsheet,
-  setConfessionMetadata,
-} from "store/index";
+import { confessionMetadata, confessionSpreadsheet } from "store/index";
 import { twMerge } from "tailwind-merge";
 import {
   ConfessionSpreadsheetGridData,
@@ -21,91 +18,10 @@ import {
   PreviewSheetKeys,
 } from "types";
 import Button from "ui-components/Button";
-import Modal from "ui-components/Modal";
+import TableComponent from "./TableComponent";
 
-const baseRowClass = "border min-w-[2em] whitespace-nowrap";
-
-const TableCell: ParentComponent<{
-  header?: boolean;
-}> = (props) => {
-  return props.header ? (
-    <th class={baseRowClass}>{props.children}</th>
-  ) : (
-    <td class={baseRowClass}>{props.children}</td>
-  );
-};
-
-function columnToLetter(column: number) {
-  let temp,
-    letter = "";
-  while (column > 0) {
-    temp = (column - 1) % 26;
-    letter = String.fromCharCode(temp + 65) + letter;
-    column = (column - temp - 1) / 26;
-  }
-  return letter;
-}
-
-const ColumnIndexes: Component<{
-  sheetKey: PreviewSheetKeys;
-}> = (props) => {
-  const numCol = createMemo(
-    () =>
-      confessionMetadata[props.sheetKey]?.properties?.gridProperties
-        ?.columnCount
-  );
-
-  // TODO: This runs too slow, optimze when possible!
-  const ths = createMemo(() => {
-    const res = [];
-    for (let i = 1; i <= numCol()!; ++i) {
-      res.push(<TableCell header>{columnToLetter(i)}</TableCell>);
-    }
-    return res;
-  });
-
-  return (
-    <tr>
-      <TableCell header />
-      {ths()}
-    </tr>
-  );
-};
-
-const TableElement: Component<{
-  sheetValues: { [key in PreviewSheetKeys]: string[][] } | null;
-  sheetKey: PreviewSheetKeys;
-}> = (props) => {
-  return (
-    <table class="border border-collapse h-full">
-      {<ColumnIndexes sheetKey={props.sheetKey} />}
-
-      <For each={props.sheetValues ? props.sheetValues[props.sheetKey] : []}>
-        {(values, index) => {
-          const ValuesElements = values.map((value) => {
-            return <TableCell>{value}</TableCell>;
-          });
-          for (
-            let i = 0,
-              n =
-                confessionMetadata[props.sheetKey]?.properties?.gridProperties
-                  ?.columnCount! - values.length;
-            i < n;
-            ++i
-          ) {
-            ValuesElements.push(<TableCell />);
-          }
-          return (
-            <tr class="">
-              <TableCell>{index()}</TableCell>
-              {ValuesElements}
-            </tr>
-          );
-        }}
-      </For>
-    </table>
-  );
-};
+export const MAX_CELL_HEIGHT = 20;
+export const MAX_CELL_WIDTH = 200;
 
 const PreviewChanges: Component<{
   show: boolean;
@@ -119,6 +35,19 @@ const PreviewChanges: Component<{
     "postedSheet",
   ];
   const [currentSheetKey, setcurrentSheetKey] = createSignal(sheetKeys[0]);
+  const [tableScrollY, setTableScrollY] = createSignal(0);
+  const [tableScrollX, setTableScrollX] = createSignal(0);
+  let tableContainer: HTMLDivElement | undefined;
+
+  createEffect(() => {
+    if (!props.sheetValues || !tableContainer) return;
+    const listener = () => {
+      setTableScrollY(tableContainer!.scrollTop),
+        setTableScrollX(tableContainer!.scrollLeft);
+    };
+    tableContainer.addEventListener("scroll", listener);
+    return () => tableContainer!.removeEventListener("scroll", listener);
+  });
 
   return (
     <Show when={props.show}>
@@ -142,18 +71,47 @@ const PreviewChanges: Component<{
                       >
                         Xem trước các thay đổi
                       </h3>
-                      <div class="my-4 overflow-y-auto max-h-[81vh] max-w-full">
-                        {sheetKeys.map((sheetKey) => (
-                          <Show when={currentSheetKey() === sheetKey}>
-                            <TableElement
-                              sheetKey={sheetKey}
-                              sheetValues={props.sheetValues}
-                            />
-                          </Show>
-                        ))}
+                      <div
+                        class="my-4 overflow-auto max-h-[81vh] max-w-full whitespace-nowrap"
+                        ref={tableContainer}
+                      >
+                        <div
+                          style={{
+                            height: props.sheetValues
+                              ? `${
+                                  MAX_CELL_HEIGHT *
+                                    props.sheetValues[currentSheetKey()]
+                                      .length +
+                                  50
+                                }px`
+                              : "auto",
+                            width: props.sheetValues
+                              ? `${
+                                  MAX_CELL_WIDTH *
+                                    (confessionMetadata[currentSheetKey()]
+                                      ?.properties?.gridProperties
+                                      ?.columnCount || 0) +
+                                  50
+                                }px`
+                              : "auto",
+                          }}
+                          class="overflow-auto relative"
+                        >
+                          {sheetKeys.map((sheetKey) => (
+                            <Show when={currentSheetKey() === sheetKey}>
+                              <TableComponent
+                                sheetKey={sheetKey}
+                                sheetValues={props.sheetValues}
+                                scrollY={tableScrollY()}
+                                scrollX={tableScrollX()}
+                                outerContainer={tableContainer!}
+                              />
+                            </Show>
+                          ))}
+                        </div>
                       </div>
                     </div>
-                    <div class="bg-gray-50 px-4 py-3 sm:flex w-full justify-between">
+                    <div class="bg-gray-50 px-4 py-3 sm:flex w-full justify-between absolute bottom-0">
                       <div>
                         {sheetKeys.map((sheetKey) => {
                           return (
