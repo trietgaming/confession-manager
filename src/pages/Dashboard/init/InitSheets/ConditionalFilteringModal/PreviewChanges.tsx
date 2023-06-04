@@ -1,6 +1,19 @@
-import { Component, For, Show, createSignal } from "solid-js";
+import {
+  Component,
+  For,
+  ParentComponent,
+  Show,
+  createEffect,
+  createMemo,
+  createSignal,
+} from "solid-js";
+import { createMutable } from "solid-js/store";
 import { Portal } from "solid-js/web";
-import { confessionMetadata, confessionSpreadsheet } from "store/index";
+import {
+  confessionMetadata,
+  confessionSpreadsheet,
+  setConfessionMetadata,
+} from "store/index";
 import { twMerge } from "tailwind-merge";
 import {
   ConfessionSpreadsheetGridData,
@@ -9,6 +22,18 @@ import {
 } from "types";
 import Button from "ui-components/Button";
 import Modal from "ui-components/Modal";
+
+const baseRowClass = "border min-w-[2em] whitespace-nowrap";
+
+const TableCell: ParentComponent<{
+  header?: boolean;
+}> = (props) => {
+  return props.header ? (
+    <th class={baseRowClass}>{props.children}</th>
+  ) : (
+    <td class={baseRowClass}>{props.children}</td>
+  );
+};
 
 function columnToLetter(column: number) {
   let temp,
@@ -24,19 +49,61 @@ function columnToLetter(column: number) {
 const ColumnIndexes: Component<{
   sheetKey: PreviewSheetKeys;
 }> = (props) => {
-  const numCol =
-    confessionMetadata[props.sheetKey]?.properties?.gridProperties?.columnCount;
+  const numCol = createMemo(
+    () =>
+      confessionMetadata[props.sheetKey]?.properties?.gridProperties
+        ?.columnCount
+  );
 
-  const ths = [];
   // TODO: This runs too slow, optimze when possible!
-  for (let i = 1; i <= numCol!; ++i) {
-    ths.push(<th class="border">{columnToLetter(i)}</th>);
-  }
+  const ths = createMemo(() => {
+    const res = [];
+    for (let i = 1; i <= numCol()!; ++i) {
+      res.push(<TableCell header>{columnToLetter(i)}</TableCell>);
+    }
+    return res;
+  });
+
   return (
     <tr>
-      <th class="border" />
-      {ths}
+      <TableCell header />
+      {ths()}
     </tr>
+  );
+};
+
+const TableElement: Component<{
+  sheetValues: { [key in PreviewSheetKeys]: string[][] } | null;
+  sheetKey: PreviewSheetKeys;
+}> = (props) => {
+  return (
+    <table class="border border-collapse h-full">
+      {<ColumnIndexes sheetKey={props.sheetKey} />}
+
+      <For each={props.sheetValues ? props.sheetValues[props.sheetKey] : []}>
+        {(values, index) => {
+          const ValuesElements = values.map((value) => {
+            return <TableCell>{value}</TableCell>;
+          });
+          for (
+            let i = 0,
+              n =
+                confessionMetadata[props.sheetKey]?.properties?.gridProperties
+                  ?.columnCount! - values.length;
+            i < n;
+            ++i
+          ) {
+            ValuesElements.push(<TableCell />);
+          }
+          return (
+            <tr class="">
+              <TableCell>{index()}</TableCell>
+              {ValuesElements}
+            </tr>
+          );
+        }}
+      </For>
+    </table>
   );
 };
 
@@ -45,14 +112,14 @@ const PreviewChanges: Component<{
   handleClose: () => any;
   sheetValues: { [key in PreviewSheetKeys]: string[][] } | null;
 }> = (props) => {
-  const sheetKeys = [
+  const sheetKeys: PreviewSheetKeys[] = [
     "pendingSheet",
     "acceptedSheet",
     "declinedSheet",
     "postedSheet",
   ];
   const [currentSheetKey, setcurrentSheetKey] = createSignal(sheetKeys[0]);
-  console.log("sheetValues", props.sheetValues);
+
   return (
     <Show when={props.show}>
       <Portal>
@@ -76,49 +143,14 @@ const PreviewChanges: Component<{
                         Xem trước các thay đổi
                       </h3>
                       <div class="my-4 overflow-y-auto max-h-[81vh] max-w-full">
-                        {/* table goes here */}
-
-                        <table class="border border-collapse h-full">
-                          {
-                            <ColumnIndexes
-                              sheetKey={currentSheetKey() as PreviewSheetKeys}
+                        {sheetKeys.map((sheetKey) => (
+                          <Show when={currentSheetKey() === sheetKey}>
+                            <TableElement
+                              sheetKey={sheetKey}
+                              sheetValues={props.sheetValues}
                             />
-                          }
-
-                          <For
-                            each={
-                              props.sheetValues![
-                                currentSheetKey() as PreviewSheetKeys
-                              ]
-                            }
-                          >
-                            {(values, index) => {
-                              const ValuesElements = values.map((value) => {
-                                return (
-                                  <td class="border min-w-[2em]">{value}</td>
-                                );
-                              });
-                              for (
-                                let i = 0,
-                                  n =
-                                    confessionMetadata[
-                                      currentSheetKey() as PreviewSheetKeys
-                                    ]?.properties?.gridProperties
-                                      ?.columnCount! - values.length;
-                                i < n;
-                                ++i
-                              ) {
-                                ValuesElements.push(<td class="border" />);
-                              }
-                              return (
-                                <tr class="">
-                                  <td class="border min-w-[2em]">{index()}</td>
-                                  {ValuesElements}
-                                </tr>
-                              );
-                            }}
-                          </For>
-                        </table>
+                          </Show>
+                        ))}
                       </div>
                     </div>
                     <div class="bg-gray-50 px-4 py-3 sm:flex w-full justify-between">

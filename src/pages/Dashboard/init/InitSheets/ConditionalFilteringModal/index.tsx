@@ -162,6 +162,7 @@ const ConditionalFilteringModal: Component<{
         [key in FilteredSheetMetadata["key"]]?: true;
       } = {};
       for (const cell of rowData.values) {
+        if (!cell.formattedValue) continue;
         const bgColor = getColorFromCell(
           cell.effectiveFormat?.backgroundColorStyle!,
           confessionSpreadsheetGridData.themeMap
