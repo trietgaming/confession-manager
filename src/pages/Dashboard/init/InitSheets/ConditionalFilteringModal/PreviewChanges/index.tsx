@@ -3,6 +3,7 @@ import {
   For,
   ParentComponent,
   Show,
+  batch,
   createEffect,
   createMemo,
   createSignal,
@@ -21,7 +22,8 @@ import Button from "ui-components/Button";
 import TableComponent from "./TableComponent";
 
 export const MAX_CELL_HEIGHT = 20;
-export const MAX_CELL_WIDTH = 200;
+export const MAX_CELL_WIDTH = 225;
+export const INDEX_WIDTH = 40;
 
 const PreviewChanges: Component<{
   show: boolean;
@@ -42,8 +44,10 @@ const PreviewChanges: Component<{
   createEffect(() => {
     if (!props.sheetValues || !tableContainer) return;
     const listener = () => {
-      setTableScrollY(tableContainer!.scrollTop),
+      batch(() => {
+        setTableScrollY(tableContainer!.scrollTop);
         setTableScrollX(tableContainer!.scrollLeft);
+      });
     };
     tableContainer.addEventListener("scroll", listener);
     return () => tableContainer!.removeEventListener("scroll", listener);
@@ -97,17 +101,13 @@ const PreviewChanges: Component<{
                           }}
                           class="overflow-auto relative"
                         >
-                          {sheetKeys.map((sheetKey) => (
-                            <Show when={currentSheetKey() === sheetKey}>
-                              <TableComponent
-                                sheetKey={sheetKey}
-                                sheetValues={props.sheetValues}
-                                scrollY={tableScrollY()}
-                                scrollX={tableScrollX()}
-                                outerContainer={tableContainer!}
-                              />
-                            </Show>
-                          ))}
+                          <TableComponent
+                            sheetKey={currentSheetKey()}
+                            sheetValues={props.sheetValues}
+                            scrollY={tableScrollY()}
+                            scrollX={tableScrollX()}
+                            outerContainer={tableContainer!}
+                          />
                         </div>
                       </div>
                     </div>
