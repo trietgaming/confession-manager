@@ -2,11 +2,15 @@ import { Component } from "solid-js";
 import Button from "ui-components/Button";
 import handleLogin from "methods/handleLogin";
 import { A } from "@solidjs/router";
+import AppLogo from "ui-components/AppLogo";
 
 const Login: Component = () => {
   return (
     <div class="flex flex-col justify-between h-full">
-      <h1 class="text-center mt-10 text-4xl font-bold">CONFESSION MANAGER</h1>
+      <div class="flex space-x-4 justify-center items-center text-center mt-10 text-4xl font-bold">
+        <AppLogo class="w-16 h-16" />
+        <h1>CONFESSION MANAGER</h1>
+      </div>
       <div class="flex px-4 flex-col items-center justify-center">
         <h1 class="text-2xl">Đăng nhập tài khoản Google của bạn để sử dụng</h1>
         <p class="my-10">

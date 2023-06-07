@@ -16,6 +16,7 @@
     "@types/gapi.auth2": "^0.0.57",
     "@types/gapi.client.forms-v1": "^0.0.1",
     "@types/gapi.client.sheets-v4": "^0.0.1",
+    "@types/gapi.people": "^1.0.9",
     "@types/google.accounts": "^0.0.7",
     "@types/google.picker": "^0.0.39",
     "@vitejs/plugin-basic-ssl": "^1.0.1",

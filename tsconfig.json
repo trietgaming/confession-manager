@@ -15,7 +15,8 @@
       "gapi.client.sheets-v4",
       "google.picker",
       "gapi.client.forms-v1",
-      "vite-plugin-pwa/client"
+      "vite-plugin-pwa/client",
+      "gapi.people"
     ],
     "noEmit": true,
     "isolatedModules": true,
@@ -29,7 +30,8 @@
       "components/*": ["./src/components/*"],
       "types": ["./src/types/index.ts"],
       "app-constants": ["./src/constants/index.ts"],
-      "classes/*": ["./src/classes/*"]
+      "classes/*": ["./src/classes/*"],
+      "assets/*": ["./src/assets/*"]
     }
   }
 }

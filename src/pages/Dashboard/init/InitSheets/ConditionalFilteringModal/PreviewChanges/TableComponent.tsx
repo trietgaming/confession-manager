@@ -64,14 +64,14 @@ const TableComponent: Component<{
       const endY = Math.min(startY + window.innerHeight, tableBorderHeight);
       const startX = MAX_CELL_WIDTH * (currentScrollX / MAX_CELL_WIDTH);
       const endX = Math.min(startX + window.innerWidth + 100, tableBorderWidth);
-      console.log(
-        JSON.stringify({
-          startX,
-          endX,
-          startY,
-          endY,
-        })
-      );
+      // console.log(
+      //   JSON.stringify({
+      //     startX,
+      //     endX,
+      //     startY,
+      //     endY,
+      //   })
+      // );
 
       const tableBottomY = endY + 2 * MAX_CELL_HEIGHT;
       const tableRightX = endX + MAX_CELL_WIDTH;
@@ -171,7 +171,7 @@ const TableComponent: Component<{
       ctx.clearRect(
         startX - 2 * p,
         startY - tp,
-        INDEX_WIDTH + 2 * p,
+        INDEX_WIDTH + tp,
         MAX_CELL_HEIGHT + tp
       );
 

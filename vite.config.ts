@@ -50,6 +50,7 @@ export default defineConfig({
       { find: "types", replacement: "/src/types" },
       { find: "app-constants", replacement: "/src/constants" },
       { find: "classes", replacement: "/src/classes" },
+      { find: "assets", replacement: "/src/assets" },
     ],
   },
 });

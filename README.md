@@ -1,4 +1,4 @@
-# Confession Manager
+# <img src="/public/icons/confession-manager-icon.svg" alt="Confession Manager Icon" style="height: 64px; width:64px;"/> Confession Manager
 
 [![GitHub package.json version][version-shield]][version-url]
 [![GitHub license][license-shield]][license-url]

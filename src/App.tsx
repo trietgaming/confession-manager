@@ -29,7 +29,7 @@ import localforage from "localforage";
 
 const NavBarWrapper: Component = () => {
   return (
-    <div class="md:translate-y-10">
+    <div class="md:translate-y-14">
       <Outlet />
     </div>
   );

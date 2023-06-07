@@ -87,7 +87,7 @@ const ConditionalFilteringModal: Component<{
   // TODO: handle submit
   const handleSubmit = () => {
     setProcessing(true);
-    console.log(confessionSpreadsheetGridData);
+    // console.log(confessionSpreadsheetGridData);
     const gridData =
       confessionSpreadsheetGridData as ConfessionSpreadsheetGridData;
     const sheetKeys = Object.keys(
@@ -124,11 +124,7 @@ const ConditionalFilteringModal: Component<{
     const sheetValues: {
       [key in PreviewSheetKeys]: string[][];
     } = {
-      pendingSheet: [
-        gridData.rowData[0]!.values!.map(
-          (cell) => cell.formattedValue as string
-        )!,
-      ],
+      pendingSheet: [],
       acceptedSheet: [],
       declinedSheet: [],
       postedSheet: [],
@@ -153,10 +149,10 @@ const ConditionalFilteringModal: Component<{
       }
     }
 
-    console.log(styleMap);
-    console.log(gridData.rowData[1]);
+    // console.log(styleMap);
+    // console.log(gridData.rowData[1]);
 
-    for (let i = 1, n = gridData.rowData.length; i < n; ++i) {
+    for (let i = gridData.rowData.length - 1; i >= 1; --i) {
       const rowData = gridData.rowData[i];
       if (!rowData.values) continue;
       const pushSheets: {
@@ -199,7 +195,12 @@ const ConditionalFilteringModal: Component<{
       }
       if (!pushAny) sheetValues["pendingSheet"].push(rowValues as string[]);
     }
-    console.log(sheetValues);
+    // convert pendingSheet to old to new order and push the header to it
+    sheetValues["pendingSheet"].push(
+      gridData.rowData[0]!.values!.map((cell) => cell.formattedValue as string)!
+    );
+    sheetValues["pendingSheet"].reverse();
+    // console.log(sheetValues);
     batch(() => {
       setPreviewModalShow(true);
       setProcessing(false);
@@ -277,6 +278,11 @@ const ConditionalFilteringModal: Component<{
                 </div>
               </div>
             </Show>
+            <p class="text-sm mt-6">
+              Lưu ý: Trang tính nhận câu trả lời từ Google Form sẽ giữ nguyên
+              thứ tự các hàng, còn các hàng của trang tính được định nghĩa sẽ
+              được sắp xếp theo dấu thời gian từ mới đến cũ - trên xuống dưới
+            </p>
           </div>
         </Show>
       </Modal>

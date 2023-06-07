@@ -123,3 +123,15 @@ export type SelectedObject = Record<SheetTypeKeys, number | null>;
 export type PreviewSheetKeys =
   | keyof ConfessionSpreadsheetGridData["selected"]
   | "pendingSheet";
+
+export interface UserInfo {
+  photoUrl?: string;
+  displayName?: string;
+  email?: string;
+}
+
+export interface VerticalNavBarMetadata {
+  iconUrl: string;
+  path: string;
+  title: string;
+}

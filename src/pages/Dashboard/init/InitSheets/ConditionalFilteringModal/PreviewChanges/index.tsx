@@ -20,6 +20,10 @@ import {
 } from "types";
 import Button from "ui-components/Button";
 import TableComponent from "./TableComponent";
+import { useSpreadsheetData } from "../..";
+import setConfessionInited from "methods/setConfessionInited";
+import { SHEETS_INITED_TYPES } from "app-constants";
+import refreshSpreadsheet from "methods/refreshSpreadsheet";
 
 export const MAX_CELL_HEIGHT = 20;
 export const MAX_CELL_WIDTH = 225;
@@ -39,6 +43,8 @@ const PreviewChanges: Component<{
   const [currentSheetKey, setcurrentSheetKey] = createSignal(sheetKeys[0]);
   const [tableScrollY, setTableScrollY] = createSignal(0);
   const [tableScrollX, setTableScrollX] = createSignal(0);
+  const [isSubmitting, setSubmitting] = createSignal(false);
+  const confessionSpreadsheetGridData = useSpreadsheetData();
   let tableContainer: HTMLDivElement | undefined;
 
   createEffect(() => {
@@ -52,6 +58,75 @@ const PreviewChanges: Component<{
     tableContainer.addEventListener("scroll", listener);
     return () => tableContainer!.removeEventListener("scroll", listener);
   });
+
+  const handleSubmit = async () => {
+    setSubmitting(true);
+    const gridData =
+      confessionSpreadsheetGridData as ConfessionSpreadsheetGridData;
+    const batchRequests: gapi.client.sheets.Request[] = [];
+    const valueBatchUpdateRequest: gapi.client.sheets.BatchUpdateValuesRequest =
+      { includeValuesInResponse: false, data: [], valueInputOption: "RAW" };
+
+    batchRequests.push({
+      deleteDimension: {
+        range: {
+          dimension: "ROWS",
+          sheetId: confessionMetadata.pendingSheet?.properties?.sheetId!,
+          startIndex: 1,
+          endIndex: gridData.rowData.length! - 1,
+        },
+      },
+    });
+    for (const sheetKey of sheetKeys) {
+      const data = props.sheetValues![sheetKey];
+      if (data.length === 0) continue;
+      const sheetId = confessionMetadata[sheetKey]?.properties?.sheetId!;
+      const sheetTitle = confessionMetadata[sheetKey]?.properties?.title!;
+      batchRequests.push({
+        insertDimension: {
+          range: {
+            dimension: "ROWS",
+            sheetId: sheetId,
+            startIndex: 1,
+            endIndex: data.length - 1,
+          },
+        },
+      });
+      valueBatchUpdateRequest.data!.push({
+        majorDimension: "ROWS",
+        range: `${sheetTitle}!A1:B${data.length}`,
+        values: data,
+      });
+    }
+
+    // TODO: FIX DELETE FORM ROWS
+
+    try {
+      const spreadsheetId = confessionSpreadsheet.spreadsheetId!;
+      await gapi.client.sheets.spreadsheets.batchUpdate(
+        {
+          spreadsheetId,
+        },
+        {
+          includeSpreadsheetInResponse: false,
+          requests: batchRequests,
+        }
+      );
+      await gapi.client.sheets.spreadsheets.values.batchUpdate(
+        {
+          spreadsheetId,
+        },
+        valueBatchUpdateRequest
+      );
+      await refreshSpreadsheet(
+        await setConfessionInited(SHEETS_INITED_TYPES.FILTERED)
+      );
+    } catch (err) {
+      console.error(err);
+    }
+
+    setSubmitting(false);
+  };
 
   return (
     <Show when={props.show}>
@@ -138,15 +213,17 @@ const PreviewChanges: Component<{
                       <div class="sm:flex-row-reverse flex sm:px-6">
                         <Button
                           class="my-0 inline-flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 sm:ml-2 sm:w-auto"
-                          onClick={() => {}}
-                          disabled={false}
+                          onClick={handleSubmit}
+                          disabled={
+                            isSubmitting() || props.sheetValues === null
+                          }
                         >
                           Xác nhận
                         </Button>
                         <Button
                           class="my-0 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto disabled:bg-gray-200 disabled:text-white disabled:hover:bg-gray-200"
                           onClick={props.handleClose}
-                          disabled={false}
+                          disabled={isSubmitting()}
                         >
                           Hủy
                         </Button>
