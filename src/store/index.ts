@@ -1,4 +1,5 @@
-import { createSignal } from "solid-js";
+import { checkSheetInited } from "methods/checkSheetInited";
+import { createMemo, createSignal } from "solid-js";
 import { createStore } from "solid-js/store";
 import { ConfessionSpreadsheetMetadata, PendingChanges } from "types";
 
@@ -14,6 +15,9 @@ export const [scrollY, setScrollY] = createSignal(window.scrollY);
 export const [confessionSpreadsheet, setConfessionSpreadsheet] =
   createStore<gapi.client.sheets.Spreadsheet>({});
 
+export const [confesisonForm, setConfessionForm] =
+  createStore<gapi.client.forms.Form>({});
+
 export const [confessionMetadata, setConfessionMetadata] =
   createStore<ConfessionSpreadsheetMetadata>({});
 
@@ -25,8 +29,14 @@ export const [pendingChanges, setPendingChanges] = createStore<PendingChanges>({
 
 export const [isGapiLoaded, setGapiLoaded] = createSignal(false);
 
-export const [isServiceWorkerRegistered, setServiceWorkerRegistered] = createSignal(false);
-export const [isNotificationSubscribed, setNotificationSubscribed] = createSignal(false);
+export const [isServiceWorkerRegistered, setServiceWorkerRegistered] =
+  createSignal(false);
+export const [isNotificationSubscribed, setNotificationSubscribed] =
+  createSignal(false);
+
+export const [isPicking, setPicking] = createSignal(false);
+
+export const isSheetInited = createMemo(checkSheetInited);
 
 window.addEventListener("scroll", () => {
   setScrollY(window.scrollY);

@@ -2,13 +2,7 @@ import {
   IS_SHEETS_INITED_METADATA_KEY,
   SHEETS_INITED_TYPES,
 } from "app-constants";
-import { produce } from "solid-js/store";
-import {
-  confessionMetadata,
-  confessionSpreadsheet,
-  setConfessionSpreadsheet,
-} from "store/index";
-import refreshSpreadsheet from "./refreshSpreadsheet";
+import { confessionSpreadsheet } from "store/index";
 
 export default async function setConfessionInited(
   initType: SHEETS_INITED_TYPES,
@@ -25,33 +19,35 @@ export default async function setConfessionInited(
     if (init) {
       return confessionSpreadsheet;
     }
-    return (await gapi.client.sheets.spreadsheets.batchUpdate(
-      {
-        spreadsheetId: confessionSpreadsheet.spreadsheetId!,
-      },
-      {
-        includeSpreadsheetInResponse: true,
-        requests: [
-          {
-            deleteDeveloperMetadata: {
-              dataFilter: {
-                developerMetadataLookup: {
-                  locationMatchingStrategy: "EXACT",
-                  metadataKey: IS_SHEETS_INITED_METADATA_KEY,
-                  metadataValue: initType,
-                  visibility: "PROJECT",
-                  metadataLocation: {
-                    spreadsheet: true,
+    return (
+      await gapi.client.sheets.spreadsheets.batchUpdate(
+        {
+          spreadsheetId: confessionSpreadsheet.spreadsheetId!,
+        },
+        {
+          includeSpreadsheetInResponse: true,
+          requests: [
+            {
+              deleteDeveloperMetadata: {
+                dataFilter: {
+                  developerMetadataLookup: {
+                    locationMatchingStrategy: "EXACT",
+                    metadataKey: IS_SHEETS_INITED_METADATA_KEY,
+                    metadataValue: initType,
+                    visibility: "PROJECT",
+                    metadataLocation: {
+                      spreadsheet: true,
+                    },
                   },
                 },
               },
             },
-          },
-        ],
-      }
-    )).result.updatedSpreadsheet;
+          ],
+        }
+      )
+    ).result.updatedSpreadsheet;
   }
-  if (!init) return;
+  if (!init) return confessionSpreadsheet;
   const result = (
     await gapi.client.sheets.spreadsheets.batchUpdate(
       {

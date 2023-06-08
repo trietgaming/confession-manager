@@ -28,7 +28,7 @@
       "pages/*": ["./src/pages/*"],
       "methods/*": ["./src/methods/*"],
       "components/*": ["./src/components/*"],
-      "types": ["./src/types/index.ts"],
+      "types": ["./src/types/index.d.ts"],
       "app-constants": ["./src/constants/index.ts"],
       "classes/*": ["./src/classes/*"],
       "assets/*": ["./src/assets/*"]

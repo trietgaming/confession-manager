@@ -47,7 +47,7 @@ const AddFilteringCondition: Component<{
     <div class="w-full p-6 bg-white border border-gray-200 rounded-lg shadow mb-4">
       <div class="flex justify-between">
         <h5 class="my-auto">{props.metadata.title}</h5>
-        <div class="flex">
+        <div class="flex space-x-2">
           <Button
             onClick={props.handleClose}
             class="my-0 whitespace-nowrap text-sm bg-gray-200 hover:bg-gray-300 ml-2 text-black"

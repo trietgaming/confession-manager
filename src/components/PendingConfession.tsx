@@ -27,7 +27,7 @@ const PendingConfession: Component<{
               cfsRef
             )
           }
-          class="bg-green-600 hover:bg-green-700"
+          class="bg-green-600 hover:bg-green-700 mr-2"
         >
           Duyệt
         </Button>

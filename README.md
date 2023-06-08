@@ -7,7 +7,7 @@
 
 > Using Google Sheet API and Facebook API to easily manage confessions right on the browser
 
-[Confession Manager](unhealthy-monkey.surge.sh) is a web application that helps users to create and manage confession posts that are published on Facebook. The application uses the [Google Sheet API V4][gsheet-api-link] to manage all the confessions in specific sheets in a centralized spreadsheet. The application provides an easy-to-use interface that allows users to create, edit, and delete confession posts, as well as view all existing posts in a simple and organized format.
+[Confession Manager](https://unhealthy-monkey.surge.sh) is a web application that helps users to create and manage confession posts that are published on Facebook. The application uses the [Google Sheet API V4][gsheet-api-link] to manage all the confessions in specific sheets in a centralized spreadsheet. The application provides an easy-to-use interface that allows users to create, edit, and delete confession posts, as well as view all existing posts in a simple and organized format.
 
 ## Features 🚀
 

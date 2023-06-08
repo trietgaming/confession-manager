@@ -10,7 +10,7 @@ const Button: ParentComponent<{
   return (
     <button
       class={twMerge(
-        `disabled:cursor-not-allowed disabled:bg-blue-200 disabled:hover:bg-blue-200 text-white text-base bg-blue-700 hover:bg-blue-800 font-medium rounded-lg px-5 py-2.5 mr-2 mb-2`,
+        `disabled:cursor-not-allowed disabled:bg-blue-200 disabled:hover:bg-blue-200 text-white text-base bg-blue-700 hover:bg-blue-800 font-medium rounded-lg px-5 py-2.5`,
         local.class
       )}
       {...others}

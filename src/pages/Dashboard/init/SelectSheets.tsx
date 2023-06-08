@@ -7,13 +7,26 @@ import {
   onMount,
   createMemo,
 } from "solid-js";
-import { confessionSpreadsheet, setConfessionSpreadsheet } from "store/index";
-import { ConfessionSpreadsheetMetadata, SelectedObject, SheetTypeKeys } from "types";
+import {
+  confessionSpreadsheet,
+  setConfessionForm,
+  setConfessionSpreadsheet,
+} from "store/index";
+import {
+  ConfessionSpreadsheetMetadata,
+  SelectedObject,
+  SheetTypeKeys,
+} from "types";
 import Button from "ui-components/Button";
 import { Portal } from "solid-js/web";
 import {
+  CHECK_ICON_URL,
   CONFESSION_SHEET_TYPE_METADATA_KEY,
+  CROSS_ICON_URL,
+  GOOGLE_FORMS_FAVICON_URL,
+  LOCAL_KEY_CONFESSION_FORM_ID,
   LOCAL_KEY_CONFESSION_SPREADSHEET_ID,
+  PAPER_PLANE_ICON_URL,
 } from "app-constants";
 import initConfessionSpreadsheetMetadata from "methods/initConfessionSpreadsheetMetadata";
 import LoadingCircle from "ui-components/LoadingCircle";
@@ -24,22 +37,27 @@ import Modal from "ui-components/Modal";
 import refreshSpreadsheet from "methods/refreshSpreadsheet";
 
 const selectElementsPayload: {
-  title: string;
+  iconUrl: string;
   key: SheetTypeKeys;
+  title: string;
 }[] = [
   {
     title: "Chọn trang tính nhận phản hồi Confession (liên kết với biểu mẫu)",
+    iconUrl: GOOGLE_FORMS_FAVICON_URL,
     key: "pendingSheet",
   },
   {
     title: "Chọn trang tính chứa các confession đã duyệt",
+    iconUrl: CHECK_ICON_URL,
     key: "acceptedSheet",
   },
   {
+    iconUrl: CROSS_ICON_URL,
     title: "Chọn trang tính chứa các confession đã từ chối",
     key: "declinedSheet",
   },
   {
+    iconUrl: PAPER_PLANE_ICON_URL,
     title: "Chọn trang tính chứa các confession đã đăng",
     key: "postedSheet",
   },
@@ -137,7 +155,12 @@ const SelectSheets: Component = () => {
     const currentSelectedState = selected();
 
     const newSheets = Object.values(currentSelectedState).filter(
-      (sheetIndex) => !currentSheetsState[sheetIndex!].properties!.sheetId
+      (sheetIndex) => {
+        const sheet = currentSheetsState[sheetIndex!];
+        return (
+          !sheet.properties!.sheetId && sheet.properties?.title?.length! <= 100
+        );
+      }
     );
     if (newSheets.length > 0) {
       try {
@@ -164,6 +187,7 @@ const SelectSheets: Component = () => {
         });
       } catch (err) {
         console.error(err);
+        return;
       }
     }
     try {
@@ -287,7 +311,11 @@ const SelectSheets: Component = () => {
   /// TODO: OPTIMIZE THIS
   const handleGoBack = async () => {
     await localforage.removeItem(LOCAL_KEY_CONFESSION_SPREADSHEET_ID);
-    setConfessionSpreadsheet(reconcile({}));
+    await localforage.removeItem(LOCAL_KEY_CONFESSION_FORM_ID);
+    batch(() => {
+      setConfessionSpreadsheet(reconcile({}));
+      setConfessionForm(reconcile({}));
+    });
   };
 
   return (
@@ -295,16 +323,17 @@ const SelectSheets: Component = () => {
       <MainTitle>Định nghĩa các trang tính</MainTitle>
       <For each={selectElementsPayload}>
         {(payload) => (
-          <div class="max-w-2xl mx-auto mt-10">
+          <div class="max-w-3xl mx-auto mt-10">
             <div class="flex justify-between">
-              <h3 class="mr-3 w-full flex flex-col justify-center">
-                {payload.title}
+              <h3 class="mr-3 w-full flex items-center space-x-4">
+                <img src={payload.iconUrl} class="w-7 h-7" />
+                <p>{payload.title}</p>
               </h3>
               <Show
                 when={selected()[payload.key] === null && isEmpty()}
                 fallback={
                   <select
-                    class="bg-gray-50 border border-gray-500 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                    class="bg-gray-50 border border-gray-500 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 max-w-md text-ellipsis block p-2.5"
                     onChange={(change) => {
                       handleChange(+change.target.value, payload.key);
                     }}
@@ -334,11 +363,8 @@ const SelectSheets: Component = () => {
           </div>
         )}
       </For>
-      <div class="flex justify-center w-full mt-10">
-        <Button
-          class="mr-3 bg-slate-500 hover:bg-slate-600"
-          onClick={handleGoBack}
-        >
+      <div class="flex justify-center w-full mt-10 space-x-3">
+        <Button class="bg-slate-500 hover:bg-slate-600" onClick={handleGoBack}>
           Quay lại
         </Button>
         <Button
@@ -356,7 +382,7 @@ const SelectSheets: Component = () => {
           }
           onClick={handleSubmit}
         >
-          <div class="flex">
+          <div class="flex items-center space-x-2">
             <span>{"Xác nhận "}</span>
             <Show when={isProcessing()}>
               <LoadingCircle />

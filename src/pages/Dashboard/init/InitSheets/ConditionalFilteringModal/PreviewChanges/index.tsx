@@ -24,6 +24,7 @@ import { useSpreadsheetData } from "../..";
 import setConfessionInited from "methods/setConfessionInited";
 import { SHEETS_INITED_TYPES } from "app-constants";
 import refreshSpreadsheet from "methods/refreshSpreadsheet";
+import LoadingCircle from "ui-components/LoadingCircle";
 
 export const MAX_CELL_HEIGHT = 20;
 export const MAX_CELL_WIDTH = 225;
@@ -212,13 +213,14 @@ const PreviewChanges: Component<{
                       </div>
                       <div class="sm:flex-row-reverse flex sm:px-6">
                         <Button
-                          class="my-0 inline-flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 sm:ml-2 sm:w-auto"
+                          class="items-center space-x-2 group my-0 inline-flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 sm:ml-2 sm:w-auto"
                           onClick={handleSubmit}
                           disabled={
                             isSubmitting() || props.sheetValues === null
                           }
                         >
-                          Xác nhận
+                          <p>Xác nhận</p>
+                          <LoadingCircle class="group-disabled:block hidden" />
                         </Button>
                         <Button
                           class="my-0 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto disabled:bg-gray-200 disabled:text-white disabled:hover:bg-gray-200"

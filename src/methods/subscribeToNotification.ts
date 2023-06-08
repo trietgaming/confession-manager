@@ -8,6 +8,7 @@ import axios from "axios";
 import { getApp } from "firebase/app";
 import { getMessaging, getToken } from "firebase/messaging";
 import localforage from "localforage";
+import { setNotificationSubscribed } from "store/index";
 export default async function subscribeToNotification() {
   const localFormId = (await localforage.getItem(
     LOCAL_KEY_CONFESSION_FORM_ID
@@ -66,5 +67,6 @@ export default async function subscribeToNotification() {
       },
     }
   );
-  console.log("subscribe OK!");
+  setNotificationSubscribed(true);
+  alert("subscribe OK!");
 }

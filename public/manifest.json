@@ -3,9 +3,10 @@
   "name": "Quản lý confession ngay trên trình duyệt.",
   "icons": [
     {
-      "src": "https://unhealthy-monkey.surge.sh/favicon.ico",
+      "src": "/icons/confession-manager-icon.svg",
       "sizes": "any",
-      "type": "image/x-icon"
+      "type": "image/x-icon",
+      "purpose": "any"
     }
   ],
   "start_url": "https://unhealthy-monkey.surge.sh",
