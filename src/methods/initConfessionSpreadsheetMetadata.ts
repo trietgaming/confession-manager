@@ -1,6 +1,11 @@
-import { confessionSpreadsheet, setConfessionMetadata } from "store/index";
+import {
+  confessionSpreadsheet,
+  setConfessionMetadata,
+  setSheetInited,
+} from "store/index";
 import { CONFESSION_SHEET_TYPE_METADATA_KEY } from "../constants";
 import { ConfessionSpreadsheetMetadata } from "types";
+import { checkSheetInited } from "./checkSheetInited";
 
 export default function initConfessionSpreadsheetMetadata() {
   const sheetsMetadata: ConfessionSpreadsheetMetadata = {};
@@ -23,4 +28,5 @@ export default function initConfessionSpreadsheetMetadata() {
   ) {
     setConfessionMetadata(sheetsMetadata);
   }
+  setSheetInited(checkSheetInited());
 }

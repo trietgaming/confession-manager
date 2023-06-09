@@ -12,20 +12,28 @@ const app = initializeApp({
   measurementId: "G-Z8MBF96X25",
 });
 
-const APP_SERVER_URL =
-  location.hostname === "localhost"
-    ? "https://localhost:3000"
-    : "https://confession-manager-server.trietgaming.repl.co";
+const IS_DEV = location.hostname === "localhost";
+
+const APP_SERVER_URL = IS_DEV
+  ? "https://localhost:3000"
+  : "https://server.confession-manager.app";
+
+const APP_URL = IS_DEV
+  ? "https://localhost:8080"
+  : "https://confession-manager.app";
 
 const FORM_DOCUMENT_TITLE_LOCAL_KEY_PREFIX = "_doctitle";
 
 const messaging = getMessaging(app);
-
+const ICON_URL = APP_URL + "/assets/favicon.svg";
+// TODO: handle click event
 onBackgroundMessage(messaging, async (payload) => {
+  if (payload.notification) return null;
+  console.log("BACKGROUND: ", payload);
   let notificationTitle = "Thông báo từ CFS MANAGER";
   let notificationOptions = {
     body: "Truy cập ứng dụng để kiểm tra",
-    icon: "/assets/favicon.ico",
+    icon: ICON_URL,
   };
   if (payload.data?.eventType === "RESPONSES") {
     let confessionTitle = await localforage.getItem(
@@ -64,9 +72,12 @@ onBackgroundMessage(messaging, async (payload) => {
     notificationTitle = confessionTitle || notificationTitle;
     notificationOptions = {
       body: "Có câu trả lời mới đến Confession của bạn",
-      icon: "/assets/favicon.ico",
+      icon: ICON_URL,
     };
   }
 
-  return self.registration.showNotification(notificationTitle, notificationOptions);
+  return self.registration.showNotification(
+    notificationTitle,
+    notificationOptions
+  );
 });

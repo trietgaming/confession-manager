@@ -12,5 +12,5 @@ export const checkSheetInited = () => {
     ((metadata.metadataValue === SHEETS_INITED_TYPES.FRESH &&
       !!confessionMetadata.archivedSheet) ||
       metadata.metadataValue === SHEETS_INITED_TYPES.FILTERED)
-  );
+  ) || false;
 };

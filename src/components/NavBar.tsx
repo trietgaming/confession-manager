@@ -19,12 +19,7 @@ import subscribeToNotification from "methods/subscribeToNotification";
 import { Component, Show, createSignal, onMount } from "solid-js";
 import { createStore } from "solid-js/store";
 import { Portal } from "solid-js/web";
-import {
-  confessionSpreadsheet,
-  isNotificationSubscribed,
-  isServiceWorkerRegistered,
-  isSheetInited,
-} from "store/index";
+import { confessionSpreadsheet, isSheetInited } from "store/index";
 import { UserInfo, VerticalNavBarMetadata } from "types";
 import AppLogo from "ui-components/AppLogo";
 import Button from "ui-components/Button";
@@ -158,7 +153,7 @@ const NavBar: Component = () => {
                 </div>
               </button>
               {/* Dropdown */}
-              <div hidden={!isAccountDropdownShow()}>
+              <Show when={isAccountDropdownShow()}>
                 <div class="absolute bg-white w-56 right-0 rounded-md drop-shadow-lg translate-y-2">
                   <A
                     href="ticket"
@@ -186,7 +181,7 @@ const NavBar: Component = () => {
                     <p>Đăng xuất</p>
                   </button>
                 </div>
-              </div>
+              </Show>
             </div>
           </div>
         </div>

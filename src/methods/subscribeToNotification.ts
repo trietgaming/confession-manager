@@ -1,3 +1,4 @@
+import { LOCAL_KEY_NOTIFICATION_SUBSCRIBED_FORMS } from "./../constants/index";
 import {
   APP_SERVER_URL,
   LOCAL_KEY_CONFESSION_FORM_ID,
@@ -5,23 +6,15 @@ import {
   NOTIFICATION_TOPIC,
 } from "app-constants";
 import axios from "axios";
-import { getApp } from "firebase/app";
-import { getMessaging, getToken } from "firebase/messaging";
 import localforage from "localforage";
-import { setNotificationSubscribed } from "store/index";
+import { confesisonForm } from "store/index";
 export default async function subscribeToNotification() {
-  const localFormId = (await localforage.getItem(
-    LOCAL_KEY_CONFESSION_FORM_ID
-  )) as string | null;
-  if (localFormId === null) {
-    // TODO: render picker for user to choose and handle it (check if chosen form.linkedsheetId === currentSheetId)
-    return alert(
-      "Vui lòng chọn một biểu mẫu confession thay vì bảng tính để nhận thông báo!"
-    );
-  }
+  const formId =
+    confesisonForm.formId ||
+    (await localforage.getItem(LOCAL_KEY_CONFESSION_FORM_ID))!;
   // Check if a watch is existed
   const watchList = await gapi.client.forms.forms.watches.list({
-    formId: localFormId,
+    formId,
   });
 
   if (
@@ -33,7 +26,7 @@ export default async function subscribeToNotification() {
     })
   ) {
     await gapi.client.forms.forms.watches.create({
-      formId: localFormId,
+      formId,
       resource: {
         watch: {
           eventType: "RESPONSES",
@@ -58,7 +51,7 @@ export default async function subscribeToNotification() {
   await axios.put(
     APP_SERVER_URL + "/notification",
     {
-      form_id: localFormId,
+      form_id: formId,
       token: notificationToken,
     },
     {
@@ -67,6 +60,10 @@ export default async function subscribeToNotification() {
       },
     }
   );
-  setNotificationSubscribed(true);
-  alert("subscribe OK!");
+  await localforage.setItem(LOCAL_KEY_NOTIFICATION_SUBSCRIBED_FORMS, [
+    ...(((await localforage.getItem(
+      LOCAL_KEY_NOTIFICATION_SUBSCRIBED_FORMS
+    )) as string[] | null) || []),
+    formId,
+  ]);
 }

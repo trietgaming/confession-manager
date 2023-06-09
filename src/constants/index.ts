@@ -68,6 +68,8 @@ export const BASE_URL = IS_DEV
 
 export const LOCAL_KEY_NOTIFICATION_TOKEN = "notification_token";
 export const LOCAL_KEY_CONFESSION_FORM_ID = "confession_form_id";
+export const LOCAL_KEY_NOTIFICATION_SUBSCRIBED_FORMS =
+  "notification_subscribed";
 
 export const NOTIFICATION_TOPIC =
   "projects/confession-manager/topics/confession-notification";

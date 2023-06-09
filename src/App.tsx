@@ -1,14 +1,20 @@
-import { Component, Match, Switch, batch, onMount } from "solid-js";
+import {
+  Component,
+  Match,
+  Switch,
+  batch,
+  createEffect,
+  onMount,
+} from "solid-js";
 import {
   loggedIn,
   setGapiLoaded,
   isGapiLoaded,
-  setServiceWorkerRegistered,
   setConfessionSpreadsheet,
-  confesisonForm,
   setPicker,
   setConfessionForm,
   setPicking,
+  confesisonForm,
   // setPushEnabled,
 } from "./store";
 import { Routes, Route, Outlet } from "@solidjs/router";
@@ -23,6 +29,7 @@ import {
   DISCOVERY_DOCS,
   LOCAL_KEY_CONFESSION_FORM_ID,
   LOCAL_KEY_CONFESSION_SPREADSHEET_ID,
+  LOCAL_KEY_NOTIFICATION_SUBSCRIBED_FORMS,
   LOCAL_KEY_NOTIFICATION_TOKEN,
 } from "app-constants";
 import axios from "axios";
@@ -30,11 +37,15 @@ import CenteredLoadingCircle from "ui-components/CenteredLoadingCircle";
 import PopupCallback from "pages/PopupCallback";
 import createGoogleApi from "app-hooks/createGoogleApi";
 import setAccessToken from "methods/setAccessToken";
-import NavBar from "pages/NavBar";
+import NavBar from "components/NavBar";
 import localforage from "localforage";
 import Settings from "pages/Settings";
 import initConfessionSpreadsheetMetadata from "methods/initConfessionSpreadsheetMetadata";
 import getLinkedFormIdFromSheet from "methods/getLinkedFormIdFromSheet";
+import getMessagingToken from "methods/getMessagingToken";
+import subscribeToNotification from "methods/subscribeToNotification";
+import unsubscribeToNotification from "methods/unsubscribeToNotification";
+import checkNotificationSubscribed from "methods/checkNotificationSubscribed";
 
 const AuthenticatedWrapper: Component = () => {
   onMount(async () => {
@@ -151,7 +162,7 @@ const App: Component = () => {
   };
 
   createGoogleApi(handleGapiLoaded);
-  onMount(() => {
+  onMount(async () => {
     const refreshAccessToken: () => any = async () => {
       try {
         const response = await axios.get(APP_SERVER_URL + "/auth", {
@@ -176,7 +187,7 @@ const App: Component = () => {
       }
     };
 
-    refreshAccessToken();
+    await refreshAccessToken();
   });
 
   onMount(async () => {
@@ -190,24 +201,19 @@ const App: Component = () => {
       measurementId: "G-Z8MBF96X25",
     });
 
+    const localNotificationKey = await localforage.getItem(
+      LOCAL_KEY_NOTIFICATION_TOKEN
+    );
+    const subscribedForms: string[] | null = await localforage.getItem(
+      LOCAL_KEY_NOTIFICATION_SUBSCRIBED_FORMS
+    );
+    if (
+      !localNotificationKey &&
+      (!subscribedForms || subscribedForms.length === 0)
+    )
+      return;
+
     const messaging = getMessaging(app);
-
-    if ("serviceWorker" in navigator) {
-      try {
-        await navigator.serviceWorker.register("/firebase-messaging-sw.js", {
-          type: "module",
-        });
-      } catch (err) {
-        console.error(err);
-      }
-    }
-    const serviceWorkerRegistration = await navigator.serviceWorker.ready;
-
-    const messagingToken = await getToken(messaging, {
-      vapidKey: import.meta.env.VITE_VAPID_PUBLIC_KEY,
-      serviceWorkerRegistration,
-    });
-    setServiceWorkerRegistered(true);
 
     // TODO: Handle update and focus new confession when notification is pushed
     onMessage(messaging, (payload) => {
@@ -216,23 +222,36 @@ const App: Component = () => {
       console.log("MESSAGE: ", payload);
     });
 
-    let localNotificationKey = await localforage.getItem(
-      LOCAL_KEY_NOTIFICATION_TOKEN
-    );
+    const messagingToken = await getMessagingToken();
 
-    if (localNotificationKey !== messagingToken) {
-      await localforage.setItem(LOCAL_KEY_NOTIFICATION_TOKEN, messagingToken);
+    if (
+      localNotificationKey !== null &&
+      localNotificationKey !== messagingToken
+    ) {
       const localNotificationFormId = await localforage.getItem(
         LOCAL_KEY_CONFESSION_FORM_ID
       );
       if (!localNotificationFormId) {
         return;
       }
-      // TODO: handle send new token key to server
-    }
+      // TODO: Optimize this
 
-    if (localNotificationKey === null) {
-      await localforage.setItem(LOCAL_KEY_NOTIFICATION_TOKEN, messagingToken);
+      // createEffect(async () => {
+      //   const toBeTrackedFormId = confesisonForm.formId;
+      //   if (!toBeTrackedFormId || !(await checkNotificationSubscribed()))
+      //     return;
+      //   await unsubscribeToNotification();
+      //   await localforage.setItem(LOCAL_KEY_NOTIFICATION_TOKEN, messagingToken);
+      //   await subscribeToNotification();
+      // });
+      const authListener = async (e: MessageEvent) => {
+        if (e.data !== "authStateChanged") return;
+        await unsubscribeToNotification();
+        await localforage.setItem(LOCAL_KEY_NOTIFICATION_TOKEN, messagingToken);
+        await subscribeToNotification();
+        window.removeEventListener("message", authListener);
+      };
+      window.addEventListener("message", authListener);
     }
   });
 
