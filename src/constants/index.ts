@@ -60,11 +60,11 @@ export const IS_DEV = import.meta.env.MODE === "development";
 
 export const APP_SERVER_URL = IS_DEV
   ? "https://localhost:3000"
-  : "https://confession-manager-server.trietgaming.repl.co";
+  : "https://server.confession-manager.app";
 
 export const BASE_URL = IS_DEV
   ? "https://localhost:8080"
-  : "https://unhealthy-monkey.surge.sh";
+  : "https://confession-manager.app";
 
 export const LOCAL_KEY_NOTIFICATION_TOKEN = "notification_token";
 export const LOCAL_KEY_CONFESSION_FORM_ID = "confession_form_id";
@@ -72,17 +72,18 @@ export const LOCAL_KEY_CONFESSION_FORM_ID = "confession_form_id";
 export const NOTIFICATION_TOPIC =
   "projects/confession-manager/topics/confession-notification";
 
-export const DEFAULT_AVATAR_URL = "images/default-avatar.jpg";
-export const SETTINGS_ICON_URL = "icons/gear-six-icon.svg";
-export const BELL_ICON_URL = "icons/bell-icon.svg";
-export const LAUNCH_ICON_URL = "icons/launch-icon.svg";
-export const LOGOUT_ICON_URL = "icons/sign-out-icon.svg";
-export const HEART_ICON_URL = "icons/heart-icon.svg";
-export const BUG_ICON_URL = "icons/bug-icon.svg";
-export const HOUSE_ICON_URL = "icons/house-icon.svg";
-export const CHECK_ICON_URL = "icons/check-icon.svg";
-export const CROSS_ICON_URL = "icons/cross-icon.svg";
-export const PAPER_PLANE_ICON_URL = "icons/paper-plane-tilt-icon.svg";
+export { default as DEFAULT_AVATAR_URL } from "../assets/images/default-avatar.jpg";
+export { default as SETTINGS_ICON_URL } from "../assets/icons/gear-six-icon.svg";
+export { default as BELL_ICON_URL } from "../assets/icons/bell-icon.svg";
+export { default as LAUNCH_ICON_URL } from "../assets/icons/launch-icon.svg";
+export { default as LOGOUT_ICON_URL } from "../assets/icons/sign-out-icon.svg";
+export { default as HEART_ICON_URL } from "../assets/icons/heart-icon.svg";
+export { default as BUG_ICON_URL } from "../assets/icons/bug-icon.svg";
+export { default as HOUSE_ICON_URL } from "../assets/icons/house-icon.svg";
+export { default as CHECK_ICON_URL } from "../assets/icons/check-icon.svg";
+export { default as CROSS_ICON_URL } from "../assets/icons/cross-icon.svg";
+export { default as PAPER_PLANE_ICON_URL } from "../assets/icons/paper-plane-tilt-icon.svg";
+
 export const GOOGLE_SHEET_FAVICON_URL =
   "https://ssl.gstatic.com/docs/doclist/images/mediatype/icon_1_spreadsheet_x64.png";
 export const GOOGLE_FORMS_FAVICON_URL =

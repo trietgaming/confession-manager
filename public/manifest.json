@@ -3,13 +3,13 @@
   "name": "Quản lý confession ngay trên trình duyệt.",
   "icons": [
     {
-      "src": "/icons/confession-manager-icon.svg",
+      "src": "assets/favicon.svg",
       "sizes": "any",
       "type": "image/x-icon",
       "purpose": "any"
     }
   ],
-  "start_url": "https://unhealthy-monkey.surge.sh",
+  "start_url": "https://confession-manager.app",
   "display": "standalone",
   "theme_color": "#000000",
   "background_color": "#ffffff"

@@ -39,6 +39,7 @@ export default defineConfig({
       },
     },
   },
+  assetsInclude: ["**/*.svg", "**/*.jpg", "**/*.png", "**/*.ico", "**/*.json"],
   resolve: {
     alias: [
       { find: "app-hooks", replacement: "/src/hooks" },
