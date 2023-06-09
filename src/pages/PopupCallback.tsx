@@ -12,7 +12,7 @@ const PopupCallback: Component = () => {
     }
     if (window.opener) {
       // send them to the opening window
-      window.opener.postMessage(accessToken);
+      window.opener.postMessage({ accessToken });
       // close the popup
       window.close();
     }

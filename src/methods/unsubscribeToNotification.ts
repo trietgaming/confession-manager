@@ -7,8 +7,9 @@ import {
 import axios from "axios";
 import localforage from "localforage";
 import { confesisonForm } from "store/index";
-export default async function unsubscribeToNotification() {
+export default async function unsubscribeToNotification(_formId?: string) {
   const formId =
+    _formId ||
     confesisonForm.formId ||
     (await localforage.getItem(LOCAL_KEY_CONFESSION_FORM_ID))!;
   const notificationToken = await localforage.getItem(

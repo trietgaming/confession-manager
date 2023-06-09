@@ -162,7 +162,7 @@ const App: Component = () => {
   };
 
   createGoogleApi(handleGapiLoaded);
-  onMount(async () => {
+  onMount(() => {
     const refreshAccessToken: () => any = async () => {
       try {
         const response = await axios.get(APP_SERVER_URL + "/auth", {
@@ -187,7 +187,7 @@ const App: Component = () => {
       }
     };
 
-    await refreshAccessToken();
+    refreshAccessToken();
   });
 
   onMount(async () => {
@@ -228,32 +228,35 @@ const App: Component = () => {
       localNotificationKey !== null &&
       localNotificationKey !== messagingToken
     ) {
-      const localNotificationFormId = await localforage.getItem(
-        LOCAL_KEY_CONFESSION_FORM_ID
+      const localSubscribedForms: string[] | null = await localforage.getItem(
+        LOCAL_KEY_NOTIFICATION_SUBSCRIBED_FORMS
       );
-      if (!localNotificationFormId) {
-        return;
+      if (!localSubscribedForms || !localSubscribedForms.length) {
+        return localforage.setItem(
+          LOCAL_KEY_NOTIFICATION_TOKEN,
+          messagingToken
+        );
       }
       // TODO: Optimize this
 
-      // createEffect(async () => {
-      //   const toBeTrackedFormId = confesisonForm.formId;
-      //   if (!toBeTrackedFormId || !(await checkNotificationSubscribed()))
-      //     return;
-      //   await unsubscribeToNotification();
-      //   await localforage.setItem(LOCAL_KEY_NOTIFICATION_TOKEN, messagingToken);
-      //   await subscribeToNotification();
-      // });
       const authListener = async (e: MessageEvent) => {
         if (e.data !== "authStateChanged") return;
-        await unsubscribeToNotification();
+        await Promise.all(
+          localSubscribedForms.map((formId) =>
+            unsubscribeToNotification(formId)
+          )
+        );
         await localforage.setItem(LOCAL_KEY_NOTIFICATION_TOKEN, messagingToken);
-        await subscribeToNotification();
+        for (const formId of localSubscribedForms) {
+          subscribeToNotification(formId);
+        }
         window.removeEventListener("message", authListener);
       };
       window.addEventListener("message", authListener);
     }
   });
+
+  createEffect(() => console.log(loggedIn()));
 
   return (
     <Routes>

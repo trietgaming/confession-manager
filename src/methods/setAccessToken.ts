@@ -1,8 +1,9 @@
 import { isGapiLoaded, setLoggedIn } from "store/index";
 
 export default function setAccessToken(token: string | null) {
-  if (!isGapiLoaded()) return;
+  // console.log(token);
   window.postMessage("authStateChanged");
+  if (!isGapiLoaded()) return;
   if (token === null) {
     gapi.client.setToken(null);
     setLoggedIn(false);

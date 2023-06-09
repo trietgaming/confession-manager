@@ -6,11 +6,12 @@ const receiveMessage = (event: MessageEvent<any>) => {
     return;
   }
   const { data } = event;
+  if (!data?.accessToken) return;
 
   // console.log(data);
 
   if (event.isTrusted) {
-    setAccessToken(data);
+    setAccessToken(data.accessToken);
   }
 };
 
@@ -36,7 +37,6 @@ const openSignInWindow = (url: string, name: string) => {
   previousUrl = url;
 };
 
-/// TODO: find out what is "name" arg
 export default async () => {
-  openSignInWindow(APP_SERVER_URL + "/auth/login", "cfs-manager-popup-login");
+  openSignInWindow(APP_SERVER_URL + "/auth/login", "_blank");
 };

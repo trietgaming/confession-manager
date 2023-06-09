@@ -37,7 +37,6 @@ export default async function handleLogout() {
       });
       await localforage.removeItem(LOCAL_KEY_CONFESSION_FORM_ID);
       await localforage.removeItem(LOCAL_KEY_CONFESSION_SPREADSHEET_ID);
-      // await localforage.removeItem(LOCAL_KEY_NOTIFICATION_TOKEN);
       // await localforage.removeItem(confesisonForm.formId + "_doctitle");
     } else {
       console.error(response.data);
