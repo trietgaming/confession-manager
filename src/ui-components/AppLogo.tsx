@@ -1,6 +1,6 @@
+import { APP_LOGO_URL } from "app-constants";
 import { Component } from "solid-js";
 import { twMerge } from "tailwind-merge";
-import APP_LOGO_URL from "../assets/icons/confession-manager-icon.svg";
 
 const AppLogo: Component<{
   class?: string;

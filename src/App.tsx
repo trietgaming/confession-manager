@@ -15,6 +15,9 @@ import {
   setConfessionForm,
   setPicking,
   confesisonForm,
+  picker,
+  confessions,
+  setPendingNotification,
   // setPushEnabled,
 } from "./store";
 import { Routes, Route, Outlet } from "@solidjs/router";
@@ -23,13 +26,20 @@ import Dashboard from "pages/Dashboard";
 import ChangesPanel from "components/ChangesPanel";
 // import LoadingCircle from "ui-components/LoadingCircle";
 import { initializeApp } from "firebase/app";
-import { getMessaging, getToken, onMessage } from "firebase/messaging";
+import {
+  MessagePayload,
+  getMessaging,
+  getToken,
+  onMessage,
+} from "firebase/messaging";
 import {
   APP_SERVER_URL,
   DISCOVERY_DOCS,
+  LOCAL_KEY_CACHED_NOTIFICATIONS,
   LOCAL_KEY_CONFESSION_FORM_ID,
   LOCAL_KEY_CONFESSION_SPREADSHEET_ID,
   LOCAL_KEY_NOTIFICATION_TOKEN,
+  LOCAL_KEY_PENDING_NOTIFICATIONS,
 } from "app-constants";
 import axios from "axios";
 import CenteredLoadingCircle from "ui-components/CenteredLoadingCircle";
@@ -39,76 +49,14 @@ import setAccessToken from "methods/setAccessToken";
 import NavBar from "components/NavBar";
 import { localData, userResourceDatabase } from "local-database";
 import Settings from "pages/Settings";
-import initConfessionSpreadsheetMetadata from "methods/initConfessionSpreadsheetMetadata";
-import getLinkedFormIdFromSheet from "methods/getLinkedFormIdFromSheet";
 import getMessagingToken from "methods/getMessagingToken";
+import buildPicker from "methods/buildPicker";
+import fetchAndInitSpreadsheet from "methods/fetchAndInitSpreadsheet";
+import { PushMessageData } from "types";
 
 const AuthenticatedWrapper: Component = () => {
   onMount(async () => {
     /// TODO: FIRE SNACKBAR
-    const getForm = async (formId: string) =>
-      formId
-        ? ((await userResourceDatabase.getItem(
-            formId
-          )) as gapi.client.forms.Form) ||
-          (
-            await gapi.client.forms.forms.get({
-              formId,
-              fields: "formId,linkedSheetId,info/documentTitle",
-            })
-          ).result
-        : {};
-    const getSpreadsheet = async (spreadsheetId: string) =>
-      spreadsheetId
-        ? ((await userResourceDatabase.getItem(
-            spreadsheetId
-          )) as gapi.client.sheets.Spreadsheet) ||
-          (
-            await gapi.client.sheets.spreadsheets.get({
-              spreadsheetId,
-            })
-          ).result
-        : {};
-
-    const fetchAndInitSpreadsheet = async ({
-      spreadsheetId,
-      formId,
-    }: {
-      spreadsheetId?: string | null;
-      formId?: string | null;
-    }) => {
-      if (!spreadsheetId && !formId) return;
-
-      const form = await getForm(
-        formId || (await getLinkedFormIdFromSheet(spreadsheetId!))!
-      );
-      if (!form.linkedSheetId) return;
-      const spreadsheet = await getSpreadsheet(
-        spreadsheetId || form.linkedSheetId!
-      );
-
-      batch(() => {
-        setConfessionSpreadsheet(spreadsheet);
-        initConfessionSpreadsheetMetadata();
-        setConfessionForm(form);
-      });
-
-      formId = form.formId;
-      spreadsheetId = spreadsheet.spreadsheetId;
-
-      await userResourceDatabase.setItem(
-        LOCAL_KEY_CONFESSION_SPREADSHEET_ID,
-        spreadsheetId
-      );
-      await userResourceDatabase.setItem(LOCAL_KEY_CONFESSION_FORM_ID, formId);
-
-      await userResourceDatabase.setItem(form.formId!, form);
-      await userResourceDatabase.setItem(
-        spreadsheet.spreadsheetId!,
-        spreadsheet
-      );
-    };
-
     await fetchAndInitSpreadsheet({
       spreadsheetId: await userResourceDatabase.getItem(
         LOCAL_KEY_CONFESSION_SPREADSHEET_ID
@@ -117,31 +65,7 @@ const AuthenticatedWrapper: Component = () => {
     });
 
     gapi.load("picker", async () => {
-      const pickerCallback = async (res: google.picker.ResponseObject) => {
-        setPicking(true);
-        if (res[google.picker.Response.ACTION] == google.picker.Action.PICKED) {
-          console.log(res);
-          await fetchAndInitSpreadsheet({
-            /// @ts-ignore
-            [res.docs[0].serviceId === "form" ? "formId" : "spreadsheetId"]:
-              res.docs[0].id,
-          });
-        }
-        setPicking(false);
-      };
-      setPicker(
-        new google.picker.PickerBuilder()
-          .addView(google.picker.ViewId.SPREADSHEETS)
-          .addView(google.picker.ViewId.FORMS)
-          .setMaxItems(1)
-          .setOAuthToken(gapi.client.getToken().access_token)
-          .setDeveloperKey(import.meta.env.VITE_GOOGLE_API_KEY)
-          .setCallback(pickerCallback)
-          .setTitle(
-            "Chọn bảng tính hoặc biểu mẫu nhận câu trả lời Confession của bạn"
-          )
-          .build()
-      );
+      setPicker(buildPicker());
     });
   });
   return (
@@ -157,7 +81,6 @@ const App: Component = () => {
     if (isGapiLoaded()) return;
     gapi.load("client", async () => {
       await gapi.client.init({
-        apiKey: import.meta.env.VITE_GOOGLE_API_KEY,
         discoveryDocs: DISCOVERY_DOCS,
       });
 
@@ -182,8 +105,12 @@ const App: Component = () => {
         const accessToken = response.data.access_token;
 
         if (response.data.ok) {
-          if (isGapiLoaded()) setAccessToken(accessToken);
-          else existed_access_token = accessToken;
+          if (isGapiLoaded()) {
+            batch(() => {
+              setAccessToken(accessToken);
+              setPicker(buildPicker());
+            });
+          } else existed_access_token = accessToken;
         }
         return setTimeout(
           refreshAccessToken,
@@ -200,13 +127,13 @@ const App: Component = () => {
 
   onMount(async () => {
     const app = initializeApp({
-      apiKey: "AIzaSyAnPO6_ZDiVdNOOYEZShljjd8cdqKyNlAc",
-      authDomain: "confession-manager.firebaseapp.com",
-      projectId: "confession-manager",
-      storageBucket: "confession-manager.appspot.com",
-      messagingSenderId: "1041449841105",
-      appId: "1:1041449841105:web:43b9b359bea7eb95afb0f0",
-      measurementId: "G-Z8MBF96X25",
+      apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+      authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+      projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+      storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+      messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+      appId: import.meta.env.VITE_FIREBASE_APP_ID,
+      measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
     });
 
     const localNotificationKey = await localData.getItem(
@@ -223,9 +150,26 @@ const App: Component = () => {
     const messaging = getMessaging(app);
 
     // TODO: Handle update and focus new confession when notification is pushed
-    onMessage(messaging, (payload) => {
-      if (payload.data?.attributes) {
+    onMessage(messaging, async (payload) => {
+      if (payload.data?.eventType === "RESPONSES") {
+        const data = payload.data as unknown as PushMessageData;
+        const values = JSON.parse(data.values);
+        const row = +data.range.match(/([0-9]+$)/gm)![0];
+        if (row === confessions.pending[confessions.pending.length - 1].row + 1)
+          confessions.pending.push({
+            data: values[1],
+            date: values[0],
+            row,
+          });
       }
+      setPendingNotification((prev) => [...prev, payload]);
+      const backgroundPendings = await userResourceDatabase.getItem(
+        LOCAL_KEY_PENDING_NOTIFICATIONS
+      );
+      await userResourceDatabase.setItem(LOCAL_KEY_PENDING_NOTIFICATIONS, [
+        payload,
+        ...((backgroundPendings as null | MessagePayload[]) || []),
+      ]);
       console.log("MESSAGE: ", payload);
     });
 
@@ -233,8 +177,6 @@ const App: Component = () => {
     // and the service worker will catch the request to handle it
     await getMessagingToken();
   });
-
-  createEffect(() => console.log(loggedIn()));
 
   return (
     <Routes>

@@ -5,12 +5,14 @@ import {
   CHECK_ICON_URL,
   CROSS_ICON_URL,
   DEFAULT_AVATAR_URL,
+  GOOGLE_FORMS_FAVICON_URL,
   GOOGLE_SHEET_FAVICON_URL,
   HEART_ICON_URL,
   HOUSE_ICON_URL,
   LAUNCH_ICON_URL,
   LOGOUT_ICON_URL,
   PAPER_PLANE_ICON_URL,
+  RIGHT_ARROW_ICON_URL,
   SETTINGS_ICON_URL,
 } from "app-constants";
 import axios from "axios";
@@ -18,9 +20,14 @@ import handleLogout from "methods/handleLogout";
 import { Component, Show, createSignal, onMount } from "solid-js";
 import { createStore } from "solid-js/store";
 import { Portal } from "solid-js/web";
-import { confessionSpreadsheet, isSheetInited } from "store/index";
+import {
+  confesisonForm,
+  confessionSpreadsheet,
+  isSheetInited,
+} from "store/index";
 import { UserInfo, VerticalNavBarMetadata } from "types";
 import AppLogo from "ui-components/AppLogo";
+import NotificationBell from "./NotificationBell";
 
 const verticalNavBarMetadatas: VerticalNavBarMetadata[] = [
   {
@@ -50,6 +57,7 @@ const AccountDropDownElementClass =
 
 const NavBar: Component = () => {
   const [isLoggingOut, setLoggingOut] = createSignal(false);
+  const [isVerticalNavExtended, setVerticalNavExtended] = createSignal(false);
 
   const [isAccountDropdownShow, setAccountDropdownShow] = createSignal(false);
   const [userData, setUserData] = createStore<UserInfo>({
@@ -102,27 +110,9 @@ const NavBar: Component = () => {
           <AppLogo />
           <h5 class="font-bold">Confession Manager</h5>
         </A>
-        {/* CenterNav */}
-        <a
-          class="flex items-center align-middle space-x-4 hover:bg-slate-200 rounded px-2 mx-auto"
-          href={confessionSpreadsheet.spreadsheetUrl}
-          target="blank"
-        >
-          <img
-            src={GOOGLE_SHEET_FAVICON_URL}
-            alt="Google Sheet"
-            class="w-8 h-8"
-          />
-          <div class="flex items-center space-x-2 font-md text-sm dark:text-white">
-            <p>{confessionSpreadsheet.properties?.title}</p>
-            <img src={LAUNCH_ICON_URL} alt="New tab" class="w-5 h-5" />
-          </div>
-        </a>
         {/* RightNav */}
         <div class="flex space-x-4 items-center">
-          <button class="rounded-full hover:cursor-pointer hover:bg-slate-200 p-1">
-            <img src={BELL_ICON_URL} alt="Bell" class="w-7 h-7" />
-          </button>
+          <NotificationBell />
           <A
             activeClass="bg-sky-100"
             href="/settings"
@@ -185,20 +175,81 @@ const NavBar: Component = () => {
       </div>
       {/* Vertical Nav */}
       <Show when={isSheetInited()}>
-        <div class="fixed flex flex-col justify-center bottom-0 h-full z-[1] px-2 bg-white space-y-0.5">
+        {/* <div class="fixed flex flex-col justify-center bottom-0 h-full z-[1] px-2 bg-white space-y-0.5">
+          
+        </div> */}
+        <div
+          class={`fixed top-[56px] flex flex-col left-0 z-[1] h-screen overflow-y-auto transition-transform bg-white ${
+            isVerticalNavExtended() ? "w-max" : "w-[64px]"
+          } dark:bg-gray-800 space-y-4 px-2`}
+          tabindex="-1"
+          aria-labelledby="drawer-left-label"
+        >
+          <button
+            onClick={() => setVerticalNavExtended((prev) => !prev)}
+            class="rounded-full hover:bg-gray-200 flex justify-center items-center w-8 h-8 ml-2 my-2"
+          >
+            <img
+              src={RIGHT_ARROW_ICON_URL}
+              alt="Menu"
+              class={`w-7 h-7 ${isVerticalNavExtended() ? "rotate-180" : ""}`}
+            />
+          </button>
+          <hr />
+          <a
+            class="rounded-lg flex space-x-4 hover:bg-slate-200 items-center p-2"
+            href={confessionSpreadsheet.spreadsheetUrl}
+            target="blank"
+          >
+            <img
+              src={GOOGLE_SHEET_FAVICON_URL}
+              alt="Google Sheet"
+              class="w-8 h-8"
+            />
+            <div class="flex items-center space-x-2 font-md text-sm dark:text-white">
+              <p
+                hidden={!isVerticalNavExtended()}
+                class="max-w-[140px] overflow-hidden whitespace-nowrap text-ellipsis"
+              >
+                {confessionSpreadsheet.properties?.title}
+              </p>
+              <img src={LAUNCH_ICON_URL} alt="New tab" class="w-5 h-5" />
+            </div>
+          </a>
+          <a
+            class="rounded-lg flex space-x-4 hover:bg-slate-200 items-center p-2"
+            href={confesisonForm.responderUri}
+            target="blank"
+          >
+            <img
+              src={GOOGLE_FORMS_FAVICON_URL}
+              alt="Google Forms"
+              class="w-8 h-8"
+            />
+            <div class="flex items-center space-x-2 font-md text-sm dark:text-white">
+              <p
+                hidden={!isVerticalNavExtended()}
+                class="max-w-[140px] overflow-hidden whitespace-nowrap text-ellipsis"
+              >
+                {confesisonForm.info?.documentTitle}
+              </p>
+              <img src={LAUNCH_ICON_URL} alt="New tab" class="w-5 h-5" />
+            </div>
+          </a>
+          <hr />
           {verticalNavBarMetadatas.map((metadata) => (
             <A
               end
               activeClass="bg-sky-100"
               href={metadata.path}
-              class="rounded-lg p-4 flex space-x-4 hover:bg-slate-200 items-center"
+              class="rounded-lg flex space-x-4 hover:bg-slate-200 items-center p-2"
             >
               <img
                 src={metadata.iconUrl}
                 alt={metadata.title}
                 class="w-8 h-8"
               />
-              <h5>{metadata.title}</h5>
+              <h5 hidden={!isVerticalNavExtended()}>{metadata.title}</h5>
             </A>
           ))}
         </div>

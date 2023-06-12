@@ -27,7 +27,7 @@ const ChangesPanel: Component = () => {
                   <h3 class="flex flex-col justify-center text-center sm:ml-4 sm:mt-0 sm:text-left text-base font-semibold text-gray-900">
                     Bạn có muốn lưu thay đổi?
                   </h3>
-                  <div class="py-2">
+                  <div class="py-2 flex space-x-2">
                     <Button class="my-0 inline-flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 sm:ml-3 sm:w-auto">
                       Lưu
                     </Button>

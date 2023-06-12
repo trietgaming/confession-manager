@@ -2,13 +2,19 @@ import FreshStartModal from "../pages/Dashboard/init/InitSheets/FreshStartModal"
 import Color from "../classes/Color";
 import { PENDING_CONFESSION_ACTION } from "../constants";
 import ConditionalFilteringModal from "../pages/Dashboard/init/InitSheets/ConditionalFilteringModal";
-import { JSX } from "solid-js";
-/// <reference types="vite/client" />
 
+/// <reference types="vite/client" />
 interface ImportMetaEnv {
   readonly VITE_GOOGLE_API_KEY: string;
   readonly VITE_GOOGLE_CLIENT_ID: string;
   readonly VITE_VAPID_PUBLIC_KEY: string;
+  readonly VITE_FIREBASE_API_KEY: string;
+  readonly VITE_FIREBASE_AUTH_DOMAIN: string;
+  readonly VITE_FIREBASE_PROJECT_ID: string;
+  readonly VITE_FIREBASE_STORAGE_BUCKET: string;
+  readonly VITE_FIREBASE_MESSAGING_SENDER_ID: string;
+  readonly VITE_FIREBASE_APP_ID: string;
+  readonly VITE_FIREBASE_MEASUREMENT_ID: string;
 }
 
 interface ImportMeta {
@@ -146,4 +152,22 @@ export interface VerticalNavBarMetadata {
   iconUrl: string;
   path: string;
   title: string;
+}
+
+export interface Confessions {
+  pending: Confession[];
+  declined: Confession[];
+  accepted: Confession[];
+  posted: Confession[];
+}
+
+export interface PushMessageData {
+  eventType: string;
+  spreadsheetId: string;
+  range: string;
+  /**
+   * JSON string array
+   */
+  values: string;
+  publishTime: string;
 }

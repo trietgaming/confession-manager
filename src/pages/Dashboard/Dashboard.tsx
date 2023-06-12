@@ -11,20 +11,17 @@ import {
 import {
   confessionMetadata,
   confessionSpreadsheet,
+  confessions,
   pendingChanges,
   scrollY,
   setPendingChanges,
 } from "store";
 import { Confession, HandleAction } from "types";
-import confessionCached from "../../caching/confession";
+// import cachedConfesison from "../../caching/confession";
 import LoadingCircle from "ui-components/LoadingCircle";
 import { FETCH_TRIGGER_Y_OFFSET, MAX_CFS_PER_LOAD } from "../../constants";
 
 const Dashboard: Component = () => {
-  const [confessions, setConfessions] = createSignal<Confession[]>(
-    confessionCached.get(),
-    { equals: false }
-  );
   const [nextFirstCfsRow, setNextFirstCfsRow] = createSignal(2); // 1: title of row, 2: first reply of the table
   const [isFetching, setFetching] = createSignal(false);
   const [isEnd, setEnd] = createSignal(false);
@@ -65,15 +62,13 @@ const Dashboard: Component = () => {
             });
           }
           batch(() => {
-            setConfessions((confessions) => {
-              for (const nextConfession of nextConfessions) {
-                confessions.push(nextConfession);
-              }
-              return confessions;
-            });
+            for (const nextConfession of nextConfessions) {
+              confessions.pending.push(nextConfession);
+            }
+
             setNextFirstCfsRow((last) => last + MAX_CFS_PER_LOAD);
           });
-          confessionCached.set(confessions());
+          // cachedConfesison.set(confessions());
         }
       } catch (err: any) {
         if (err?.result?.error.status === "INVALID_ARGUMENT") {
@@ -100,7 +95,7 @@ const Dashboard: Component = () => {
       </h1>
       <ul class="self-center" ref={cfsContainer}>
         <For
-          each={confessions()}
+          each={confessions.pending}
           fallback={<h3>Hiện tại không có confession nào...</h3>}
         >
           {(confession) => {

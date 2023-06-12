@@ -16,7 +16,7 @@
       "google.picker",
       "gapi.client.forms-v1",
       "vite-plugin-pwa/client",
-      "gapi.people"
+      "gapi.people",
     ],
     "noEmit": true,
     "isolatedModules": true,

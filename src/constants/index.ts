@@ -1,25 +1,8 @@
 import { PendingChanges } from "types";
 
-export const POSTED_COLOR = "#74b9ff";
-export const DECLINED_COLOR = "#fc5c65";
-export const ACCEPTED_COLOR = "#7bed9f";
-
-// export const POSTED_COLOR_METADATA_KEY = "cfs_posted_color";
-// export const DECLINED_COLOR_METADATA_KEY = "cfs_declined_color";
-// export const ACCEPTED_COLOR_METADATA_KEY = "cfs_accepted_color";
-
-// export const POSTED_SHEET_ID_METADATA_KEY = "cfs_posted_sheet_id";
-// export const DECLINED_SHEET_ID_METADATA_KEY = "cfs_declined_sheet_id";
-// export const ACCEPTED_SHEET_ID_METADATA_KEY = "cfs_accepted_sheet_id";
-
-// export const METADATA_KEYS_NEEDED = [
-//   POSTED_COLOR_METADATA_KEY,
-//   DECLINED_COLOR_METADATA_KEY,
-//   ACCEPTED_COLOR_METADATA_KEY,
-//   POSTED_SHEET_ID_METADATA_KEY,
-//   DECLINED_SHEET_ID_METADATA_KEY,
-//   ACCEPTED_SHEET_ID_METADATA_KEY,
-// ];
+// export const POSTED_COLOR = "#74b9ff";
+// export const DECLINED_COLOR = "#fc5c65";
+// export const ACCEPTED_COLOR = "#7bed9f";
 
 export const CONFESSION_SHEET_TYPE_METADATA_KEY = "cfs_sheet_type";
 
@@ -48,7 +31,6 @@ export const PENDING_CHANGES_CONFESSION_ARRAY_KEYS: (keyof PendingChanges)[] = [
 
 export const DISCOVERY_DOCS = [
   "https://sheets.googleapis.com/$discovery/rest?version=v4",
-  "https://forms.googleapis.com/$discovery/rest?version=v1",
 ];
 
 export const SCOPES = "https://www.googleapis.com/auth/drive";
@@ -70,6 +52,8 @@ export const LOCAL_KEY_CONFESSION_FORM_ID = "confession_form_id";
 export const LOCAL_KEY_NOTIFICATION_SUBSCRIBED_SPREADSHEETS =
   "notification_subscribed";
 export const LOCAL_KEY_NOTIFICATION_TOKEN = "notification_token";
+export const LOCAL_KEY_CACHED_NOTIFICATIONS = "notifications";
+export const LOCAL_KEY_PENDING_NOTIFICATIONS = "pending_notifications";
 
 export const NOTIFICATION_TOPIC =
   "projects/confession-manager/topics/confession-notification";
@@ -85,6 +69,8 @@ export { default as HOUSE_ICON_URL } from "../assets/icons/house-icon.svg";
 export { default as CHECK_ICON_URL } from "../assets/icons/check-icon.svg";
 export { default as CROSS_ICON_URL } from "../assets/icons/cross-icon.svg";
 export { default as PAPER_PLANE_ICON_URL } from "../assets/icons/paper-plane-tilt-icon.svg";
+export { default as RIGHT_ARROW_ICON_URL } from "../assets/icons/right-arrow-icon.svg";
+export { default as APP_LOGO_URL } from "../assets/icons/confession-manager-icon.svg";
 
 export const GOOGLE_SHEET_FAVICON_URL =
   "https://ssl.gstatic.com/docs/doclist/images/mediatype/icon_1_spreadsheet_x64.png";
