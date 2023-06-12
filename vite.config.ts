@@ -52,6 +52,7 @@ export default defineConfig({
       { find: "app-constants", replacement: "/src/constants" },
       { find: "classes", replacement: "/src/classes" },
       { find: "assets", replacement: "/src/assets" },
+      { find: "local-database", replacement: "/src/constants/database.js" },
     ],
   },
 });

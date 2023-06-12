@@ -31,10 +31,10 @@ import {
 import initConfessionSpreadsheetMetadata from "methods/initConfessionSpreadsheetMetadata";
 import LoadingCircle from "ui-components/LoadingCircle";
 import { reconcile } from "solid-js/store";
-import localforage from "localforage";
 import MainTitle from "ui-components/MainTitle";
 import Modal from "ui-components/Modal";
 import refreshSpreadsheet from "methods/refreshSpreadsheet";
+import { userResourceDatabase } from "local-database";
 
 const selectElementsPayload: {
   iconUrl: string;
@@ -310,8 +310,8 @@ const SelectSheets: Component = () => {
 
   /// TODO: OPTIMIZE THIS
   const handleGoBack = async () => {
-    await localforage.removeItem(LOCAL_KEY_CONFESSION_SPREADSHEET_ID);
-    await localforage.removeItem(LOCAL_KEY_CONFESSION_FORM_ID);
+    await userResourceDatabase.removeItem(LOCAL_KEY_CONFESSION_SPREADSHEET_ID);
+    await userResourceDatabase.removeItem(LOCAL_KEY_CONFESSION_FORM_ID);
     batch(() => {
       setConfessionSpreadsheet(reconcile({}));
       setConfessionForm(reconcile({}));

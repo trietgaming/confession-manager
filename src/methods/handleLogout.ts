@@ -2,12 +2,10 @@ import {
   APP_SERVER_URL,
   LOCAL_KEY_CONFESSION_FORM_ID,
   LOCAL_KEY_CONFESSION_SPREADSHEET_ID,
-  LOCAL_KEY_NOTIFICATION_TOKEN,
 } from "app-constants";
 import axios from "axios";
 import setAccessToken from "./setAccessToken";
 import {
-  confesisonForm,
   setConfessionForm,
   setConfessionMetadata,
   setConfessionSpreadsheet,
@@ -15,7 +13,7 @@ import {
 } from "store/index";
 import { reconcile } from "solid-js/store";
 import { batch } from "solid-js";
-import localforage from "localforage";
+import { userResourceDatabase } from "local-database";
 
 export default async function handleLogout() {
   //TODO: RESET all state of prev user
@@ -35,8 +33,16 @@ export default async function handleLogout() {
         setPendingChanges(reconcile({}));
         setConfessionForm(reconcile({}));
       });
-      await localforage.removeItem(LOCAL_KEY_CONFESSION_FORM_ID);
-      await localforage.removeItem(LOCAL_KEY_CONFESSION_SPREADSHEET_ID);
+      await userResourceDatabase.removeItem(LOCAL_KEY_CONFESSION_FORM_ID);
+      await userResourceDatabase.removeItem(LOCAL_KEY_CONFESSION_SPREADSHEET_ID);
+      // const localSubscribedForms: string[] | null = await localforage.getItem(
+      //   LOCAL_KEY_NOTIFICATION_SUBSCRIBED_FORMS
+      // );
+      /// HANDLE UNSUBSCRIBE FROM SW
+      // if (localSubscribedForms) {
+      //   await unsubscribeToNotification(localSubscribedForms);
+      //   await localforage.removeItem(LOCAL_KEY_NOTIFICATION_SUBSCRIBED_FORMS);
+      // }
       // await localforage.removeItem(confesisonForm.formId + "_doctitle");
     } else {
       console.error(response.data);

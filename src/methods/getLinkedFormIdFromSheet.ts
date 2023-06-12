@@ -1,4 +1,4 @@
-import { APP_SCRIPT_ID } from "app-constants";
+import { APP_SCRIPT_RUN_URL } from "app-constants";
 import axios from "axios";
 
 export default async function getLinkedFormIdFromSheet(
@@ -8,7 +8,7 @@ export default async function getLinkedFormIdFromSheet(
 
   try {
     const response = await axios.post(
-      `https://script.googleapis.com/v1/scripts/${APP_SCRIPT_ID}:run`,
+      APP_SCRIPT_RUN_URL,
       {
         function: "getLinkedFormId",
         parameters: [spreadsheetId],

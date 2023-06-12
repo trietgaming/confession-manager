@@ -1,47 +1,35 @@
-import { LOCAL_KEY_NOTIFICATION_SUBSCRIBED_FORMS } from "./../constants/index";
 import {
-  APP_SERVER_URL,
-  LOCAL_KEY_CONFESSION_FORM_ID,
-  LOCAL_KEY_NOTIFICATION_TOKEN,
-  NOTIFICATION_TOPIC,
+  APP_SCRIPT_RUN_URL,
+  LOCAL_KEY_CONFESSION_SPREADSHEET_ID,
+  LOCAL_KEY_NOTIFICATION_SUBSCRIBED_SPREADSHEETS,
 } from "app-constants";
+import { APP_SERVER_URL, LOCAL_KEY_NOTIFICATION_TOKEN } from "app-constants";
 import axios from "axios";
-import localforage from "localforage";
-import { confesisonForm } from "store/index";
-export default async function subscribeToNotification(_formId?: string) {
-  const formId =
-    _formId ||
-    confesisonForm.formId ||
-    (await localforage.getItem(LOCAL_KEY_CONFESSION_FORM_ID))!;
-  // Check if a watch is existed
-  const watchList = await gapi.client.forms.forms.watches.list({
-    formId,
-  });
+import { localData, userResourceDatabase } from "local-database";
+import { confessionSpreadsheet } from "store/index";
 
-  if (
-    !watchList.result.watches?.some((watch) => {
-      return (
-        watch.target?.topic?.topicName === NOTIFICATION_TOPIC &&
-        watch.eventType === "RESPONSES"
-      );
-    })
-  ) {
-    await gapi.client.forms.forms.watches.create({
-      formId,
-      resource: {
-        watch: {
-          eventType: "RESPONSES",
-          target: {
-            topic: {
-              topicName: NOTIFICATION_TOPIC,
-            },
-          },
-        },
+export default async function subscribeToNotification(_spreadsheetId?: string) {
+  const spreadsheetId =
+    _spreadsheetId ||
+    confessionSpreadsheet.spreadsheetId ||
+    (await userResourceDatabase.getItem(LOCAL_KEY_CONFESSION_SPREADSHEET_ID))!;
+  console.log("subscribe ", spreadsheetId);
+
+  // Subscribe to trigger
+  await axios.post(
+    APP_SCRIPT_RUN_URL,
+    {
+      function: "subscribeToFormResponse",
+      parameters: [spreadsheetId],
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${gapi.client.getToken().access_token}`,
       },
-    });
-  }
+    }
+  );
 
-  const notificationToken = await localforage.getItem(
+  const notificationToken = await localData.getItem(
     LOCAL_KEY_NOTIFICATION_TOKEN
   );
   if (!notificationToken) {
@@ -52,7 +40,7 @@ export default async function subscribeToNotification(_formId?: string) {
   await axios.put(
     APP_SERVER_URL + "/notification",
     {
-      form_id: formId,
+      spreadsheetId,
       token: notificationToken,
     },
     {
@@ -61,10 +49,13 @@ export default async function subscribeToNotification(_formId?: string) {
       },
     }
   );
-  await localforage.setItem(LOCAL_KEY_NOTIFICATION_SUBSCRIBED_FORMS, [
-    ...(((await localforage.getItem(
-      LOCAL_KEY_NOTIFICATION_SUBSCRIBED_FORMS
-    )) as string[] | null) || []),
-    formId,
-  ]);
+  await userResourceDatabase.setItem(
+    LOCAL_KEY_NOTIFICATION_SUBSCRIBED_SPREADSHEETS,
+    [
+      ...(((await userResourceDatabase.getItem(
+        LOCAL_KEY_NOTIFICATION_SUBSCRIBED_SPREADSHEETS
+      )) as string[] | null) || []),
+      spreadsheetId,
+    ]
+  );
 }

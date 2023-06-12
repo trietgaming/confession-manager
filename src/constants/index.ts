@@ -53,8 +53,8 @@ export const DISCOVERY_DOCS = [
 
 export const SCOPES = "https://www.googleapis.com/auth/drive";
 
-export const APP_SCRIPT_ID =
-  "AKfycbx1z61KgHlJxPtJjUp1LS4N9BK-4BDnySVLj2ESrUCEaSZg6kaE4a4e6nTvizmHkxdC";
+export const APP_SCRIPT_RUN_URL =
+  "https://script.googleapis.com/v1/scripts/AKfycbx1z61KgHlJxPtJjUp1LS4N9BK-4BDnySVLj2ESrUCEaSZg6kaE4a4e6nTvizmHkxdC:run";
 
 export const IS_DEV = import.meta.env.MODE === "development";
 
@@ -66,10 +66,10 @@ export const BASE_URL = IS_DEV
   ? "https://localhost:8080"
   : "https://confession-manager.app";
 
-export const LOCAL_KEY_NOTIFICATION_TOKEN = "notification_token";
 export const LOCAL_KEY_CONFESSION_FORM_ID = "confession_form_id";
-export const LOCAL_KEY_NOTIFICATION_SUBSCRIBED_FORMS =
+export const LOCAL_KEY_NOTIFICATION_SUBSCRIBED_SPREADSHEETS =
   "notification_subscribed";
+export const LOCAL_KEY_NOTIFICATION_TOKEN = "notification_token";
 
 export const NOTIFICATION_TOPIC =
   "projects/confession-manager/topics/confession-notification";

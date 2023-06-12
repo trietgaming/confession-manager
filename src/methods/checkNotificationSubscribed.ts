@@ -1,12 +1,12 @@
-import { LOCAL_KEY_NOTIFICATION_SUBSCRIBED_FORMS } from "app-constants";
-import localforage from "localforage";
-import { confesisonForm } from "store/index";
+import { LOCAL_KEY_NOTIFICATION_SUBSCRIBED_SPREADSHEETS } from "app-constants";
+import { userResourceDatabase } from "local-database";
+import { confessionSpreadsheet } from "store/index";
 
 export default async function checkNotificationSubscribed() {
-  const formId = confesisonForm.formId;
-  const subscribedForms = await localforage.getItem(
-    LOCAL_KEY_NOTIFICATION_SUBSCRIBED_FORMS
+  const spreadsheetId = confessionSpreadsheet.spreadsheetId;
+  const subscribedSpreadsheets = await userResourceDatabase.getItem(
+    LOCAL_KEY_NOTIFICATION_SUBSCRIBED_SPREADSHEETS
   );
 
-  return (subscribedForms as string[])?.includes(formId || "")
+  return (subscribedSpreadsheets as string[])?.includes(spreadsheetId || "");
 }

@@ -13,7 +13,6 @@ import {
   BELL_ICON_URL,
   GOOGLE_FORMS_FAVICON_URL,
   GOOGLE_SHEET_FAVICON_URL,
-  LOCAL_KEY_NOTIFICATION_SUBSCRIBED_FORMS,
   LOCAL_KEY_NOTIFICATION_TOKEN,
 } from "app-constants";
 import handlePick from "methods/handlePick";
@@ -22,8 +21,8 @@ import subscribeToNotification from "methods/subscribeToNotification";
 import Toggle from "ui-components/Toggle";
 import unsubscribeToNotification from "methods/unsubscribeToNotification";
 import getMessagingToken from "methods/getMessagingToken";
-import localforage from "localforage";
 import checkNotificationSubscribed from "methods/checkNotificationSubscribed";
+import { localData } from "local-database";
 
 const settingContainerClass = "flex justify-between items-center";
 const doubleTitleContainerClass = "flex items-center space-x-4";
@@ -48,14 +47,15 @@ const Settings: Component = () => {
   const handleToggleNotification = async () => {
     setLoadingNotificationSubscription(true);
     try {
-      await localforage.setItem(
+      const currentSubscriptionState = isNotificationSubscribed();
+      setNotificationSubscribed(!isNotificationSubscribed());
+      await localData.setItem(
         LOCAL_KEY_NOTIFICATION_TOKEN,
         await getMessagingToken()
       );
-      isNotificationSubscribed()
+      currentSubscriptionState
         ? await unsubscribeToNotification()
         : await subscribeToNotification();
-      setNotificationSubscribed(!isNotificationSubscribed());
     } catch (err) {
       if (!("serviceWorker" in navigator)) {
         alert(
@@ -76,10 +76,9 @@ const Settings: Component = () => {
       } else {
         console.error(err);
       }
-      setNotificationSubscribed((prev) => !prev);
-    } finally {
-      setLoadingNotificationSubscription(false);
+      setNotificationSubscribed(!isNotificationSubscribed());
     }
+    setLoadingNotificationSubscription(false);
   };
 
   return (

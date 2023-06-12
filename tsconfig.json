@@ -30,6 +30,7 @@
       "components/*": ["./src/components/*"],
       "types": ["./src/types/index.d.ts"],
       "app-constants": ["./src/constants/index.ts"],
+      "local-database": ["./src/constants/database.ts"],
       "classes/*": ["./src/classes/*"],
       "assets/*": ["./src/assets/*"]
     }

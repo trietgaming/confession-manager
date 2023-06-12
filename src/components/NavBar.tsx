@@ -15,15 +15,12 @@ import {
 } from "app-constants";
 import axios from "axios";
 import handleLogout from "methods/handleLogout";
-import subscribeToNotification from "methods/subscribeToNotification";
 import { Component, Show, createSignal, onMount } from "solid-js";
 import { createStore } from "solid-js/store";
 import { Portal } from "solid-js/web";
 import { confessionSpreadsheet, isSheetInited } from "store/index";
 import { UserInfo, VerticalNavBarMetadata } from "types";
 import AppLogo from "ui-components/AppLogo";
-import Button from "ui-components/Button";
-import LoadingCircle from "ui-components/LoadingCircle";
 
 const verticalNavBarMetadatas: VerticalNavBarMetadata[] = [
   {

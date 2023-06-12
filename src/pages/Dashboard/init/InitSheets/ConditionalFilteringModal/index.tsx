@@ -23,7 +23,6 @@ import createSignalObjectEmptyChecker from "methods/createSignalObjectEmptyCheck
 import { Conditions } from "types";
 import { confessionMetadata } from "store/index";
 import hashTextFormat from "methods/hashTextFormat";
-import { key } from "localforage";
 import getColorFromCell from "methods/getColorFromCell";
 import PreviewChanges from "./PreviewChanges";
 

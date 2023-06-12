@@ -29,7 +29,6 @@ import {
   DISCOVERY_DOCS,
   LOCAL_KEY_CONFESSION_FORM_ID,
   LOCAL_KEY_CONFESSION_SPREADSHEET_ID,
-  LOCAL_KEY_NOTIFICATION_SUBSCRIBED_FORMS,
   LOCAL_KEY_NOTIFICATION_TOKEN,
 } from "app-constants";
 import axios from "axios";
@@ -38,21 +37,21 @@ import PopupCallback from "pages/PopupCallback";
 import createGoogleApi from "app-hooks/createGoogleApi";
 import setAccessToken from "methods/setAccessToken";
 import NavBar from "components/NavBar";
-import localforage from "localforage";
+import { localData, userResourceDatabase } from "local-database";
 import Settings from "pages/Settings";
 import initConfessionSpreadsheetMetadata from "methods/initConfessionSpreadsheetMetadata";
 import getLinkedFormIdFromSheet from "methods/getLinkedFormIdFromSheet";
 import getMessagingToken from "methods/getMessagingToken";
-import subscribeToNotification from "methods/subscribeToNotification";
-import unsubscribeToNotification from "methods/unsubscribeToNotification";
-import checkNotificationSubscribed from "methods/checkNotificationSubscribed";
 
 const AuthenticatedWrapper: Component = () => {
   onMount(async () => {
     /// TODO: FIRE SNACKBAR
     const getForm = async (formId: string) =>
       formId
-        ? (
+        ? ((await userResourceDatabase.getItem(
+            formId
+          )) as gapi.client.forms.Form) ||
+          (
             await gapi.client.forms.forms.get({
               formId,
               fields: "formId,linkedSheetId,info/documentTitle",
@@ -61,7 +60,10 @@ const AuthenticatedWrapper: Component = () => {
         : {};
     const getSpreadsheet = async (spreadsheetId: string) =>
       spreadsheetId
-        ? (
+        ? ((await userResourceDatabase.getItem(
+            spreadsheetId
+          )) as gapi.client.sheets.Spreadsheet) ||
+          (
             await gapi.client.sheets.spreadsheets.get({
               spreadsheetId,
             })
@@ -94,18 +96,24 @@ const AuthenticatedWrapper: Component = () => {
       formId = form.formId;
       spreadsheetId = spreadsheet.spreadsheetId;
 
-      await localforage.setItem(
+      await userResourceDatabase.setItem(
         LOCAL_KEY_CONFESSION_SPREADSHEET_ID,
         spreadsheetId
       );
-      await localforage.setItem(LOCAL_KEY_CONFESSION_FORM_ID, formId);
+      await userResourceDatabase.setItem(LOCAL_KEY_CONFESSION_FORM_ID, formId);
+
+      await userResourceDatabase.setItem(form.formId!, form);
+      await userResourceDatabase.setItem(
+        spreadsheet.spreadsheetId!,
+        spreadsheet
+      );
     };
 
     await fetchAndInitSpreadsheet({
-      spreadsheetId: await localforage.getItem(
+      spreadsheetId: await userResourceDatabase.getItem(
         LOCAL_KEY_CONFESSION_SPREADSHEET_ID
       ),
-      formId: await localforage.getItem(LOCAL_KEY_CONFESSION_FORM_ID),
+      formId: await userResourceDatabase.getItem(LOCAL_KEY_CONFESSION_FORM_ID),
     });
 
     gapi.load("picker", async () => {
@@ -201,15 +209,14 @@ const App: Component = () => {
       measurementId: "G-Z8MBF96X25",
     });
 
-    const localNotificationKey = await localforage.getItem(
+    const localNotificationKey = await localData.getItem(
       LOCAL_KEY_NOTIFICATION_TOKEN
     );
-    const subscribedForms: string[] | null = await localforage.getItem(
-      LOCAL_KEY_NOTIFICATION_SUBSCRIBED_FORMS
-    );
+    const subscribedSpreadsheets: string[] | null =
+      await userResourceDatabase.getItem(LOCAL_KEY_CONFESSION_SPREADSHEET_ID);
     if (
       !localNotificationKey &&
-      (!subscribedForms || subscribedForms.length === 0)
+      (!subscribedSpreadsheets || subscribedSpreadsheets.length === 0)
     )
       return;
 
@@ -222,38 +229,9 @@ const App: Component = () => {
       console.log("MESSAGE: ", payload);
     });
 
-    const messagingToken = await getMessagingToken();
-
-    if (
-      localNotificationKey !== null &&
-      localNotificationKey !== messagingToken
-    ) {
-      const localSubscribedForms: string[] | null = await localforage.getItem(
-        LOCAL_KEY_NOTIFICATION_SUBSCRIBED_FORMS
-      );
-      if (!localSubscribedForms || !localSubscribedForms.length) {
-        return localforage.setItem(
-          LOCAL_KEY_NOTIFICATION_TOKEN,
-          messagingToken
-        );
-      }
-      // TODO: Optimize this
-
-      const authListener = async (e: MessageEvent) => {
-        if (e.data !== "authStateChanged") return;
-        await Promise.all(
-          localSubscribedForms.map((formId) =>
-            unsubscribeToNotification(formId)
-          )
-        );
-        await localforage.setItem(LOCAL_KEY_NOTIFICATION_TOKEN, messagingToken);
-        for (const formId of localSubscribedForms) {
-          subscribeToNotification(formId);
-        }
-        window.removeEventListener("message", authListener);
-      };
-      window.addEventListener("message", authListener);
-    }
+    // If the token is different from local token, this will make a request to firebase api
+    // and the service worker will catch the request to handle it
+    await getMessagingToken();
   });
 
   createEffect(() => console.log(loggedIn()));

@@ -1,20 +1,25 @@
 import {
   APP_SERVER_URL,
-  LOCAL_KEY_CONFESSION_FORM_ID,
-  LOCAL_KEY_NOTIFICATION_SUBSCRIBED_FORMS,
+  LOCAL_KEY_CONFESSION_SPREADSHEET_ID,
+  LOCAL_KEY_NOTIFICATION_SUBSCRIBED_SPREADSHEETS,
   LOCAL_KEY_NOTIFICATION_TOKEN,
 } from "app-constants";
 import axios from "axios";
-import localforage from "localforage";
-import { confesisonForm } from "store/index";
-export default async function unsubscribeToNotification(_formId?: string) {
-  const formId =
-    _formId ||
-    confesisonForm.formId ||
-    (await localforage.getItem(LOCAL_KEY_CONFESSION_FORM_ID))!;
-  const notificationToken = await localforage.getItem(
+import { localData, userResourceDatabase } from "local-database";
+import { confessionSpreadsheet } from "store/index";
+export default async function unsubscribeToNotification(
+  _spreadsheetId?: string
+) {
+  const spreadsheetId =
+    _spreadsheetId ||
+    confessionSpreadsheet.spreadsheetId ||
+    (await userResourceDatabase.getItem(LOCAL_KEY_CONFESSION_SPREADSHEET_ID))!;
+
+  const notificationToken = await localData.getItem(
     LOCAL_KEY_NOTIFICATION_TOKEN
   );
+
+  console.log("unsubscribe ", spreadsheetId);
   if (!notificationToken) {
     console.error("Why no token?");
     throw "unexpected error";
@@ -25,17 +30,17 @@ export default async function unsubscribeToNotification(_formId?: string) {
       Authorization: `Bearer ${gapi.client.getToken().access_token}`,
     },
     data: {
-      form_id: formId,
+      spreadsheetId,
       token: notificationToken,
     },
   });
-  await localforage.removeItem(LOCAL_KEY_NOTIFICATION_TOKEN);
-  await localforage.setItem(
-    LOCAL_KEY_NOTIFICATION_SUBSCRIBED_FORMS,
+  await userResourceDatabase.setItem(
+    LOCAL_KEY_NOTIFICATION_SUBSCRIBED_SPREADSHEETS,
     (
-      (await localforage.getItem(LOCAL_KEY_NOTIFICATION_SUBSCRIBED_FORMS)) as
-        | string[]
-        | null
-    )?.filter((cachedFormId) => cachedFormId != formId) || []
+      (await userResourceDatabase.getItem(
+        LOCAL_KEY_NOTIFICATION_SUBSCRIBED_SPREADSHEETS
+      )) as string[] | null
+    )?.filter((cachedspreadsheetId) => cachedspreadsheetId != spreadsheetId) ||
+      []
   );
 }
