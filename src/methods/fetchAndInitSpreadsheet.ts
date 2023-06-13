@@ -2,12 +2,53 @@ import { userResourceDatabase } from "local-database";
 import getLinkedFormIdFromSheet from "./getLinkedFormIdFromSheet";
 import axios from "axios";
 import { batch } from "solid-js";
-import { setConfessionForm, setConfessionSpreadsheet } from "store/index";
+import {
+  confesisonForm,
+  confessionSpreadsheet,
+  confessions,
+  pendingChanges,
+  resetPendingChanges,
+  setConfessionForm,
+  setConfessionSpreadsheet,
+} from "store/index";
 import initConfessionSpreadsheetMetadata from "./initConfessionSpreadsheetMetadata";
 import {
   LOCAL_KEY_CONFESSION_FORM_ID,
   LOCAL_KEY_CONFESSION_SPREADSHEET_ID,
+  PENDING_CHANGES_CONFESSION_ARRAY_KEYS,
 } from "app-constants";
+import { reconcile } from "solid-js/store";
+
+const updateStates = (
+  spreadsheet: gapi.client.sheets.Spreadsheet,
+  form: gapi.client.forms.Form
+) =>
+  batch(() => {
+    resetPendingChanges();
+    if (confessionSpreadsheet?.spreadsheetId !== spreadsheet.spreadsheetId) {
+      for (const key in confessions) {
+        // @ts-ignore
+        confessions[key] = [];
+      }
+    }
+    setConfessionSpreadsheet(spreadsheet);
+    initConfessionSpreadsheetMetadata(spreadsheet);
+    setConfessionForm(form);
+  });
+
+const updateCached = async (
+  spreadsheet: gapi.client.sheets.Spreadsheet,
+  form: gapi.client.forms.Form
+) => {
+  await userResourceDatabase.setItem(
+    LOCAL_KEY_CONFESSION_SPREADSHEET_ID,
+    spreadsheet.spreadsheetId
+  );
+  await userResourceDatabase.setItem(LOCAL_KEY_CONFESSION_FORM_ID, form.formId);
+
+  await userResourceDatabase.setItem(form.formId!, form);
+  await userResourceDatabase.setItem(spreadsheet.spreadsheetId!, spreadsheet);
+};
 
 const getForm = async (formId: string) =>
   formId
@@ -26,53 +67,57 @@ const getForm = async (formId: string) =>
       ).data
     : {};
 
-const getSpreadsheet = async (spreadsheetId: string) =>
+const getLocalSpreadsheet = async (spreadsheetId: string) =>
   spreadsheetId
     ? ((await userResourceDatabase.getItem(
         spreadsheetId
-      )) as gapi.client.sheets.Spreadsheet) ||
-      (
-        await gapi.client.sheets.spreadsheets.get({
-          spreadsheetId,
-        })
-      ).result
+      )) as gapi.client.sheets.Spreadsheet)
     : {};
 
 const fetchAndInitSpreadsheet = async ({
   spreadsheetId,
   formId,
+  updatedSpreadsheet,
 }: {
   spreadsheetId?: string | null;
   formId?: string | null;
+  updatedSpreadsheet?: gapi.client.sheets.Spreadsheet;
 }) => {
-  if (!spreadsheetId && !formId) return;
-
-  const form = await getForm(
-    formId || (await getLinkedFormIdFromSheet(spreadsheetId!))!
-  );
+  if (!spreadsheetId && !formId && !updatedSpreadsheet) return;
+  const form = updatedSpreadsheet
+    ? ((await userResourceDatabase.getItem(
+        confesisonForm.formId!
+      )) as gapi.client.forms.Form)
+    : await getForm(
+        formId || (await getLinkedFormIdFromSheet(spreadsheetId!))!
+      );
   // TODO: FIRESNACKBAR HERE
-  if (!form.linkedSheetId) return alert("Trang tính này chưa liên kết với biểu mẫu nào!");
-  const spreadsheet = await getSpreadsheet(
-    spreadsheetId || form.linkedSheetId!
-  );
+  if (!form.linkedSheetId)
+    return alert("Trang tính này chưa liên kết với biểu mẫu nào!");
 
-  batch(() => {
-    setConfessionSpreadsheet(spreadsheet);
-    initConfessionSpreadsheetMetadata();
-    setConfessionForm(form);
-  });
+  let spreadsheet =
+    updatedSpreadsheet ||
+    (await getLocalSpreadsheet(spreadsheetId || form.linkedSheetId!));
+  // Update changes from user
+  if (!updatedSpreadsheet && spreadsheet) {
+    gapi.client.sheets.spreadsheets
+      .get({
+        spreadsheetId: spreadsheetId || form.linkedSheetId!,
+      })
+      .then((response) => {
+        updateStates(response.result, form);
+        updateCached(response.result, form);
+      });
+  }
+  if (!spreadsheet)
+    spreadsheet = (
+      await gapi.client.sheets.spreadsheets.get({
+        spreadsheetId: spreadsheetId || form.linkedSheetId!,
+      })
+    ).result;
 
-  formId = form.formId;
-  spreadsheetId = spreadsheet.spreadsheetId;
-
-  await userResourceDatabase.setItem(
-    LOCAL_KEY_CONFESSION_SPREADSHEET_ID,
-    spreadsheetId
-  );
-  await userResourceDatabase.setItem(LOCAL_KEY_CONFESSION_FORM_ID, formId);
-
-  await userResourceDatabase.setItem(form.formId!, form);
-  await userResourceDatabase.setItem(spreadsheet.spreadsheetId!, spreadsheet);
+  updateStates(spreadsheet, form);
+  updateCached(spreadsheet, form);
 };
 
 export default fetchAndInitSpreadsheet;

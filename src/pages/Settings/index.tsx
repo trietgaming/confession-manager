@@ -1,6 +1,5 @@
 import { Component, Show, createEffect, createSignal } from "solid-js";
 import Button from "ui-components/Button";
-import handleLogin from "methods/handleLogin";
 import MainTitle from "ui-components/MainTitle";
 import {
   confesisonForm,
@@ -23,6 +22,7 @@ import unsubscribeToNotification from "methods/unsubscribeToNotification";
 import getMessagingToken from "methods/getMessagingToken";
 import checkNotificationSubscribed from "methods/checkNotificationSubscribed";
 import { localData } from "local-database";
+import SelectSheets from "pages/Dashboard/init/SelectSheets";
 
 const settingContainerClass = "flex justify-between items-center";
 const doubleTitleContainerClass = "flex items-center space-x-4";
@@ -86,6 +86,33 @@ const Settings: Component = () => {
       <div class="flex flex-col space-y-6 h-full px-8 w-full max-w-3xl bg-white mt-2 drop-shadow-md rounded-lg pb-8">
         <MainTitle>Cài đặt</MainTitle>
         <div class={settingContainerClass}>
+          <div class={doubleTitleContainerClass}>
+            <img src={BELL_ICON_URL} alt="FB" class={titleIconClass} />
+            <p>Thông báo về confession mới</p>
+          </div>
+          <Toggle
+            handleToggle={handleToggleNotification}
+            disabled={
+              !isSheetInited() ||
+              isLoadingNotificationSubscription() ||
+              isNotificationSubscribed() === null
+            }
+            checked={!!isNotificationSubscribed()}
+          />
+        </div>
+        <div class={settingContainerClass}>
+          <div class={doubleTitleContainerClass}>
+            <img
+              src="https://upload.wikimedia.org/wikipedia/en/0/04/Facebook_f_logo_%282021%29.svg"
+              alt="FB"
+              class={titleIconClass}
+            />
+            <p>Tài khoản Facebook</p>
+          </div>
+          <Button>Liên kết</Button>
+        </div>
+        <hr />
+        <div class={settingContainerClass}>
           <div class="flex flex-col space-y-4">
             <div class="flex items-center space-x-8">
               <div class={doubleTitleContainerClass}>
@@ -123,34 +150,12 @@ const Settings: Component = () => {
             <LoadingCircle class="group-disabled:block hidden" />
           </Button>
         </div>
-        <hr />
-        <div class={settingContainerClass}>
-          <div class={doubleTitleContainerClass}>
-            <img src={BELL_ICON_URL} alt="FB" class={titleIconClass} />
-            <p>Thông báo về confession mới</p>
+        <Show when={!!confessionSpreadsheet?.spreadsheetId}>
+          <hr />
+          <div class={settingContainerClass + " -translate-y-6"}>
+            <SelectSheets settingPage />
           </div>
-          <Toggle
-            handleToggle={handleToggleNotification}
-            disabled={
-              !isSheetInited() ||
-              isLoadingNotificationSubscription() ||
-              isNotificationSubscribed() === null
-            }
-            checked={!!isNotificationSubscribed()}
-          />
-        </div>
-        <hr />
-        <div class={settingContainerClass}>
-          <div class={doubleTitleContainerClass}>
-            <img
-              src="https://upload.wikimedia.org/wikipedia/en/0/04/Facebook_f_logo_%282021%29.svg"
-              alt="FB"
-              class={titleIconClass}
-            />
-            <p>Tài khoản Facebook</p>
-          </div>
-          <Button>Liên kết</Button>
-        </div>
+        </Show>
       </div>
     </div>
   );

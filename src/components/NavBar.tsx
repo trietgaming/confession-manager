@@ -17,7 +17,7 @@ import {
 } from "app-constants";
 import axios from "axios";
 import handleLogout from "methods/handleLogout";
-import { Component, Show, createSignal, onMount } from "solid-js";
+import { Component, Show, createEffect, createSignal, onMount } from "solid-js";
 import { createStore } from "solid-js/store";
 import { Portal } from "solid-js/web";
 import {
@@ -28,6 +28,7 @@ import {
 import { UserInfo, VerticalNavBarMetadata } from "types";
 import AppLogo from "ui-components/AppLogo";
 import NotificationBell from "./NotificationBell";
+import checkNotificationSubscribed from "methods/checkNotificationSubscribed";
 
 const verticalNavBarMetadatas: VerticalNavBarMetadata[] = [
   {
@@ -104,12 +105,26 @@ const NavBar: Component = () => {
 
   return (
     <Portal>
-      <div class="fixed top-0 flex flex-row w-full bg-white py-1 px-6 space-x-6 z-[2] justify-between">
+      <div class="fixed top-0 flex flex-row w-full bg-white py-1 pr-6 pl-2 space-x-6 z-[2] justify-between">
         {/* LeftLogo */}
-        <A class="flex items-center space-x-4" href="/">
-          <AppLogo />
-          <h5 class="font-bold">Confession Manager</h5>
-        </A>
+        <div class="flex items-center space-x-2">
+          <Show when={isSheetInited()}>
+            <button
+              onClick={() => setVerticalNavExtended((prev) => !prev)}
+              class="rounded-full hover:bg-gray-200 flex justify-center items-center w-8 h-8"
+            >
+              <img
+                src={RIGHT_ARROW_ICON_URL}
+                alt="Menu"
+                class={`w-7 h-7 ${isVerticalNavExtended() ? "rotate-180" : ""}`}
+              />
+            </button>
+          </Show>
+          <A class="flex items-center space-x-4" href="/">
+            <AppLogo />
+            <h5 class="font-bold">Confession Manager</h5>
+          </A>
+        </div>
         {/* RightNav */}
         <div class="flex space-x-4 items-center">
           <NotificationBell />
@@ -132,11 +147,9 @@ const NavBar: Component = () => {
                   src={userData.photoUrl}
                   alt="Avatar"
                 />
-                <div class="font-md text-sm dark:text-white">
+                <div class="font-md text-sm">
                   <div>{userData.displayName}</div>
-                  <div class="text-sm text-gray-500 dark:text-gray-400">
-                    {userData.email}
-                  </div>
+                  <div class="text-sm text-gray-500">{userData.email}</div>
                 </div>
               </button>
               {/* Dropdown */}
@@ -181,32 +194,21 @@ const NavBar: Component = () => {
         <div
           class={`fixed top-[56px] flex flex-col left-0 z-[1] h-screen overflow-y-auto transition-transform bg-white ${
             isVerticalNavExtended() ? "w-max" : "w-[64px]"
-          } dark:bg-gray-800 space-y-4 px-2`}
+          } space-y-4 px-2`}
           tabindex="-1"
           aria-labelledby="drawer-left-label"
         >
-          <button
-            onClick={() => setVerticalNavExtended((prev) => !prev)}
-            class="rounded-full hover:bg-gray-200 flex justify-center items-center w-8 h-8 ml-2 my-2"
-          >
-            <img
-              src={RIGHT_ARROW_ICON_URL}
-              alt="Menu"
-              class={`w-7 h-7 ${isVerticalNavExtended() ? "rotate-180" : ""}`}
-            />
-          </button>
-          <hr />
           <a
             class="rounded-lg flex space-x-4 hover:bg-slate-200 items-center p-2"
             href={confessionSpreadsheet.spreadsheetUrl}
-            target="blank"
+            target="_blank"
           >
             <img
               src={GOOGLE_SHEET_FAVICON_URL}
               alt="Google Sheet"
               class="w-8 h-8"
             />
-            <div class="flex items-center space-x-2 font-md text-sm dark:text-white">
+            <div class="flex items-center space-x-2 font-md text-sm">
               <p
                 hidden={!isVerticalNavExtended()}
                 class="max-w-[140px] overflow-hidden whitespace-nowrap text-ellipsis"
@@ -219,14 +221,14 @@ const NavBar: Component = () => {
           <a
             class="rounded-lg flex space-x-4 hover:bg-slate-200 items-center p-2"
             href={confesisonForm.responderUri}
-            target="blank"
+            target="_blank"
           >
             <img
               src={GOOGLE_FORMS_FAVICON_URL}
               alt="Google Forms"
               class="w-8 h-8"
             />
-            <div class="flex items-center space-x-2 font-md text-sm dark:text-white">
+            <div class="flex items-center space-x-2 font-md text-sm">
               <p
                 hidden={!isVerticalNavExtended()}
                 class="max-w-[140px] overflow-hidden whitespace-nowrap text-ellipsis"

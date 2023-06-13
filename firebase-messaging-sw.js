@@ -8,6 +8,7 @@ import {
   LOCAL_KEY_NOTIFICATION_SUBSCRIBED_SPREADSHEETS,
   LOCAL_KEY_NOTIFICATION_TOKEN,
   LOCAL_KEY_PENDING_NOTIFICATIONS,
+  GOOGLE_FORMS_FAVICON_URL,
 } from "app-constants";
 
 const app = initializeApp({
@@ -137,7 +138,7 @@ self.addEventListener("notificationclick", (event) => {
       .matchAll({ includeUncontrolled: true, type: "window" })
       .then((clientList) => {
         for (const client of clientList) {
-          if (client.url === BASE_URL + "/" && "focus" in client)
+          if (client.url.startsWith(BASE_URL) && "focus" in client)
             return client.focus();
         }
         if (clients.openWindow) return clients.openWindow("/");
@@ -149,15 +150,11 @@ onBackgroundMessage(messaging, async (payload) => {
   console.log("BACKGROUND: ", payload);
   let notificationTitle = "Confession Manager";
   let notificationOptions = {
-    body: "Truy cập ứng dụng để kiểm tra",
+    body: "Cập nhật mới.",
     icon: ICON_URL,
   };
   if (payload.data?.eventType === "RESPONSES") {
-    let confessionTitle =
-      (await userResourceDatabase.getItem(payload.data.spreadsheetId))
-        ?.properties?.title || payload.data.spreadsheetId;
-
-    notificationTitle = confessionTitle || notificationTitle;
+    notificationTitle = payload.data.spreadsheetTitle;
     notificationOptions = {
       body:
         JSON.parse(payload.data?.values)[1] ||
@@ -165,6 +162,8 @@ onBackgroundMessage(messaging, async (payload) => {
       icon: ICON_URL,
     };
   }
+  if (!payload.data.publishTime)
+    payload.data.publishTime = new Date().toISOString();
 
   const pendings = await userResourceDatabase.getItem(
     LOCAL_KEY_PENDING_NOTIFICATIONS
@@ -173,6 +172,16 @@ onBackgroundMessage(messaging, async (payload) => {
     payload,
     ...(pendings || []),
   ]);
+
+  let firebaseNotification = false;
+
+  if (payload.notification) firebaseNotification = true;
+  else
+    payload.notification = {
+      title: notificationTitle,
+      body: notificationOptions.body,
+      icon: GOOGLE_FORMS_FAVICON_URL,
+    };
 
   await self.clients
     .matchAll({
@@ -183,11 +192,12 @@ onBackgroundMessage(messaging, async (payload) => {
       if (clients && clients.length) {
         clients[0].postMessage({
           type: "backgroundMessage",
+          payload,
         });
       }
     });
 
-  if (payload.notification) return null;
+  if (firebaseNotification) return null;
   return self.registration.showNotification(
     notificationTitle,
     notificationOptions

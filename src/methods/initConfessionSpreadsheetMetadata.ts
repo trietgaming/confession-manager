@@ -1,3 +1,4 @@
+import { reconcile } from "solid-js/store";
 import {
   confessionSpreadsheet,
   setConfessionMetadata,
@@ -7,10 +8,13 @@ import { CONFESSION_SHEET_TYPE_METADATA_KEY } from "../constants";
 import { ConfessionSpreadsheetMetadata } from "types";
 import { checkSheetInited } from "./checkSheetInited";
 
-export default function initConfessionSpreadsheetMetadata() {
+export default function initConfessionSpreadsheetMetadata(
+  spreadsheet?: gapi.client.sheets.Spreadsheet
+) {
   const sheetsMetadata: ConfessionSpreadsheetMetadata = {};
+  if (!spreadsheet) spreadsheet = confessionSpreadsheet!;
 
-  for (const sheet of confessionSpreadsheet!.sheets!) {
+  for (const sheet of spreadsheet!.sheets!) {
     if (!sheet.developerMetadata) continue;
     for (const metadata of sheet.developerMetadata) {
       if (metadata.metadataKey === CONFESSION_SHEET_TYPE_METADATA_KEY) {
@@ -27,6 +31,8 @@ export default function initConfessionSpreadsheetMetadata() {
     sheetsMetadata.pendingSheet
   ) {
     setConfessionMetadata(sheetsMetadata);
+  } else {
+    setConfessionMetadata(reconcile({}));
   }
   setSheetInited(checkSheetInited());
 }

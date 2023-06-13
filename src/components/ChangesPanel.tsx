@@ -1,21 +1,23 @@
 import { Component, Show } from "solid-js";
 import { Portal } from "solid-js/web";
-import { pendingChanges, setPendingChanges } from "store/index";
+import { pendingChanges } from "store/index";
 import Button from "ui-components/Button";
 import hadChanges from "app-hooks/hadChanges";
 import { PENDING_CHANGES_CONFESSION_ARRAY_KEYS } from "../constants";
 import { ConfessionElement } from "types";
 
-const handleCancel = () => {
-  for (const key of PENDING_CHANGES_CONFESSION_ARRAY_KEYS) {
-    (pendingChanges[key]! as ConfessionElement[]).forEach(
-      (el) => (el.ref.hidden = false)
-    );
-    setPendingChanges(key, []);
-  }
-};
-
 const ChangesPanel: Component = () => {
+  const handleCancel = () => {
+    for (const key of PENDING_CHANGES_CONFESSION_ARRAY_KEYS) {
+      (pendingChanges[key]! as ConfessionElement[]).forEach(
+        (el) => (el.ref.hidden = false)
+      );
+      pendingChanges[key] = [];
+    }
+  };
+  const handleSaveChanges = () => {
+    console.log(pendingChanges);
+  };
   return (
     <Show when={hadChanges()}>
       <Portal>
@@ -28,7 +30,10 @@ const ChangesPanel: Component = () => {
                     Bạn có muốn lưu thay đổi?
                   </h3>
                   <div class="py-2 flex space-x-2">
-                    <Button class="my-0 inline-flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 sm:ml-3 sm:w-auto">
+                    <Button
+                      onClick={handleSaveChanges}
+                      class="my-0 inline-flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 sm:ml-3 sm:w-auto"
+                    >
                       Lưu
                     </Button>
                     <Button

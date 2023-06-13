@@ -1,22 +1,19 @@
-import { reconcile } from "solid-js/store";
-import { batch } from "solid-js";
-import { confessionSpreadsheet, setConfessionSpreadsheet } from "store/index";
-import initConfessionSpreadsheetMetadata from "./initConfessionSpreadsheetMetadata";
+import {
+  confesisonForm,
+  confessionSpreadsheet,
+  setConfessionSpreadsheet,
+} from "store/index";
+import fetchAndInitSpreadsheet from "./fetchAndInitSpreadsheet";
 
 export default async function refreshSpreadsheet(
-  updatedConfessionSpreadsheet: gapi.client.sheets.Spreadsheet | null = null
+  updatedConfessionSpreadsheet?: gapi.client.sheets.Spreadsheet
 ) {
-  await batch(async () => {
-    setConfessionSpreadsheet(
-      reconcile(
-        updatedConfessionSpreadsheet ||
-          (
-            await gapi.client.sheets.spreadsheets.get({
-              spreadsheetId: confessionSpreadsheet!.spreadsheetId!,
-            })
-          ).result
-      )
-    );
-    initConfessionSpreadsheetMetadata();
-  });
+  return updatedConfessionSpreadsheet
+    ? await fetchAndInitSpreadsheet({
+        updatedSpreadsheet: updatedConfessionSpreadsheet,
+      })
+    : await fetchAndInitSpreadsheet({
+        spreadsheetId: confessionSpreadsheet.spreadsheetId,
+        formId: confesisonForm.formId,
+      });
 }

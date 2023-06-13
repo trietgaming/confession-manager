@@ -1,7 +1,4 @@
-import { LOCAL_KEY_PENDING_NOTIFICATIONS } from "app-constants";
-import { MessagePayload } from "firebase/messaging";
-import { userResourceDatabase } from "local-database";
-import { setPendingNotification } from "store/index";
+import handlePushMessage from "./handlePushMessage";
 
 export default async function registerSw() {
   if (!("serviceWorker" in navigator))
@@ -13,10 +10,9 @@ export default async function registerSw() {
 
   navigator.serviceWorker.onmessage = async (event) => {
     if (event.data && event.data.type === "backgroundMessage") {
-      const pending = (await userResourceDatabase.getItem(
-        LOCAL_KEY_PENDING_NOTIFICATIONS
-      )) as null | MessagePayload[];
-      setPendingNotification((prev) => [...prev, ...(pending || [])]);
+      const payload = event.data.payload;
+      handlePushMessage(payload);
+      console.log("background event")
     }
   };
   return await navigator.serviceWorker.ready;

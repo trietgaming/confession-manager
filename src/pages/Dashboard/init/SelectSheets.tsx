@@ -6,6 +6,7 @@ import {
   batch,
   onMount,
   createMemo,
+  createEffect,
 } from "solid-js";
 import {
   confessionSpreadsheet,
@@ -28,7 +29,6 @@ import {
   LOCAL_KEY_CONFESSION_SPREADSHEET_ID,
   PAPER_PLANE_ICON_URL,
 } from "app-constants";
-import initConfessionSpreadsheetMetadata from "methods/initConfessionSpreadsheetMetadata";
 import LoadingCircle from "ui-components/LoadingCircle";
 import { reconcile } from "solid-js/store";
 import MainTitle from "ui-components/MainTitle";
@@ -70,38 +70,49 @@ const numberOfSelected = (selected: Record<any, any>) =>
     0
   );
 
-const initExistedMetadataSheets = (sheets: gapi.client.sheets.Sheet[]) => {
-  const preProcessObject: Record<string, any> = {};
-  sheets.forEach((sheet, index) => {
-    const metadata = sheet.developerMetadata?.find(
-      (metadata) => metadata.metadataKey === CONFESSION_SHEET_TYPE_METADATA_KEY
-    );
-    if (!!metadata) preProcessObject[metadata.metadataValue!] = index;
-  });
-  const selectedObject: SelectedObject = {
-    acceptedSheet: preProcessObject.acceptedSheet ?? null,
-    declinedSheet: preProcessObject.declinedSheet ?? null,
-    postedSheet: preProcessObject.postedSheet ?? null,
-    pendingSheet: preProcessObject.pendingSheet ?? null,
+const SelectSheets: Component<{
+  settingPage?: boolean;
+}> = (props) => {
+  const initExistedMetadataSheets = (sheets: gapi.client.sheets.Sheet[]) => {
+    const preProcessObject: Record<string, any> = {};
+    sheets.forEach((sheet, index) => {
+      const metadata = sheet.developerMetadata?.find(
+        (metadata) =>
+          metadata.metadataKey === CONFESSION_SHEET_TYPE_METADATA_KEY
+      );
+      if (!!metadata) preProcessObject[metadata.metadataValue!] = index;
+    });
+    const selectedObject: SelectedObject = {
+      acceptedSheet: preProcessObject.acceptedSheet ?? null,
+      declinedSheet: preProcessObject.declinedSheet ?? null,
+      postedSheet: preProcessObject.postedSheet ?? null,
+      pendingSheet: preProcessObject.pendingSheet ?? null,
+    };
+    return selectedObject;
   };
-  return selectedObject;
-};
 
-const SelectSheets: Component = () => {
   const [sheets, setSheets] = createSignal(confessionSpreadsheet!.sheets || []);
-  const existedMetadataSheets = initExistedMetadataSheets(
-    confessionSpreadsheet!.sheets || []
+  let existedMetadataSheets = createMemo(() =>
+    initExistedMetadataSheets(confessionSpreadsheet!.sheets || [])
   );
-  const [selected, setSelected] = createSignal<SelectedObject>(
-    existedMetadataSheets
-  );
+  const [selected, setSelected] = createSignal<SelectedObject>({
+    ...existedMetadataSheets(),
+  });
   const [isEmpty, setEmpty] = createSignal(false);
   const [isCreateSheetModalOpen, setCreateSheetModalOpen] = createSignal<
     string | boolean
   >(false);
   const [isProcessing, setProcessing] = createSignal(false);
+
   ///@ts-ignore
   let sheetTitleInputRef: HTMLInputElement;
+
+  createEffect(() => {
+    batch(() => {
+      setSheets(confessionSpreadsheet!.sheets || []);
+      setSelected({ ...existedMetadataSheets() });
+    });
+  });
 
   onMount(() => {
     handleEmpty();
@@ -200,7 +211,7 @@ const SelectSheets: Component = () => {
 
       const selectedValues = Object.values(currentSelectedState);
       for (const [sheetTypeValue, index] of Object.entries(
-        existedMetadataSheets
+        existedMetadataSheets()
       )) {
         // If not selected but existed metadata then delete
         if (index === null || selectedValues.includes(index)) continue;
@@ -291,17 +302,20 @@ const SelectSheets: Component = () => {
       console.log(batchRequests);
 
       // console.log(
-      await gapi.client.sheets.spreadsheets.batchUpdate(
-        {
-          spreadsheetId: confessionSpreadsheet!.spreadsheetId!,
-        },
-        {
-          includeSpreadsheetInResponse: false,
-          requests: batchRequests,
-        }
+      await refreshSpreadsheet(
+        (
+          await gapi.client.sheets.spreadsheets.batchUpdate(
+            {
+              spreadsheetId: confessionSpreadsheet!.spreadsheetId!,
+            },
+            {
+              includeSpreadsheetInResponse: true,
+              requests: batchRequests,
+            }
+          )
+        ).result.updatedSpreadsheet
       );
       // );
-      await refreshSpreadsheet();
     } catch (err) {
       console.error(err);
     }
@@ -320,7 +334,9 @@ const SelectSheets: Component = () => {
 
   return (
     <div>
-      <MainTitle>Định nghĩa các trang tính</MainTitle>
+      <Show when={!props.settingPage}>
+        <MainTitle>Định nghĩa các trang tính</MainTitle>
+      </Show>
       <For each={selectElementsPayload}>
         {(payload) => (
           <div class="max-w-3xl mx-auto mt-10">
@@ -364,8 +380,20 @@ const SelectSheets: Component = () => {
         )}
       </For>
       <div class="flex justify-center w-full mt-10 space-x-3">
-        <Button class="bg-slate-500 hover:bg-slate-600" onClick={handleGoBack}>
-          Quay lại
+        <Button
+          class="bg-slate-500 hover:bg-slate-600"
+          onClick={
+            props.settingPage
+              ? () => {
+                  batch(() => {
+                    setSelected({ ...existedMetadataSheets() });
+                    setSheets(confessionSpreadsheet!.sheets!);
+                  });
+                }
+              : handleGoBack
+          }
+        >
+          {props.settingPage ? "Hủy" : "Quay lại"}
         </Button>
         <Button
           class="whitespace-nowrap"
@@ -378,12 +406,19 @@ const SelectSheets: Component = () => {
         <Button
           disabled={
             numberOfSelected(selected()) !== Object.keys(selected()).length ||
-            isProcessing()
+            isProcessing() ||
+            Object.keys(existedMetadataSheets()).reduce(
+              (prev, key) =>
+                prev &&
+                existedMetadataSheets()[key as SheetTypeKeys] ===
+                  selected()[key as SheetTypeKeys],
+              true
+            )
           }
           onClick={handleSubmit}
         >
           <div class="flex items-center space-x-2">
-            <span>{"Xác nhận "}</span>
+            <span>Xác nhận</span>
             <Show when={isProcessing()}>
               <LoadingCircle />
             </Show>

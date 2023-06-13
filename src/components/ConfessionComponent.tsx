@@ -1,11 +1,13 @@
 import { Component, splitProps } from "solid-js";
-import { Confession, HandleAction } from "types";
+import { ActionButtonMetadata, Confession, HandleAction } from "types";
 import Button from "ui-components/Button";
 import { PENDING_CONFESSION_ACTION } from "../constants";
 
-const PendingConfession: Component<{
+const ConfessionComponent: Component<{
   confession: Confession;
   handleAction: HandleAction;
+  primaryAction: ActionButtonMetadata;
+  secondaryAction: ActionButtonMetadata;
 }> = (props) => {
   const [{ confession, handleAction }, otherProps] = splitProps(props, [
     "confession",
@@ -21,31 +23,23 @@ const PendingConfession: Component<{
         <p class="mb-3 font-normal text-gray-600 text-md">{date}</p>
         <Button
           onClick={() =>
-            handleAction(
-              PENDING_CONFESSION_ACTION.ACCEPT,
-              confession,
-              cfsRef
-            )
+            handleAction(PENDING_CONFESSION_ACTION.ACCEPT, confession, cfsRef)
           }
           class="bg-green-600 hover:bg-green-700 mr-2"
         >
-          Duyệt
+          {props.primaryAction.title}
         </Button>
         <Button
           onClick={() =>
-            handleAction(
-              PENDING_CONFESSION_ACTION.DECLINE,
-              confession,
-              cfsRef
-            )
+            handleAction(PENDING_CONFESSION_ACTION.DECLINE, confession, cfsRef)
           }
           class="bg-red-500 hover:bg-red-700"
         >
-          Bỏ
+          {props.secondaryAction.title}
         </Button>
       </div>
     </li>
   );
 };
 
-export default PendingConfession;
+export default ConfessionComponent;

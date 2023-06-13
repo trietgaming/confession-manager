@@ -6,9 +6,13 @@ import App from "./App";
 
 const root = document.getElementById("root");
 
-// T//O//D//O: Clear out the flow of service worker (register issue - checkout index.html)
 //TODO: type check all request to server
 //TODO: Make all tailwind classes static (declare a class constant)
+// TODO: Handle the auth flow and the picker service. Bug: If auth process took shorter than the picker.load
+// then "google" is not defined
+// TODO: Update pending changes via some methods
+// TODO: SUPPORT confessions that have more than 1 answer column
+// TODO: Make UI Responsive
 
 render(
   () => (

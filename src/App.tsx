@@ -18,11 +18,14 @@ import {
   picker,
   confessions,
   setPendingNotification,
+  setMessagingTokenRegistered,
+  confessionSpreadsheet,
+  confessionMetadata,
+  isSheetInited,
   // setPushEnabled,
 } from "./store";
 import { Routes, Route, Outlet } from "@solidjs/router";
 import Login from "./pages/Login";
-import Dashboard from "pages/Dashboard";
 import ChangesPanel from "components/ChangesPanel";
 // import LoadingCircle from "ui-components/LoadingCircle";
 import { initializeApp } from "firebase/app";
@@ -53,8 +56,21 @@ import getMessagingToken from "methods/getMessagingToken";
 import buildPicker from "methods/buildPicker";
 import fetchAndInitSpreadsheet from "methods/fetchAndInitSpreadsheet";
 import { PushMessageData } from "types";
+import handlePushMessage from "methods/handlePushMessage";
+import SelectSpreadsheet from "pages/Dashboard/init/SelectSpreadsheet";
+import SelectSheets from "pages/Dashboard/init/SelectSheets";
+import InitSheets from "pages/Dashboard/init/InitSheets";
+import View from "pages/_ConfessionView";
 
-const AuthenticatedWrapper: Component = () => {
+const NavBarWrapper: Component = () => {
+  return (
+    <div class="md:translate-y-14">
+      <Outlet />
+    </div>
+  );
+};
+
+const AuthenticatedRoute: Component = () => {
   onMount(async () => {
     /// TODO: FIRE SNACKBAR
     await fetchAndInitSpreadsheet({
@@ -69,9 +85,44 @@ const AuthenticatedWrapper: Component = () => {
     });
   });
   return (
-    <div class="md:translate-y-14">
-      <Outlet />
-    </div>
+    <>
+      <Route path={"/*"} element={<NavBarWrapper />}>
+        <Switch>
+          <Match when={!confessionSpreadsheet.spreadsheetId}>
+            <Route path={"/*"} element={<SelectSpreadsheet />} />
+          </Match>
+          <Match
+            when={
+              !confessionMetadata.pendingSheet ||
+              !confessionMetadata.acceptedSheet ||
+              !confessionMetadata.declinedSheet ||
+              !confessionMetadata.postedSheet
+            }
+          >
+            <Route path={"/*"} element={<SelectSheets />} />
+          </Match>
+          <Match when={!isSheetInited()}>
+            <Route path={"/*"} element={<InitSheets />} />
+          </Match>
+          <Match
+            when={
+              confessionSpreadsheet.spreadsheetId &&
+              confessionMetadata.pendingSheet &&
+              confessionMetadata.acceptedSheet &&
+              confessionMetadata.declinedSheet &&
+              confessionMetadata.postedSheet
+            }
+          >
+            <Route path={"/"} element={<View key="pending" />} />
+            <Route path={"/accepted"} element={<View key="accepted" />} />
+            <Route path={"/declined"} element={<View key="declined" />} />
+          </Match>
+        </Switch>
+        <Route path={"/settings"} element={<Settings />} />
+      </Route>
+      <NavBar />
+      <ChangesPanel />
+    </>
   );
 };
 
@@ -139,6 +190,7 @@ const App: Component = () => {
     const localNotificationKey = await localData.getItem(
       LOCAL_KEY_NOTIFICATION_TOKEN
     );
+    setMessagingTokenRegistered(!!localNotificationKey);
     const subscribedSpreadsheets: string[] | null =
       await userResourceDatabase.getItem(LOCAL_KEY_CONFESSION_SPREADSHEET_ID);
     if (
@@ -151,18 +203,9 @@ const App: Component = () => {
 
     // TODO: Handle update and focus new confession when notification is pushed
     onMessage(messaging, async (payload) => {
-      if (payload.data?.eventType === "RESPONSES") {
-        const data = payload.data as unknown as PushMessageData;
-        const values = JSON.parse(data.values);
-        const row = +data.range.match(/([0-9]+$)/gm)![0];
-        if (row === confessions.pending[confessions.pending.length - 1].row + 1)
-          confessions.pending.push({
-            data: values[1],
-            date: values[0],
-            row,
-          });
-      }
-      setPendingNotification((prev) => [...prev, payload]);
+      if (payload.data && !payload.data?.publishTime)
+        payload.data.publishTime = new Date().toISOString();
+      handlePushMessage(payload);
       const backgroundPendings = await userResourceDatabase.getItem(
         LOCAL_KEY_PENDING_NOTIFICATIONS
       );
@@ -189,12 +232,7 @@ const App: Component = () => {
               <Route path={"/*"} element={<Login />} />
             </Match>
             <Match when={loggedIn()}>
-              <Route path={"/*"} element={<AuthenticatedWrapper />}>
-                <Route path={"/"} element={<Dashboard />} />
-                <Route path={"/settings"} element={<Settings />} />
-              </Route>
-              <NavBar />
-              <ChangesPanel />
+              <AuthenticatedRoute />
             </Match>
           </Switch>
         </Match>

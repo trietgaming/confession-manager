@@ -1,4 +1,4 @@
-import PendingConfession from "components/PendingConfession";
+import ConfessionComponent from "components/ConfessionComponent";
 import {
   Component,
   For,
@@ -14,15 +14,77 @@ import {
   confessions,
   pendingChanges,
   scrollY,
-  setPendingChanges,
 } from "store";
-import { Confession, HandleAction } from "types";
+import {
+  ActionButtonMetadata,
+  Confession,
+  Confessions,
+  HandleAction,
+  SheetTypeKeys,
+} from "types";
 // import cachedConfesison from "../../caching/confession";
 import LoadingCircle from "ui-components/LoadingCircle";
 import { FETCH_TRIGGER_Y_OFFSET, MAX_CFS_PER_LOAD } from "../../constants";
 
-const Dashboard: Component = () => {
-  const [nextFirstCfsRow, setNextFirstCfsRow] = createSignal(2); // 1: title of row, 2: first reply of the table
+const VIEW_METADATA: {
+  [key in keyof Confessions]: {
+    title: string;
+    actions: {
+      primary: ActionButtonMetadata;
+      secondary: ActionButtonMetadata;
+    };
+  };
+} = {
+  accepted: {
+    title: "Các Confession đã duyệt (chưa đăng)",
+    actions: {
+      primary: {
+        title: "Bỏ duyệt",
+        handler: () => {},
+      },
+      secondary: {
+        title: "Từ chối",
+        handler: () => {},
+      },
+    },
+  },
+  declined: {
+    title: "Các Confession đã từ chối",
+    actions: {
+      primary: {
+        title: "Duyệt",
+        handler: () => {},
+      },
+      secondary: {
+        title: "Bỏ từ chối",
+        handler: () => {},
+      },
+    },
+  },
+  pending: {
+    title: "Các Confession đang chờ duyệt",
+    actions: {
+      primary: {
+        title: "Duyệt",
+        handler: () => {},
+      },
+      secondary: {
+        title: "Từ chối",
+        handler: () => {},
+      },
+    },
+  },
+};
+
+const View: Component<{
+  key: keyof Confessions;
+}> = (props) => {
+  const metadata = VIEW_METADATA[props.key];
+  const [nextFirstCfsRow, setNextFirstCfsRow] = createSignal(
+    confessions[props.key].length
+      ? confessions[props.key][confessions[props.key].length - 1].row + 1
+      : 2
+  ); // 1: title of row, 2: first reply of the table
   const [isFetching, setFetching] = createSignal(false);
   const [isEnd, setEnd] = createSignal(false);
 
@@ -40,7 +102,8 @@ const Dashboard: Component = () => {
       const currentFirstCfsRow = nextFirstCfsRow();
 
       const range: string = `'${
-        confessionMetadata!.pendingSheet!.properties!.title
+        confessionMetadata[(props.key + "Sheet") as SheetTypeKeys]!.properties!
+          .title
       }'!A${currentFirstCfsRow}:B${currentFirstCfsRow + MAX_CFS_PER_LOAD - 1}`;
 
       try {
@@ -63,7 +126,7 @@ const Dashboard: Component = () => {
           }
           batch(() => {
             for (const nextConfession of nextConfessions) {
-              confessions.pending.push(nextConfession);
+              confessions[props.key].push(nextConfession);
             }
 
             setNextFirstCfsRow((last) => last + MAX_CFS_PER_LOAD);
@@ -82,8 +145,7 @@ const Dashboard: Component = () => {
   createEffect(handleScroll);
 
   const handleAction: HandleAction = (actionType, confession, ref) => {
-    /// @ts-ignore
-    setPendingChanges(actionType, (prev) => [...prev, { confession, ref }]);
+    pendingChanges[actionType]?.push({ ...confession, ref });
     handleScroll();
     ref.hidden = true;
   };
@@ -91,19 +153,21 @@ const Dashboard: Component = () => {
   return (
     <div class="flex flex-col">
       <h1 class="text-center my-8 text-4xl font-bold w-full">
-        Các Confession đang chờ duyệt
+        {metadata.title}
       </h1>
       <ul class="self-center" ref={cfsContainer}>
         <For
-          each={confessions.pending}
+          each={confessions[props.key]}
           fallback={<h3>Hiện tại không có confession nào...</h3>}
         >
           {(confession) => {
             return (
-              <PendingConfession
+              <ConfessionComponent
+                primaryAction={metadata.actions.primary}
+                secondaryAction={metadata.actions.secondary}
                 confession={confession}
                 handleAction={handleAction}
-              ></PendingConfession>
+              ></ConfessionComponent>
             );
           }}
         </For>
@@ -120,4 +184,4 @@ const Dashboard: Component = () => {
   );
 };
 
-export default Dashboard;
+export default View;

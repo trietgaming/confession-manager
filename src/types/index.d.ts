@@ -43,15 +43,8 @@ export interface ConfessionElement extends Confession {
 export interface PendingChanges {
   accepts?: ConfessionElement[];
   declines?: ConfessionElement[];
+  cancels?: ConfessionElement[];
   post?: ConfessionElement[];
-  addSheets?: {
-    type: keyof ConfessionSpreadsheetMetadata;
-    title: string;
-  }[];
-  updateSheetMetadata?: {
-    sheetId: number;
-    newType: keyof ConfessionSpreadsheetMetadata;
-  };
 }
 
 export type HandleAction = (
@@ -158,7 +151,6 @@ export interface Confessions {
   pending: Confession[];
   declined: Confession[];
   accepted: Confession[];
-  posted: Confession[];
 }
 
 export interface PushMessageData {
@@ -171,3 +163,8 @@ export interface PushMessageData {
   values: string;
   publishTime: string;
 }
+
+export type ActionButtonMetadata = {
+  title: string;
+  handler: () => any;
+};

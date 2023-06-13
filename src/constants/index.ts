@@ -17,6 +17,8 @@ export const IS_SHEETS_INITED_METADATA_KEY = "confession_manager_inited";
 export enum PENDING_CONFESSION_ACTION {
   ACCEPT = "accepts",
   DECLINE = "declines",
+  CANCEL = "cancels",
+  POST = "post",
 }
 
 export enum SHEETS_INITED_TYPES {
@@ -27,6 +29,8 @@ export enum SHEETS_INITED_TYPES {
 export const PENDING_CHANGES_CONFESSION_ARRAY_KEYS: (keyof PendingChanges)[] = [
   "accepts",
   "declines",
+  "cancels",
+  "post",
 ];
 
 export const DISCOVERY_DOCS = [

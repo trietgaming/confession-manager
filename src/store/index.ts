@@ -1,4 +1,7 @@
-import { LOCAL_KEY_CACHED_NOTIFICATIONS } from "app-constants";
+import {
+  LOCAL_KEY_CACHED_NOTIFICATIONS,
+  PENDING_CHANGES_CONFESSION_ARRAY_KEYS,
+} from "app-constants";
 import { MessagePayload, NotificationPayload } from "firebase/messaging";
 import { userResourceDatabase } from "local-database";
 import { createSignal } from "solid-js";
@@ -19,6 +22,9 @@ export const [isPicking, setPicking] = createSignal(false);
 
 export const [scrollY, setScrollY] = createSignal(window.scrollY);
 
+export const [isMessagingTokenRegistered, setMessagingTokenRegistered] =
+  createSignal(false);
+
 /// USER STATES
 export const [confessionSpreadsheet, setConfessionSpreadsheet] =
   createStore<gapi.client.sheets.Spreadsheet>({});
@@ -29,11 +35,18 @@ export const [confesisonForm, setConfessionForm] =
 export const [confessionMetadata, setConfessionMetadata] =
   createStore<ConfessionSpreadsheetMetadata>({});
 
-export const [pendingChanges, setPendingChanges] = createStore<PendingChanges>({
+export const pendingChanges = createMutable<PendingChanges>({
   accepts: [],
   declines: [],
   post: [],
+  cancels: [],
 });
+
+export const resetPendingChanges = () => {
+  for (const key of PENDING_CHANGES_CONFESSION_ARRAY_KEYS) {
+    pendingChanges[key] = [];
+  }
+};
 
 export const [loggedIn, setLoggedIn] = createSignal(false);
 
@@ -43,7 +56,6 @@ export const confessions = createMutable<Confessions>({
   pending: [],
   declined: [],
   accepted: [],
-  posted: [],
 });
 
 export const [pendingNotification, setPendingNotification] = createSignal<

@@ -8,11 +8,12 @@ import axios from "axios";
 import setAccessToken from "./setAccessToken";
 import {
   confessions,
+  resetPendingChanges,
   setConfessionForm,
   setConfessionMetadata,
   setConfessionSpreadsheet,
   setLoggedIn,
-  setPendingChanges,
+  setPendingNotification,
   setSheetInited,
 } from "store/index";
 import { reconcile } from "solid-js/store";
@@ -44,12 +45,13 @@ export default async function handleLogout() {
       }
       batch(() => {
         setAccessToken(null);
+        setLoggedIn(false);
+        setPendingNotification([]);
+        setSheetInited(false);
         setConfessionMetadata(reconcile({}));
         setConfessionSpreadsheet(reconcile({}));
-        setPendingChanges(reconcile({}));
         setConfessionForm(reconcile({}));
-        setLoggedIn(false);
-        setSheetInited(false);
+        resetPendingChanges();
         for (const key in confessions) {
           // @ts-ignore
           confessions[key] = [];
