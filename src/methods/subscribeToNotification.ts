@@ -7,27 +7,17 @@ import { APP_SERVER_URL, LOCAL_KEY_NOTIFICATION_TOKEN } from "app-constants";
 import axios from "axios";
 import { localData, userResourceDatabase } from "local-database";
 import { confessionSpreadsheet } from "store/index";
+import callAppScriptApi from "./callAppScriptApi";
 
 export default async function subscribeToNotification(_spreadsheetId?: string) {
   const spreadsheetId =
     _spreadsheetId ||
     confessionSpreadsheet.spreadsheetId ||
     (await userResourceDatabase.getItem(LOCAL_KEY_CONFESSION_SPREADSHEET_ID))!;
-  console.log("subscribe ", spreadsheetId);
+  // console.log("subscribe ", spreadsheetId);
 
   // Subscribe to trigger
-  await axios.post(
-    APP_SCRIPT_RUN_URL,
-    {
-      function: "subscribeToFormResponse",
-      parameters: [spreadsheetId],
-    },
-    {
-      headers: {
-        Authorization: `Bearer ${gapi.client.getToken().access_token}`,
-      },
-    }
-  );
+  await callAppScriptApi("subscribeToFormResponse", [spreadsheetId]);
 
   const notificationToken = await localData.getItem(
     LOCAL_KEY_NOTIFICATION_TOKEN

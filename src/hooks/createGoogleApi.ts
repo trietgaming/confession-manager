@@ -12,12 +12,7 @@ const createAndMountScript = (src: string, onLoadCallback: () => any) => {
 };
 
 function createGoogleApi(gapiLoadedCallback: () => any) {
-  onMount(async () => {
-    createAndMountScript(
-      "https://apis.google.com/js/api.js",
-      gapiLoadedCallback
-    );
-  });
+  createAndMountScript("https://apis.google.com/js/api.js", gapiLoadedCallback);
 }
 
 export default createGoogleApi;

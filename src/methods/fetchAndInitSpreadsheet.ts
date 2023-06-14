@@ -18,6 +18,7 @@ import {
   PENDING_CHANGES_CONFESSION_ARRAY_KEYS,
 } from "app-constants";
 import { reconcile } from "solid-js/store";
+import resetConfessions from "./resetConfessions";
 
 const updateStates = (
   spreadsheet: gapi.client.sheets.Spreadsheet,
@@ -26,10 +27,7 @@ const updateStates = (
   batch(() => {
     resetPendingChanges();
     if (confessionSpreadsheet?.spreadsheetId !== spreadsheet.spreadsheetId) {
-      for (const key in confessions) {
-        // @ts-ignore
-        confessions[key] = [];
-      }
+      resetConfessions();
     }
     setConfessionSpreadsheet(spreadsheet);
     initConfessionSpreadsheetMetadata(spreadsheet);

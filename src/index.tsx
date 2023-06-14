@@ -13,6 +13,7 @@ const root = document.getElementById("root");
 // TODO: Update pending changes via some methods
 // TODO: SUPPORT confessions that have more than 1 answer column
 // TODO: Make UI Responsive
+//TODO: Add sort by time in confession view
 
 render(
   () => (

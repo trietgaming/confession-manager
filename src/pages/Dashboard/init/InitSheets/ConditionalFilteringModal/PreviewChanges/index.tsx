@@ -89,7 +89,18 @@ const PreviewChanges: Component<{
             dimension: "ROWS",
             sheetId: sheetId,
             startIndex: 1,
-            endIndex: data.length - 1,
+            endIndex: data.length, // exclusive range [startIndex, endIndex)
+          },
+        },
+      });
+      batchRequests.push({
+        updateSheetProperties: {
+          fields: "gridProperties.frozenRowCount",
+          properties: {
+            sheetId,
+            gridProperties: {
+              frozenRowCount: 1,
+            },
           },
         },
       });

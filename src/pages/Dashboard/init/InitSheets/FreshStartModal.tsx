@@ -7,6 +7,7 @@ import refreshSpreadsheet from "methods/refreshSpreadsheet";
 import setConfessionInited from "methods/setConfessionInited";
 import { Component, createEffect, createSignal, JSX } from "solid-js";
 import { confessionMetadata, confessionSpreadsheet } from "store/index";
+import { ConfessionSpreadsheetMetadata } from "types";
 import Modal from "ui-components/Modal";
 
 const FreshStartModal: Component<{
@@ -24,23 +25,65 @@ const FreshStartModal: Component<{
   const handleSubmit = async () => {
     setLoading(true);
     const archivedSheetTitle = sheetTitle();
+    const spreadsheetId = confessionSpreadsheet.spreadsheetId!;
     try {
+      const batchRequests: gapi.client.sheets.Request[] = [
+        {
+          duplicateSheet: {
+            insertSheetIndex: confessionSpreadsheet.sheets?.length,
+            newSheetName: archivedSheetTitle,
+            sourceSheetId:
+              confessionMetadata.pendingSheet!.properties!.sheetId!,
+          },
+        },
+      ];
+
+      (
+        [
+          "acceptedSheet",
+          "declinedSheet",
+          "postedSheet",
+        ] as (keyof ConfessionSpreadsheetMetadata)[]
+      ).forEach((sheetKey) => {
+        const sheetId = (
+          confessionMetadata[sheetKey] as gapi.client.sheets.Sheet
+        ).properties?.sheetId!;
+        batchRequests.push({
+          copyPaste: {
+            destination: {
+              sheetId,
+              startRowIndex: 0,
+              endRowIndex: 1,
+            },
+            source: {
+              sheetId: confessionMetadata.pendingSheet?.properties?.sheetId!,
+              startRowIndex: 0,
+              endRowIndex: 1,
+            },
+            pasteType: "PASTE_VALUES",
+            pasteOrientation: "NORMAL",
+          },
+        });
+        batchRequests.push({
+          updateSheetProperties: {
+            fields: "gridProperties.frozenRowCount",
+            properties: {
+              sheetId,
+              gridProperties: {
+                frozenRowCount: 1,
+              },
+            },
+          },
+        });
+      });
+
       const duplicateSheetResult = (
         await gapi.client.sheets.spreadsheets.batchUpdate(
           {
-            spreadsheetId: confessionSpreadsheet.spreadsheetId!,
+            spreadsheetId,
           },
           {
-            requests: [
-              {
-                duplicateSheet: {
-                  insertSheetIndex: confessionSpreadsheet.sheets?.length,
-                  newSheetName: archivedSheetTitle,
-                  sourceSheetId:
-                    confessionMetadata.pendingSheet!.properties!.sheetId!,
-                },
-              },
-            ],
+            requests: batchRequests,
           }
         )
       ).result;

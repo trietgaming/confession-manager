@@ -19,7 +19,7 @@ export default async function unsubscribeToNotification(
     LOCAL_KEY_NOTIFICATION_TOKEN
   );
 
-  console.log("unsubscribe ", spreadsheetId);
+  // console.log("unsubscribe ", spreadsheetId);
   if (!notificationToken) {
     console.error("Why no token?");
     throw "unexpected error";

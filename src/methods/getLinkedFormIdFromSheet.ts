@@ -1,5 +1,4 @@
-import { APP_SCRIPT_RUN_URL } from "app-constants";
-import axios from "axios";
+import callAppScriptApi from "./callAppScriptApi";
 
 export default async function getLinkedFormIdFromSheet(
   spreadsheetId: string | null
@@ -7,21 +6,10 @@ export default async function getLinkedFormIdFromSheet(
   if (!gapi || !spreadsheetId) return null;
 
   try {
-    const response = await axios.post(
-      APP_SCRIPT_RUN_URL,
-      {
-        function: "getLinkedFormId",
-        parameters: [spreadsheetId],
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${gapi.client.getToken().access_token}`,
-        },
-      }
-    );
+    const response = await callAppScriptApi("getLinkedFormId", [spreadsheetId]);
     const result = response.data;
     if (result.done && !result.error) {
-      return result.response.result;
+      return result.response!.result;
     }
     return null;
   } catch (err) {

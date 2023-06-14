@@ -38,7 +38,6 @@ export const [confessionMetadata, setConfessionMetadata] =
 export const pendingChanges = createMutable<PendingChanges>({
   accepts: [],
   declines: [],
-  post: [],
   cancels: [],
 });
 

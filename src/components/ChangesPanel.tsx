@@ -1,22 +1,121 @@
-import { Component, Show } from "solid-js";
+import { Component, Show, batch, createSignal } from "solid-js";
 import { Portal } from "solid-js/web";
-import { pendingChanges } from "store/index";
+import {
+  confessionMetadata,
+  confessionSpreadsheet,
+  pendingChanges,
+  resetPendingChanges,
+  setScrollY,
+  scrollY,
+} from "store/index";
 import Button from "ui-components/Button";
 import hadChanges from "app-hooks/hadChanges";
 import { PENDING_CHANGES_CONFESSION_ARRAY_KEYS } from "../constants";
-import { ConfessionElement } from "types";
+import Confession from "classes/Confesison";
+import { PendingChanges } from "types";
+import resetConfessions from "methods/resetConfessions";
+import LoadingCircle from "ui-components/LoadingCircle";
 
 const ChangesPanel: Component = () => {
+  const [isSubmitting, setSubmitting] = createSignal(false);
+
   const handleCancel = () => {
     for (const key of PENDING_CHANGES_CONFESSION_ARRAY_KEYS) {
-      (pendingChanges[key]! as ConfessionElement[]).forEach(
-        (el) => (el.ref.hidden = false)
-      );
+      for (
+        let i = 0, n = (pendingChanges[key]! as Confession[]).length;
+        i < n;
+        ++i
+      ) {
+        const el = (pendingChanges[key]! as Confession[])[i];
+        el.ref!.hidden = false;
+      }
       pendingChanges[key] = [];
     }
   };
-  const handleSaveChanges = () => {
+  const handleSaveChanges = async () => {
+    setSubmitting(true);
     console.log(pendingChanges);
+    const sheetMap: {
+      [key in keyof PendingChanges]: number; // SheetId
+    } = {
+      accepts: confessionMetadata.acceptedSheet?.properties?.sheetId!,
+      cancels: confessionMetadata.pendingSheet?.properties?.sheetId!,
+      declines: confessionMetadata.declinedSheet?.properties?.sheetId!,
+    };
+    const batchRequests: gapi.client.sheets.Request[] = [];
+
+    for (const changeKey in pendingChanges) {
+      const confesisons = pendingChanges[changeKey as keyof PendingChanges];
+      if (!confesisons || confesisons.length === 0) continue;
+
+      const sheetId = sheetMap[changeKey as keyof PendingChanges];
+
+      const rows: gapi.client.sheets.RowData[] = [];
+
+      for (let i = 0, n = confesisons.length; i < n; ++i) {
+        const confession = confesisons[i];
+        const row: gapi.client.sheets.CellData[] = confession.raw.map(
+          (val) => ({
+            userEnteredValue: {
+              stringValue: val,
+            },
+          })
+        );
+
+        batchRequests.push({
+          deleteDimension: {
+            range: {
+              dimension: "ROWS",
+              sheetId: confession.in.properties?.sheetId!,
+              startIndex: confession.row - 1, // this is 0-based index but confession.row is 1-based
+              endIndex: confession.row,
+            },
+          },
+        });
+
+        rows.push({
+          values: row,
+        });
+      }
+
+      batchRequests.push({
+        appendCells: {
+          sheetId,
+          rows,
+          fields: "userEnteredValue",
+        },
+      });
+    }
+    if (batchRequests.length) {
+      batchRequests.sort((a, b) => {
+        if (a.deleteDimension && b.deleteDimension)
+          return (
+            b.deleteDimension.range!.startIndex! -
+            a.deleteDimension.range!.startIndex!
+          );
+        if (a.appendCells) return 1;
+        return -1;
+      });
+      try {
+        await gapi.client.sheets.spreadsheets.batchUpdate(
+          {
+            spreadsheetId: confessionSpreadsheet.spreadsheetId!,
+          },
+          {
+            includeSpreadsheetInResponse: false,
+            requests: batchRequests,
+          }
+        );
+      } catch (err) {
+        alert("Đã có lỗi xảy ra");
+        console.error(err);
+      }
+    }
+    batch(() => {
+      setSubmitting(false);
+      resetConfessions();
+      resetPendingChanges();
+    });
   };
   return (
     <Show when={hadChanges()}>
@@ -32,13 +131,18 @@ const ChangesPanel: Component = () => {
                   <div class="py-2 flex space-x-2">
                     <Button
                       onClick={handleSaveChanges}
-                      class="my-0 inline-flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 sm:ml-3 sm:w-auto"
+                      class="my-0 inline-flex space-x-2 w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 sm:ml-3 sm:w-auto"
+                      disabled={isSubmitting()}
                     >
                       Lưu
+                      <Show when={isSubmitting()}>
+                        <LoadingCircle />
+                      </Show>
                     </Button>
                     <Button
                       onClick={handleCancel}
                       class="my-0 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
+                      disabled={isSubmitting()}
                     >
                       Hủy
                     </Button>

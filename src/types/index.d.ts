@@ -1,9 +1,9 @@
+/// <reference types="vite/client" />
 import FreshStartModal from "../pages/Dashboard/init/InitSheets/FreshStartModal";
 import Color from "../classes/Color";
-import { PENDING_CONFESSION_ACTION } from "../constants";
 import ConditionalFilteringModal from "../pages/Dashboard/init/InitSheets/ConditionalFilteringModal";
+import Confession from "classes/Confesison";
 
-/// <reference types="vite/client" />
 interface ImportMetaEnv {
   readonly VITE_GOOGLE_API_KEY: string;
   readonly VITE_GOOGLE_CLIENT_ID: string;
@@ -21,12 +21,6 @@ interface ImportMeta {
   readonly env: ImportMetaEnv;
 }
 
-export interface Confession {
-  row: number;
-  data: string;
-  date: string;
-}
-
 export interface ConfessionSpreadsheetMetadata {
   acceptedSheet?: gapi.client.sheets.Sheet;
   declinedSheet?: gapi.client.sheets.Sheet;
@@ -36,21 +30,15 @@ export interface ConfessionSpreadsheetMetadata {
   inited?: boolean;
 }
 
-export interface ConfessionElement extends Confession {
-  ref: HTMLLIElement;
-}
-
 export interface PendingChanges {
-  accepts?: ConfessionElement[];
-  declines?: ConfessionElement[];
-  cancels?: ConfessionElement[];
-  post?: ConfessionElement[];
+  accepts?: Confession[];
+  declines?: Confession[];
+  cancels?: Confession[];
 }
 
 export type HandleAction = (
-  actionType: `${PENDING_CONFESSION_ACTION}`,
-  confession: Confession,
-  ref: HTMLLIElement
+  actionType: `${keyof PendingChanges}`,
+  confession: Confession
 ) => any;
 
 export type RGB =
@@ -165,6 +153,7 @@ export interface PushMessageData {
 }
 
 export type ActionButtonMetadata = {
+  key: keyof PendingChanges;
   title: string;
   handler: () => any;
 };

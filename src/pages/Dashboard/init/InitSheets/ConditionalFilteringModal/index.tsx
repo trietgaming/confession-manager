@@ -93,9 +93,6 @@ const ConditionalFilteringModal: Component<{
       gridData.selected
     ) as (keyof ConfessionSpreadsheetGridData["selected"])[];
 
-    const batchRequests: gapi.client.sheets.BatchUpdateSpreadsheetRequest["requests"] =
-      [];
-
     const styleMap: {
       [key in keyof ConfessionSpreadsheetGridData["selected"]]: {
         [key in keyof Conditions]: {
@@ -150,8 +147,15 @@ const ConditionalFilteringModal: Component<{
 
     // console.log(styleMap);
     // console.log(gridData.rowData[1]);
+    for (const sheetKey in sheetValues) {
+      sheetValues[sheetKey as keyof typeof sheetValues].push(
+        gridData.rowData[0]!.values!.map(
+          (cell) => cell.formattedValue as string
+        )!
+      );
+    }
 
-    for (let i = gridData.rowData.length - 1; i >= 1; --i) {
+    for (let i = 1, n = gridData.rowData.length; i < n; ++i) {
       const rowData = gridData.rowData[i];
       if (!rowData.values) continue;
       const pushSheets: {
@@ -194,11 +198,7 @@ const ConditionalFilteringModal: Component<{
       }
       if (!pushAny) sheetValues["pendingSheet"].push(rowValues as string[]);
     }
-    // convert pendingSheet to old to new order and push the header to it
-    sheetValues["pendingSheet"].push(
-      gridData.rowData[0]!.values!.map((cell) => cell.formattedValue as string)!
-    );
-    sheetValues["pendingSheet"].reverse();
+
     // console.log(sheetValues);
     batch(() => {
       setPreviewModalShow(true);
@@ -277,10 +277,8 @@ const ConditionalFilteringModal: Component<{
                 </div>
               </div>
             </Show>
-            <p class="text-sm mt-6">
-              Lưu ý: Trang tính nhận câu trả lời từ Google Form sẽ giữ nguyên
-              thứ tự các hàng, còn các hàng của trang tính được định nghĩa sẽ
-              được sắp xếp theo dấu thời gian từ mới đến cũ - trên xuống dưới
+            <p class="text-sm mt-6 text-center">
+              Lưu ý: Các dữ liệu sẽ được giữ nguyên thứ tự như trang tính gốc
             </p>
           </div>
         </Show>

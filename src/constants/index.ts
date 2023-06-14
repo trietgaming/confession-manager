@@ -14,13 +14,6 @@ export const LOCAL_KEY_CONFESSION_SPREADSHEET_ID = "confession_spreadsheet_id";
 
 export const IS_SHEETS_INITED_METADATA_KEY = "confession_manager_inited";
 
-export enum PENDING_CONFESSION_ACTION {
-  ACCEPT = "accepts",
-  DECLINE = "declines",
-  CANCEL = "cancels",
-  POST = "post",
-}
-
 export enum SHEETS_INITED_TYPES {
   FRESH = "fresh",
   FILTERED = "filtered",

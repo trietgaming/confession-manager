@@ -37,6 +37,7 @@ import {
 } from "firebase/messaging";
 import {
   APP_SERVER_URL,
+  BASE_URL,
   DISCOVERY_DOCS,
   LOCAL_KEY_CACHED_NOTIFICATIONS,
   LOCAL_KEY_CONFESSION_FORM_ID,
@@ -126,26 +127,42 @@ const AuthenticatedRoute: Component = () => {
   );
 };
 
+let initSetTokenFunction:
+  | (() => (obj: { accessToken?: string; isGapi?: boolean }) => any)
+  | null = () => {
+  let _accessToken: string | false = false;
+  let _gapi: boolean | null = null;
+  return ({ accessToken, isGapi }) => {
+    if (accessToken) _accessToken = accessToken;
+    if (isGapi) _gapi = isGapi;
+    if ((_accessToken === null || _accessToken) && _gapi) {
+      batch(() => {
+        setGapiLoaded(true);
+        setAccessToken(_accessToken as string | null);
+      });
+      initSetTokenFunction = null;
+    }
+  };
+};
+
 const App: Component = () => {
-  let existed_access_token: string | null = null;
+  const setTokenFunction = initSetTokenFunction!();
+
   const handleGapiLoaded = () => {
     if (isGapiLoaded()) return;
     gapi.load("client", async () => {
       await gapi.client.init({
         discoveryDocs: DISCOVERY_DOCS,
       });
-
-      setGapiLoaded(true);
-      if (existed_access_token !== null) {
-        setAccessToken(existed_access_token);
-        existed_access_token = null;
-      }
+      setTokenFunction({
+        isGapi: true,
+      });
     });
   };
 
   createGoogleApi(handleGapiLoaded);
   onMount(() => {
-    const refreshAccessToken: () => any = async () => {
+    const refreshAccessToken = async () => {
       try {
         const response = await axios.get(APP_SERVER_URL + "/auth", {
           withCredentials: true,
@@ -155,25 +172,21 @@ const App: Component = () => {
 
         const accessToken = response.data.access_token;
 
-        if (response.data.ok) {
-          if (isGapiLoaded()) {
-            batch(() => {
-              setAccessToken(accessToken);
-              setPicker(buildPicker());
-            });
-          } else existed_access_token = accessToken;
-        }
-        return setTimeout(
+        setTimeout(
           refreshAccessToken,
           // Refresh 30 second earlier
           (response.data.expires_in - 30) * 1000
         );
+        return accessToken;
       } catch (err) {
-        return console.error(err);
+        console.error(err);
+        return null;
       }
     };
 
-    refreshAccessToken();
+    refreshAccessToken().then((accessToken) =>
+      setTokenFunction({ accessToken })
+    );
   });
 
   onMount(async () => {

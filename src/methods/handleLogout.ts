@@ -20,6 +20,7 @@ import { reconcile } from "solid-js/store";
 import { batch } from "solid-js";
 import { userResourceDatabase } from "local-database";
 import unsubscribeToNotification from "./unsubscribeToNotification";
+import resetConfessions from "./resetConfessions";
 
 export default async function handleLogout() {
   //TODO: RESET all state of prev user
@@ -52,10 +53,7 @@ export default async function handleLogout() {
         setConfessionSpreadsheet(reconcile({}));
         setConfessionForm(reconcile({}));
         resetPendingChanges();
-        for (const key in confessions) {
-          // @ts-ignore
-          confessions[key] = [];
-        }
+        resetConfessions();
       });
       await userResourceDatabase.clear();
       // await localforage.removeItem(confesisonForm.formId + "_doctitle");

@@ -17,7 +17,6 @@ import {
 } from "store";
 import {
   ActionButtonMetadata,
-  Confession,
   Confessions,
   HandleAction,
   SheetTypeKeys,
@@ -25,6 +24,8 @@ import {
 // import cachedConfesison from "../../caching/confession";
 import LoadingCircle from "ui-components/LoadingCircle";
 import { FETCH_TRIGGER_Y_OFFSET, MAX_CFS_PER_LOAD } from "../../constants";
+import getLastRowPositionHasValue from "methods/getLastRowPositionHasValue";
+import Confession from "classes/Confesison";
 
 const VIEW_METADATA: {
   [key in keyof Confessions]: {
@@ -40,10 +41,12 @@ const VIEW_METADATA: {
     actions: {
       primary: {
         title: "Bỏ duyệt",
+        key: "cancels",
         handler: () => {},
       },
       secondary: {
         title: "Từ chối",
+        key: "declines",
         handler: () => {},
       },
     },
@@ -53,10 +56,12 @@ const VIEW_METADATA: {
     actions: {
       primary: {
         title: "Duyệt",
+        key: "accepts",
         handler: () => {},
       },
       secondary: {
         title: "Bỏ từ chối",
+        key: "cancels",
         handler: () => {},
       },
     },
@@ -66,10 +71,12 @@ const VIEW_METADATA: {
     actions: {
       primary: {
         title: "Duyệt",
+        key: "accepts",
         handler: () => {},
       },
       secondary: {
         title: "Từ chối",
+        key: "declines",
         handler: () => {},
       },
     },
@@ -84,7 +91,7 @@ const View: Component<{
     confessions[props.key].length
       ? confessions[props.key][confessions[props.key].length - 1].row + 1
       : 2
-  ); // 1: title of row, 2: first reply of the table
+  ); // first row is the frozen row which is the form item, not response
   const [isFetching, setFetching] = createSignal(false);
   const [isEnd, setEnd] = createSignal(false);
 
@@ -100,10 +107,11 @@ const View: Component<{
     ) {
       setFetching(true);
       const currentFirstCfsRow = nextFirstCfsRow();
+      const currentSheet =
+        confessionMetadata[(props.key + "Sheet") as SheetTypeKeys]!;
 
       const range: string = `'${
-        confessionMetadata[(props.key + "Sheet") as SheetTypeKeys]!.properties!
-          .title
+        currentSheet.properties!.title
       }'!A${currentFirstCfsRow}:B${currentFirstCfsRow + MAX_CFS_PER_LOAD - 1}`;
 
       try {
@@ -118,11 +126,9 @@ const View: Component<{
           for (let i = 0; i < MAX_CFS_PER_LOAD; ++i) {
             const value = values[i];
             if (!value || !value.length) continue;
-            nextConfessions.push({
-              data: value[1],
-              date: value[0],
-              row: i + currentFirstCfsRow,
-            });
+            nextConfessions.push(
+              new Confession(value, i + currentFirstCfsRow, currentSheet)
+            );
           }
           batch(() => {
             for (const nextConfession of nextConfessions) {
@@ -143,11 +149,19 @@ const View: Component<{
   };
 
   createEffect(handleScroll);
-
-  const handleAction: HandleAction = (actionType, confession, ref) => {
-    pendingChanges[actionType]?.push({ ...confession, ref });
+  createEffect(() => {
+    setNextFirstCfsRow(
+      confessions[props.key].length
+        ? confessions[props.key][confessions[props.key].length - 1].row + 1
+        : 2
+    );
     handleScroll();
-    ref.hidden = true;
+  });
+
+  const handleAction: HandleAction = (actionType, confession) => {
+    pendingChanges[actionType]?.push(confession);
+    handleScroll();
+    confession.ref!.hidden = true;
   };
 
   return (

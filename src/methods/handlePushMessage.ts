@@ -1,7 +1,9 @@
 import { APP_LOGO_URL, GOOGLE_FORMS_FAVICON_URL } from "app-constants";
+import Confession from "classes/Confesison";
 import { MessagePayload } from "firebase/messaging";
 import { userResourceDatabase } from "local-database";
 import {
+  confessionMetadata,
   confessionSpreadsheet,
   confessions,
   setPendingNotification,
@@ -23,11 +25,9 @@ export default function handlePushMessage(payload: MessagePayload) {
       row ===
         (confessions.pending[confessions.pending.length - 1]?.row || 0) + 1
     ) {
-      confessions.pending.push({
-        data: values[1],
-        date: values[0],
-        row,
-      });
+      confessions.pending.push(
+        new Confession(values, row, confessionMetadata.pendingSheet!)
+      );
     }
 
     payload.notification = {
