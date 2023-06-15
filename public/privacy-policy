@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <link rel="shortcut icon" type="image/ico" href="assets/favicon.svg" />
+    <link rel="manifest" href="manifest.json" />
+    <title>Chính sách quyền riêng tư - Confession Manager</title>
+  </head>
+  <body
+    style="
+      margin: 0 10%;
+      font-family: Arial, Helvetica, sans-serif;
+      line-height: 1.5;
+    "
+  >
+    <!-- Privacy Policy Start here -->
+    <h1>Chính sách quyền riêng tư</h1>
+    <p>
+      Confession Manager là ứng dụng quản lí những bài viết Confession mà thu
+      thập câu trả lời bằng Google Biểu mẫu và Google Trang tính đồng thời đăng
+      tải bài viết bằng trang Facebook.
+    </p>
+    <p>
+      Chính sách quyền riêng tư này giải thích cách Ứng dụng thu thập, sử dụng
+      và bảo vệ thông tin cá nhân của bạn khi bạn sử dụng Ứng dụng của chúng
+      tôi.
+    </p>
+    <p>
+      Ứng dụng chỉ có thể truy cập được thông tin của bạn khi và chỉ khi bạn ủy
+      quyền cho Ứng dụng để truy cập những thông tin của bạn được cung cấp bởi
+      các nhà cung cấp Google hoặc Facebook, hoặc bạn tự nguyện cung cấp cho
+      chúng tôi những thông tin cần thiết qua các biểu mẫu.
+    </p>
+    <p>
+      Bằng việc đăng nhập vào Ứng dụng bằng tài khoản Google của bạn, bạn đã
+      đồng ý và chấp nhận việc thu thập và sử dụng thông tin được đề cập tại
+      Chính sách này.
+    </p>
+    <h2>Định nghĩa</h2>
+    <ul>
+      <li>
+        <p><b>Chúng tôi</b>: là nhà phát triển ứng dụng Confesison Manager</p>
+      </li>
+      <li>
+        <p>
+          <b>Ứng dụng</b>: ứng dụng Confession Manager. Lưu ý rằng "Ứng dụng" là
+          cách gọi tắt của Confession Manager, còn "ứng dụng" là ứng dụng đã
+          được tải về trình duyệt để người dùng sử dụng.
+        </p>
+      </li>
+    </ul>
+    <h2>Về việc thu thập thông tin cá nhân của bạn</h2>
+    <h3>Những thông tin Ứng dụng thu thập</h3>
+    <p>Sau đây là những thông tin Ứng dụng thu thập từ nhà cung cấp Google:</p>
+    <ul>
+      <li><p>Email</p></li>
+      <li><p>Tên hiển thị</p></li>
+    </ul>
+    <p>
+      Sau đây là những thông tin Ứng dụng thu thập từ nhà cung cấp Facebook:
+    </p>
+    <ul>
+      <li><p>Họ và tên</p></li>
+      <li><p>Tên các của trang do bạn quản lí</p></li>
+    </ul>
+    <p>
+      Chúng tôi đồng thời thu thập và ghi nhận toàn bộ những thông tin bạn tự
+      nguyện cung cấp cho Ứng dụng thông qua những biểu mẫu gửi yêu cầu góp ý
+      hay báo lỗi của Ứng dụng.
+    </p>
+    <h3>Phương thức thu thập</h3>
+    <p>
+      Ứng dụng tích hợp các tài khoản mạng xã hội như Google và Facebook hoặc
+      các biểu mẫu để thu thập thông tin của bạn. Tất cả những thông tin mà Ứng
+      dụng thu thập đều được nêu rõ trong lúc bạn đăng nhập với Bên cung cấp hay
+      lúc bạn điền biểu mẫu.
+    </p>
+    <h2>Về việc sử dụng thông tin cá nhân của bạn</h2>
+    <p>
+      Ứng dụng không lưu trữ bất kì thông tin cá nhân nào của bạn bên phía máy
+      chủ trừ những thông tin về góp ý hoặc báo lỗi. Thay vào đó, Ứng dụng thu
+      thập thông tin người dùng từ nhà cung cấp bên thứ ba như Google và
+      Facebook nhằm sử dụng thông tin này để hiển thị lên ứng dụng phía máy
+      khách để người dùng có thể biết ai đã đăng nhập.
+    </p>
+    <h2>Về việc chia sẻ thông tin của bạn với bên thứ ba</h2>
+    <p>
+      Chúng tôi TUYỆT ĐỐI không chia sẻ bất kì thông tin cá nhân nào của bạn
+      sang bên thứ ba hay bất kể đơn vị nào khác.
+    </p>
+    <h2>Về việc bảo mật thông tin cá nhân</h2>
+    <p>
+      Chúng tôi không lưu trữ bất kỳ thông tin nào của bạn. Toàn bộ thông tin cá
+      nhân của bạn là do chính bạn quản lí.
+    </p>
+    <p>
+      Chúng tôi không chịu trách nhiệm về việc rò rỉ thông tin cá nhân của bạn.
+      Tất cả thông tin cá nhân của bạn bao gồm tên và email được lưu vào bộ nhớ
+      tạm thời trên thiết bị của bạn khi sử dụng Ứng dụng và được đặt lại khi
+      bạn thoát ứng dụng hoặc đóng trình duyệt.
+    </p>
+    <h2>Cookie</h2>
+    <p>
+      Ứng dụng chỉ sử dụng Cookie để ghi nhớ thông tin đăng nhập của bạn, tránh
+      phải đăng nhập lại mỗi khi truy cập ứng dụng.
+    </p>
+    <h2>Về các quyền truy cập vào tài khoản Google của bạn</h2>
+    <h3>Những quyền Ứng dụng cần truy cập</h3>
+    <p>
+      Để các chức năng của Ứng dụng hoạt động bình thường, Ứng dụng yêu cầu bạn
+      cung cấp những quyền truy cập chính vào tài khoản Google của bạn như sau:
+    </p>
+    <ul>
+      <li><p>Xem tất cả tệp của bạn trên Google Drive</p></li>
+      <li>
+        <p>Xem và chỉnh sửa tất cả bảng tính của bạn trên Google Trang Tính</p>
+      </li>
+      <li><p>Xem tất cả biểu mẫu của bạn trên Google Biểu mẫu</p></li>
+      <li>
+        <p>Kết nối với dịch vụ bên ngoài</p>
+      </li>
+      <li><p>Cho phép ứng dụng chạy khi bạn không có mặt</p></li>
+    </ul>
+    <p>
+      Ngoài ra, Ứng dụng hiển nhiên truy cập được các quyền dưới đây khi bạn
+      đăng nhập bằng tài khoản Google của bạn:
+    </p>
+    <ul>
+      <li><p>Xem các thông tin cá nhân mà bạn đã công khai</p></li>
+      <li><p>Xem địa chỉ email của bạn</p></li>
+    </ul>
+    <h2>Mục đích của những quyền truy cập chính vào tài khoản Google</h2>
+    <h3>Những định nghĩa</h3>
+    <p>
+      Từ mục này trở về sau, tất cả các từ thuộc danh sách dưới đây được coi là
+      thuộc phạm vi một tệp tài liệu thuộc tài khoản Google của bạn:
+    </p>
+    <ul>
+      <li><p>Biểu mẫu</p></li>
+      <li><p>Bảng Tính</p></li>
+      <li><p>Trang tính</p></li>
+    </ul>
+    <h3>Giải thích các quyền truy cập</h3>
+    <ul>
+      <li>
+        <h4>Xem tất cả tệp của bạn trên Google Drive</h4>
+        <p>
+          Bản chất của một Bảng tính hoặc một Biểu mẫu là một tệp trên Google
+          Drive. Để biết Bảng tính hay Biểu mẫu nào của bạn chứa hay nhận câu
+          trả lời, Ứng dụng cần quyền truy cập này để có thể nhận dạng được Bảng
+          tính hay Biểu mẫu của bạn để thực hiện các thao tác sau này của Ứng
+          dụng. Ứng dụng sử dụng Google Picker để hiển thị bảng chọn mà bạn có
+          thể chọn được Bảng tính hay Biểu mẫu cần dùng.
+        </p>
+      </li>
+      <li>
+        <h4>
+          Xem và chỉnh sửa tất cả bảng tính của bạn trên Google Trang Tính
+        </h4>
+        <p>
+          Để quản lí các confession, chúng tôi cần quyền này để thực hiện các
+          thao tác sau:
+        </p>
+        <ul>
+          <li>
+            <p>Đọc các câu trả lời từ Bảng tính và hiển thị lên ứng dụng</p>
+          </li>
+          <li>
+            <p>
+              Tạo thêm các trang tính để chứa các câu trả lời theo các định
+              nghĩa của Ứng dụng
+            </p>
+          </li>
+          <li>
+            <p>
+              Di chuyển các hàng của Trang tính từ Trang tính này sang Trang
+              tính khác
+            </p>
+          </li>
+          <li>
+            <p>
+              Thêm, sửa và xóa các Siêu dữ liệu của nhà phát triển để lưu trữ
+              những thông tin của Ứng dụng tùy theo Bảng tính
+            </p>
+          </li>
+          <li>
+            <p>
+              Tạo kích hoạt Google App Script theo sự kiện "Đang gửi biểu mẫu"
+              để thông báo cho bạn về câu trả lời mới (Chỉ tạo khi bạn cho phép)
+            </p>
+          </li>
+          <li><p>Chỉnh sửa thuộc tính của Bảng tính khi cần thiết</p></li>
+        </ul>
+      </li>
+      <li>
+        <h4>Xem tất cả biểu mẫu của bạn trên Google Biểu mẫu</h4>
+        <p>
+          Ứng dụng cần quyền này để biết được Bảng tính nào chứa câu trả lời của
+          Biểu mẫu và thực hiện chức năng của Ứng dụng đối với Bảng tính đó.
+        </p>
+      </li>
+      <li>
+        <h4>Kết nối với dịch vụ bên ngoài</h4>
+        <p>
+          Lưu ý rằng dịch vụ bên ngoài ở đây là "dịch vụ bên ngoài đối với
+          Google" vì đây là tên của quyền truy cập này. "Dịch vụ bên ngoài" ở
+          đây thực chất là máy chủ của Ứng dụng. Ứng dụng cần quyền này để nhận
+          thông tin của câu trả lời từ kích hoạt theo sự kiện "Đang gửi biểu
+          mẫu" của Google App Script và gửi yêu cầu HTTP về máy chủ của Ứng
+          dụng, sau đó máy chủ sẽ gửi thông báo về câu trả lời cho người dùng
+          thông qua dịch vụ Firebase Cloud Messaging của Google. Chỉ có người
+          dùng có quyền truy cập (tối thiểu là "Người chỉnh sửa") vào Bảng tính
+          chứa câu trả lời mới có thể nhận được thông báo từ Bảng tính đó.
+        </p>
+      </li>
+      <li>
+        <h4>Cho phép ứng dụng chạy khi bạn không có mặt</h4>
+        <p>
+          Ứng dụng cần quyền này để có thể gửi thông báo về câu trả lời mới cho
+          bạn, kể cả khi bạn thoát ứng dụng hoặc đóng trình duyệt.
+        </p>
+      </li>
+    </ul>
+    <!-- <ul>
+      <li>
+        <p>Email address</p>
+      </li>
+      <li>
+        <p>First name and last name</p>
+      </li>
+      <li>
+        <p>Usage Data</p>
+      </li>
+    </ul> -->
+
+    <h1>Liên hệ</h1>
+    <p>
+      Nếu bạn có bất kì thắc mắc nào về Chính sách hay Ứng dụng, liên hệ Chúng
+      tôi qua email:
+      <a href="mailto:triet123vn@gmail.com">triet123vn@gmail.com</a>
+    </p>
+  </body>
+</html>

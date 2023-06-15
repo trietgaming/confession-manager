@@ -133,7 +133,7 @@ let initSetTokenFunction:
   let _accessToken: string | false = false;
   let _gapi: boolean | null = null;
   return ({ accessToken, isGapi }) => {
-    if (accessToken) _accessToken = accessToken;
+    if (accessToken !== undefined) _accessToken = accessToken;
     if (isGapi) _gapi = isGapi;
     if ((_accessToken === null || _accessToken) && _gapi) {
       batch(() => {
