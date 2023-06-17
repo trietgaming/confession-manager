@@ -17,6 +17,7 @@
       "gapi.client.forms-v1",
       "vite-plugin-pwa/client",
       "gapi.people",
+      "facebook-js-sdk"
     ],
     "noEmit": true,
     "isolatedModules": true,

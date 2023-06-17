@@ -14,6 +14,7 @@ import {
   confessions,
   pendingChanges,
   scrollY,
+  sheetsLastRow,
 } from "store";
 import {
   ActionButtonMetadata,
@@ -23,16 +24,23 @@ import {
 } from "types";
 // import cachedConfesison from "../../caching/confession";
 import LoadingCircle from "ui-components/LoadingCircle";
-import { FETCH_TRIGGER_Y_OFFSET, MAX_CFS_PER_LOAD } from "../../constants";
+import {
+  ConfessionStoreType,
+  FETCH_TRIGGER_Y_OFFSET,
+  MAX_CFS_PER_LOAD,
+  RIGHT_ARROW_ICON_URL,
+} from "../../constants";
 import getLastRowPositionHasValue from "methods/getLastRowPositionHasValue";
 import Confession from "classes/Confesison";
+import Button from "ui-components/Button";
+import { Portal } from "solid-js/web";
 
 const VIEW_METADATA: {
-  [key in keyof Confessions]: {
+  [key in keyof Confessions]?: {
     title: string;
     actions: {
-      primary: ActionButtonMetadata;
-      secondary: ActionButtonMetadata;
+      primary?: ActionButtonMetadata;
+      secondary?: ActionButtonMetadata;
     };
   };
 } = {
@@ -42,12 +50,10 @@ const VIEW_METADATA: {
       primary: {
         title: "Bỏ duyệt",
         key: "cancels",
-        handler: () => {},
       },
       secondary: {
         title: "Từ chối",
         key: "declines",
-        handler: () => {},
       },
     },
   },
@@ -57,12 +63,10 @@ const VIEW_METADATA: {
       primary: {
         title: "Duyệt",
         key: "accepts",
-        handler: () => {},
       },
       secondary: {
         title: "Bỏ từ chối",
         key: "cancels",
-        handler: () => {},
       },
     },
   },
@@ -72,12 +76,10 @@ const VIEW_METADATA: {
       primary: {
         title: "Duyệt",
         key: "accepts",
-        handler: () => {},
       },
       secondary: {
         title: "Từ chối",
         key: "declines",
-        handler: () => {},
       },
     },
   },
@@ -85,20 +87,48 @@ const VIEW_METADATA: {
 
 const View: Component<{
   key: keyof Confessions;
+  ascending?: boolean;
+  postPage?: boolean;
+  metadata?: typeof VIEW_METADATA;
 }> = (props) => {
-  const metadata = VIEW_METADATA[props.key];
-  const [nextFirstCfsRow, setNextFirstCfsRow] = createSignal(
-    confessions[props.key].length
-      ? confessions[props.key][confessions[props.key].length - 1].row + 1
-      : 2
+  const metadata =
+    (props.metadata && props.metadata[props.key]) || VIEW_METADATA[props.key]!;
+  const currentSheet =
+    confessionMetadata[(props.key + "Sheet") as SheetTypeKeys]!;
+
+  const [isAscending, setAscending] = createSignal(!!props.ascending);
+  const currentConfessions = createMemo(
+    () => confessions[props.key][+isAscending()]
+  );
+
+  const nextFirstCfsRow = createMemo(() =>
+    currentConfessions().length
+      ? currentConfessions()[currentConfessions().length - 1].row +
+        (isAscending() ? 1 : -1)
+      : isAscending()
+      ? 2
+      : sheetsLastRow[(props.key + "Sheet") as SheetTypeKeys]! || -1
   ); // first row is the frozen row which is the form item, not response
   const [isFetching, setFetching] = createSignal(false);
   const [isEnd, setEnd] = createSignal(false);
 
   let cfsContainer: HTMLUListElement | undefined;
 
+  createEffect(() => {
+    if (
+      !isAscending() &&
+      !sheetsLastRow[(props.key + "Sheet") as SheetTypeKeys]
+    ) {
+      setFetching(true);
+    } else {
+      setFetching(false);
+    }
+  });
+
   const handleScroll = async () => {
     if (isFetching() || isEnd()) return;
+    const currentFirstCfsRow = nextFirstCfsRow();
+    if (currentFirstCfsRow <= 1) return;
     if (
       scrollY() + window.innerHeight >=
       cfsContainer!.clientHeight -
@@ -106,57 +136,99 @@ const View: Component<{
         cfsContainer!.offsetTop
     ) {
       setFetching(true);
-      const currentFirstCfsRow = nextFirstCfsRow();
-      const currentSheet =
-        confessionMetadata[(props.key + "Sheet") as SheetTypeKeys]!;
+      if (isAscending()) {
+        let _nextFirstCfsRow = currentFirstCfsRow + MAX_CFS_PER_LOAD;
 
-      const range: string = `'${
-        currentSheet.properties!.title
-      }'!A${currentFirstCfsRow}:B${currentFirstCfsRow + MAX_CFS_PER_LOAD - 1}`;
+        const range: string = `'${
+          currentSheet.properties!.title
+        }'!A${currentFirstCfsRow}:B${_nextFirstCfsRow - 1}`;
 
-      try {
-        const response = await gapi.client.sheets.spreadsheets.values.get({
-          spreadsheetId: confessionSpreadsheet!.spreadsheetId!,
-          range,
-        });
-        const values = response.result.values;
-        if (!values) setEnd(true);
-        else {
-          const nextConfessions: Confession[] = [];
-          for (let i = 0; i < MAX_CFS_PER_LOAD; ++i) {
-            const value = values[i];
-            if (!value || !value.length) continue;
-            nextConfessions.push(
-              new Confession(value, i + currentFirstCfsRow, currentSheet)
-            );
-          }
-          batch(() => {
-            for (const nextConfession of nextConfessions) {
-              confessions[props.key].push(nextConfession);
-            }
-
-            setNextFirstCfsRow((last) => last + MAX_CFS_PER_LOAD);
+        try {
+          const response = await gapi.client.sheets.spreadsheets.values.get({
+            spreadsheetId: confessionSpreadsheet!.spreadsheetId!,
+            range,
           });
-          // cachedConfesison.set(confessions());
+          const values = response.result.values;
+          if (!values) setEnd(true);
+          else {
+            const nextConfessions: Confession[] = [];
+            for (let i = 0; i < MAX_CFS_PER_LOAD; ++i) {
+              const value = values[i];
+              if (!value || !value.length) continue;
+              nextConfessions.push(
+                new Confession(value, i + currentFirstCfsRow, currentSheet)
+              );
+            }
+            batch(() => {
+              for (const nextConfession of nextConfessions) {
+                currentConfessions().push(nextConfession);
+              }
+
+              // setNextFirstCfsRow(_nextFirstCfsRow);
+            });
+            // cachedConfesison.set(confessions());
+          }
+        } catch (err: any) {
+          if (err?.result?.error.status === "INVALID_ARGUMENT") {
+            setEnd(true);
+          } else console.error(err);
         }
-      } catch (err: any) {
-        if (err?.result?.error.status === "INVALID_ARGUMENT") {
+      } else {
+        let _nextFirstCfsRow = currentFirstCfsRow - MAX_CFS_PER_LOAD;
+        console.log(_nextFirstCfsRow);
+        if (_nextFirstCfsRow <= 1) {
+          _nextFirstCfsRow = 1;
           setEnd(true);
-        } else console.error(err);
+        }
+        const range: string = `'${currentSheet.properties!.title}'!A${
+          _nextFirstCfsRow + 1
+        }:B${currentFirstCfsRow}`;
+
+        try {
+          const response = await gapi.client.sheets.spreadsheets.values.get({
+            spreadsheetId: confessionSpreadsheet!.spreadsheetId!,
+            range,
+          });
+          const values = response.result.values;
+          if (!values) setEnd(true);
+          else {
+            const nextConfessions: Confession[] = [];
+            for (
+              let i = currentFirstCfsRow - _nextFirstCfsRow - 1, start = i;
+              i >= 0;
+              --i
+            ) {
+              const value = values[i];
+              if (!value || !value.length) continue;
+              nextConfessions.push(
+                new Confession(
+                  value,
+                  currentFirstCfsRow - (start - i),
+                  currentSheet
+                )
+              );
+            }
+            batch(() => {
+              for (const nextConfession of nextConfessions) {
+                currentConfessions().push(nextConfession);
+              }
+
+              // setNextFirstCfsRow(_nextFirstCfsRow);
+            });
+            // cachedConfesison.set(confessions());
+          }
+        } catch (err: any) {
+          if (err?.result?.error.status === "INVALID_ARGUMENT") {
+            setEnd(true);
+          } else console.error(err);
+        }
       }
+
       setFetching(false);
     }
   };
 
   createEffect(handleScroll);
-  createEffect(() => {
-    setNextFirstCfsRow(
-      confessions[props.key].length
-        ? confessions[props.key][confessions[props.key].length - 1].row + 1
-        : 2
-    );
-    handleScroll();
-  });
 
   const handleAction: HandleAction = (actionType, confession) => {
     pendingChanges[actionType]?.push(confession);
@@ -164,15 +236,55 @@ const View: Component<{
     confession.ref!.hidden = true;
   };
 
+  const handleSort = (_isAscending: boolean) => {
+    batch(() => {
+      setAscending(_isAscending);
+      setEnd(false);
+    });
+    handleScroll();
+  };
+
   return (
     <div class="flex flex-col">
-      <h1 class="text-center my-8 text-4xl font-bold w-full">
-        {metadata.title}
-      </h1>
+      {props.postPage ? (
+        <h2 class="text-2xl text-center font-bold mt-14">
+          Confession đã duyệt
+        </h2>
+      ) : (
+        <h1 class="text-center my-8 text-4xl font-bold w-full">
+          {metadata.title}
+        </h1>
+      )}
+      <Portal>
+        <div
+          class={`fixed flex items-center space-x-2 ${
+            props.postPage ? "left-20" : "right-4"
+          } translate-y-[80px] top-0`}
+        >
+          <button
+            onclick={() => handleSort(true)}
+            class={`rounded-lg p-1 ${
+              isAscending() ? "bg-blue-300" : "bg-gray-200"
+            }`}
+          >
+            Cũ nhất trước
+          </button>
+          <button
+            onclick={() => handleSort(false)}
+            class={`rounded-lg p-1 ${
+              isAscending() ? "bg-gray-200" : "bg-blue-300"
+            }`}
+          >
+            Mới nhất trước
+          </button>
+        </div>
+      </Portal>
       <ul class="self-center" ref={cfsContainer}>
         <For
-          each={confessions[props.key]}
-          fallback={<h3>Hiện tại không có confession nào...</h3>}
+          each={currentConfessions()}
+          fallback={
+            <h3 hidden={isFetching()}>Hiện tại không có confession nào...</h3>
+          }
         >
           {(confession) => {
             return (

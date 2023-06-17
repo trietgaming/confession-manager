@@ -1,4 +1,4 @@
-import { APP_SERVER_URL, BASE_URL } from "app-constants";
+import { APP_SERVER_URL, BASE_URL, GOOGLE_API_SCOPES } from "app-constants";
 import setAccessToken from "./setAccessToken";
 
 const receiveMessage = (event: MessageEvent<any>) => {
@@ -49,8 +49,7 @@ export default async () => {
     client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
     redirect_uri: APP_SERVER_URL + "/auth/handler",
     response_type: "code",
-    scope:
-      "https://www.googleapis.com/auth/drive.readonly https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/forms.body.readonly https://www.googleapis.com/auth/script.scriptapp https://www.googleapis.com/auth/script.external_request",
+    scope: GOOGLE_API_SCOPES,
     include_granted_scopes: "true",
     prompt: "consent",
     access_type: "offline",

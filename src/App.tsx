@@ -62,6 +62,10 @@ import SelectSpreadsheet from "pages/Dashboard/init/SelectSpreadsheet";
 import SelectSheets from "pages/Dashboard/init/SelectSheets";
 import InitSheets from "pages/Dashboard/init/InitSheets";
 import View from "pages/_ConfessionView";
+import Posting from "pages/Posting";
+import LinkResponses from "components/LinkResponses";
+import createFacebook from "app-hooks/createFacebook";
+import FbCallback from "pages/FbCallback";
 
 const NavBarWrapper: Component = () => {
   return (
@@ -114,15 +118,17 @@ const AuthenticatedRoute: Component = () => {
               confessionMetadata.postedSheet
             }
           >
-            <Route path={"/"} element={<View key="pending" />} />
+            <Route path={"/"} element={<View key="pending" ascending />} />
             <Route path={"/accepted"} element={<View key="accepted" />} />
             <Route path={"/declined"} element={<View key="declined" />} />
+            <Route path={"/posting"} element={<Posting />} />
           </Match>
         </Switch>
         <Route path={"/settings"} element={<Settings />} />
       </Route>
       <NavBar />
       <ChangesPanel />
+      <LinkResponses />
     </>
   );
 };
@@ -161,6 +167,8 @@ const App: Component = () => {
   };
 
   createGoogleApi(handleGapiLoaded);
+  createFacebook();
+
   onMount(() => {
     const refreshAccessToken = async () => {
       try {
@@ -237,6 +245,7 @@ const App: Component = () => {
   return (
     <Routes>
       <Route path={"/callback"} element={<PopupCallback />} />
+      <Route path={"/fbcallback"} element={<FbCallback />} />
       <Route path={"/about"} element={<div>hello</div>} />
       <Switch fallback={<CenteredLoadingCircle />}>
         <Match when={isGapiLoaded()}>

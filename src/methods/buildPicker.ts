@@ -16,6 +16,7 @@ const pickerCallback = async (res: google.picker.ResponseObject) => {
 
 export default function buildPicker() {
   return new google.picker.PickerBuilder()
+    .setAppId("1041449841105")
     .addView(google.picker.ViewId.SPREADSHEETS)
     .addView(google.picker.ViewId.FORMS)
     .setMaxItems(1)

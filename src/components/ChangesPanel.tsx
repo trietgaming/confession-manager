@@ -7,12 +7,13 @@ import {
   resetPendingChanges,
   setScrollY,
   scrollY,
+  sheetsLastRow,
 } from "store/index";
 import Button from "ui-components/Button";
 import hadChanges from "app-hooks/hadChanges";
 import { PENDING_CHANGES_CONFESSION_ARRAY_KEYS } from "../constants";
 import Confession from "classes/Confesison";
-import { PendingChanges } from "types";
+import { PendingChanges, SheetTypeKeys } from "types";
 import resetConfessions from "methods/resetConfessions";
 import LoadingCircle from "ui-components/LoadingCircle";
 
@@ -41,6 +42,11 @@ const ChangesPanel: Component = () => {
       accepts: confessionMetadata.acceptedSheet?.properties?.sheetId!,
       cancels: confessionMetadata.pendingSheet?.properties?.sheetId!,
       declines: confessionMetadata.declinedSheet?.properties?.sheetId!,
+    };
+    const sheetTypeMap: { [key in keyof PendingChanges]: SheetTypeKeys } = {
+      accepts: "acceptedSheet",
+      cancels: "pendingSheet",
+      declines: "declinedSheet",
     };
     const batchRequests: gapi.client.sheets.Request[] = [];
 
@@ -72,6 +78,12 @@ const ChangesPanel: Component = () => {
             },
           },
         });
+        if (confession.in === confessionMetadata.pendingSheet)
+          sheetsLastRow.pendingSheet && (sheetsLastRow.pendingSheet -= 1);
+        if (confession.in === confessionMetadata.acceptedSheet)
+          sheetsLastRow.acceptedSheet && (sheetsLastRow.acceptedSheet -= 1);
+        if (confession.in === confessionMetadata.declinedSheet)
+          sheetsLastRow.declinedSheet && (sheetsLastRow.declinedSheet -= 1);
 
         rows.push({
           values: row,
@@ -85,6 +97,14 @@ const ChangesPanel: Component = () => {
           fields: "userEnteredValue",
         },
       });
+      if (
+        typeof sheetsLastRow[
+          sheetTypeMap[changeKey as keyof PendingChanges] as SheetTypeKeys
+        ] === "number"
+      )
+        sheetsLastRow[
+          sheetTypeMap[changeKey as keyof PendingChanges] as SheetTypeKeys
+        ]! += rows.length;
     }
     if (batchRequests.length) {
       batchRequests.sort((a, b) => {

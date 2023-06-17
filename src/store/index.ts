@@ -10,15 +10,21 @@ import {
   ConfessionSpreadsheetMetadata,
   Confessions,
   PendingChanges,
+  SheetTypeKeys,
 } from "types";
 
 export const [isGapiLoaded, setGapiLoaded] = createSignal(false);
+export const [isFacebookLoaded, setFacebookLoaded] = createSignal(false);
 
 export const [picker, setPicker] = createSignal<google.picker.Picker | null>(
   null
 );
 
 export const [isPicking, setPicking] = createSignal(false);
+export const [linkResponsesShow, setLinkResponsesShow] = createSignal<{
+  spreadsheetId?: string | null;
+  formId?: string | null;
+} | null>(null);
 
 export const [scrollY, setScrollY] = createSignal(window.scrollY);
 
@@ -51,15 +57,23 @@ export const [loggedIn, setLoggedIn] = createSignal(false);
 
 export const [isSheetInited, setSheetInited] = createSignal(false);
 
+/**
+ * 0 - false: Descending
+ * 1 - true: Ascending
+ */
 export const confessions = createMutable<Confessions>({
-  pending: [],
-  declined: [],
-  accepted: [],
+  pending: [[], []],
+  declined: [[], []],
+  accepted: [[], []],
 });
 
 export const [pendingNotification, setPendingNotification] = createSignal<
   MessagePayload[]
 >([]);
+
+export const sheetsLastRow = createMutable<{
+  [key in SheetTypeKeys]?: number;
+}>({});
 
 // EVENTS
 window.addEventListener("scroll", () => {

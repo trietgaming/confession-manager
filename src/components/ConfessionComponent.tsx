@@ -1,13 +1,13 @@
-import { Component, splitProps } from "solid-js";
-import { ActionButtonMetadata, HandleAction } from "types";
+import { Component, Show, splitProps } from "solid-js";
+import { ActionButtonMetadata, HandleAction, PendingChanges } from "types";
 import Button from "ui-components/Button";
 import Confession from "classes/Confesison";
 
 const ConfessionComponent: Component<{
   confession: Confession;
-  handleAction: HandleAction;
-  primaryAction: ActionButtonMetadata;
-  secondaryAction: ActionButtonMetadata;
+  handleAction?: HandleAction | (() => any);
+  primaryAction?: ActionButtonMetadata;
+  secondaryAction?: ActionButtonMetadata;
 }> = (props) => {
   const [
     { confession, handleAction, primaryAction, secondaryAction },
@@ -28,18 +28,32 @@ const ConfessionComponent: Component<{
         <p class="mb-3 font-normal text-gray-600 text-md">
           {confession.getTimestamp()}
         </p>
-        <Button
-          onClick={() => handleAction(primaryAction.key, confession)}
-          class="mr-2"
-        >
-          {primaryAction.title}
-        </Button>
-        <Button
-          onClick={() => handleAction(secondaryAction.key, confession)}
-          class="bg-white hover:bg-sky-200 text-black border-sky-400 border"
-        >
-          {secondaryAction.title}
-        </Button>
+        <Show when={!!primaryAction && handleAction}>
+          <Button
+            onClick={() =>
+              handleAction!(
+                primaryAction!.key as keyof PendingChanges,
+                confession
+              )
+            }
+            class="mr-2"
+          >
+            {primaryAction!.title}
+          </Button>
+        </Show>
+        <Show when={!!secondaryAction && handleAction}>
+          <Button
+            onClick={() =>
+              handleAction!(
+                secondaryAction!.key as keyof PendingChanges,
+                confession
+              )
+            }
+            class="bg-white hover:bg-sky-200 text-black border-sky-400 border"
+          >
+            {secondaryAction!.title}
+          </Button>
+        </Show>
       </div>
     </li>
   );

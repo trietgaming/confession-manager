@@ -1,12 +1,15 @@
 import { reconcile } from "solid-js/store";
 import {
+  confessionMetadata,
   confessionSpreadsheet,
   setConfessionMetadata,
   setSheetInited,
 } from "store/index";
 import { CONFESSION_SHEET_TYPE_METADATA_KEY } from "../constants";
-import { ConfessionSpreadsheetMetadata } from "types";
+import { ConfessionSpreadsheetMetadata, SheetTypeKeys } from "types";
 import { checkSheetInited } from "./checkSheetInited";
+import { batch } from "solid-js";
+import getLastRowPositionHasValue from "./getLastRowPositionHasValue";
 
 export default function initConfessionSpreadsheetMetadata(
   spreadsheet?: gapi.client.sheets.Spreadsheet
@@ -30,6 +33,22 @@ export default function initConfessionSpreadsheetMetadata(
     sheetsMetadata.postedSheet &&
     sheetsMetadata.pendingSheet
   ) {
+    (
+      [
+        "pendingSheet",
+        "acceptedSheet",
+        "declinedSheet",
+        "postedSheet",
+      ] as SheetTypeKeys[]
+    ).map((key) => {
+      if (
+        !confessionMetadata[key] ||
+        sheetsMetadata![key]!.properties!.sheetId! !==
+          confessionMetadata![key]!.properties!.sheetId!
+      )
+        getLastRowPositionHasValue(sheetsMetadata, key);
+    });
+
     setConfessionMetadata(sheetsMetadata);
   } else {
     setConfessionMetadata(reconcile({}));

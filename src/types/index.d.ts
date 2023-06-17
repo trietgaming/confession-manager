@@ -136,9 +136,9 @@ export interface VerticalNavBarMetadata {
 }
 
 export interface Confessions {
-  pending: Confession[];
-  declined: Confession[];
-  accepted: Confession[];
+  pending: [Confession[], Confession[]];
+  declined: [Confession[], Confession[]];
+  accepted: [Confession[], Confession[]];
 }
 
 export interface PushMessageData {
@@ -153,7 +153,6 @@ export interface PushMessageData {
 }
 
 export type ActionButtonMetadata = {
-  key: keyof PendingChanges;
+  key: keyof PendingChanges | "post";
   title: string;
-  handler: () => any;
 };

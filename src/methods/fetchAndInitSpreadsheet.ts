@@ -10,6 +10,7 @@ import {
   resetPendingChanges,
   setConfessionForm,
   setConfessionSpreadsheet,
+  setLinkResponsesShow,
 } from "store/index";
 import initConfessionSpreadsheetMetadata from "./initConfessionSpreadsheetMetadata";
 import {
@@ -90,8 +91,8 @@ const fetchAndInitSpreadsheet = async ({
         formId || (await getLinkedFormIdFromSheet(spreadsheetId!))!
       );
   // TODO: FIRESNACKBAR HERE
-  if (!form.linkedSheetId)
-    return alert("Trang tính này chưa liên kết với biểu mẫu nào!");
+  if (!form.formId) return setLinkResponsesShow({ spreadsheetId });
+  if (!form.linkedSheetId) return setLinkResponsesShow({ formId: form.formId });
 
   let spreadsheet =
     updatedSpreadsheet ||

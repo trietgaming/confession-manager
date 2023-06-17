@@ -14,6 +14,10 @@ interface AppScriptApiFunction {
     params: [string];
     return: null;
   };
+  linkFormToSpreadsheet: {
+    params: [string, string];
+    return: null;
+  };
 }
 
 export default function callAppScriptApi<T extends keyof AppScriptApiFunction>(

@@ -113,11 +113,16 @@
       cung cấp những quyền truy cập chính vào tài khoản Google của bạn như sau:
     </p>
     <ul>
-      <li><p>Xem tất cả tệp của bạn trên Google Drive</p></li>
+      <li>
+        <p>
+          Chỉ xem, chỉnh sửa, tạo và xóa các tệp Google Drive bạn sử dụng với
+          ứng dụng này
+        </p>
+      </li>
       <li>
         <p>Xem và chỉnh sửa tất cả bảng tính của bạn trên Google Trang Tính</p>
       </li>
-      <li><p>Xem tất cả biểu mẫu của bạn trên Google Biểu mẫu</p></li>
+      <li><p>Xem và quản lý biểu mẫu của bạn trong Google Drive</p></li>
       <li>
         <p>Kết nối với dịch vụ bên ngoài</p>
       </li>
@@ -145,7 +150,10 @@
     <h3>Giải thích các quyền truy cập</h3>
     <ul>
       <li>
-        <h4>Xem tất cả tệp của bạn trên Google Drive</h4>
+        <h4>
+          Chỉ xem, chỉnh sửa, tạo và xóa các tệp Google Drive bạn sử dụng với
+          ứng dụng này
+        </h4>
         <p>
           Bản chất của một Bảng tính hoặc một Biểu mẫu là một tệp trên Google
           Drive. Để biết Bảng tính hay Biểu mẫu nào của bạn chứa hay nhận câu
@@ -153,6 +161,10 @@
           tính hay Biểu mẫu của bạn để thực hiện các thao tác sau này của Ứng
           dụng. Ứng dụng sử dụng Google Picker để hiển thị bảng chọn mà bạn có
           thể chọn được Bảng tính hay Biểu mẫu cần dùng.
+        </p>
+        <p>
+          Ứng dụng chỉ có thể xem và chỉnh sửa được các Bảng tính hoặc Biểu mẫu
+          mà bạn chọn.
         </p>
       </li>
       <li>
@@ -195,10 +207,12 @@
         </ul>
       </li>
       <li>
-        <h4>Xem tất cả biểu mẫu của bạn trên Google Biểu mẫu</h4>
+        <h4>Xem và quản lý biểu mẫu của bạn trong Google Drive</h4>
         <p>
           Ứng dụng cần quyền này để biết được Bảng tính nào chứa câu trả lời của
-          Biểu mẫu và thực hiện chức năng của Ứng dụng đối với Bảng tính đó.
+          Biểu mẫu và thực hiện chức năng của Ứng dụng đối với Bảng tính đó đồng
+          thời liên kết Biểu mẫu đó với một Bảng tính để nhận câu trả lời trong
+          trường hợp Biểu mẫu đó chưa liên kết với Bảng tính nào.
         </p>
       </li>
       <li>

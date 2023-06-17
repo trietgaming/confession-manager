@@ -23,12 +23,13 @@ import getMessagingToken from "methods/getMessagingToken";
 import checkNotificationSubscribed from "methods/checkNotificationSubscribed";
 import { localData } from "local-database";
 import SelectSheets from "pages/Dashboard/init/SelectSheets";
+import FacebookLoginButton from "components/FacebookLoginButton";
 
 const settingContainerClass = "flex justify-between items-center";
 const doubleTitleContainerClass = "flex items-center space-x-4";
 const titleIconClass = "w-8 h-8";
 const middleTitleClass =
-  "overflow-hidden whitespace-nowrap text-ellipsis max-w-[40%]";
+  "overflow-hidden whitespace-nowrap text-ellipsis max-w-[40%] text-blue-500";
 
 const Settings: Component = () => {
   const [
@@ -109,7 +110,7 @@ const Settings: Component = () => {
             />
             <p>Tài khoản Facebook</p>
           </div>
-          <Button>Liên kết</Button>
+          <FacebookLoginButton />
         </div>
         <hr />
         <div class={settingContainerClass}>
@@ -123,9 +124,13 @@ const Settings: Component = () => {
                 />
                 <p>Trang tính chứa Confession</p>
               </div>
-              <p class={middleTitleClass}>
+              <a
+                href={confessionSpreadsheet.spreadsheetUrl}
+                target="_blank"
+                class={middleTitleClass}
+              >
                 {confessionSpreadsheet.properties?.title}
-              </p>
+              </a>
             </div>
             <div class="flex items-center space-x-8">
               <div class={doubleTitleContainerClass}>
@@ -136,9 +141,13 @@ const Settings: Component = () => {
                 />
                 <p>Biểu mẫu nhận Confession</p>
               </div>
-              <p class={middleTitleClass}>
+              <a
+                href={confesisonForm.responderUri}
+                target="_blank"
+                class={middleTitleClass}
+              >
                 {confesisonForm.info?.documentTitle}
-              </p>
+              </a>
             </div>
           </div>
           <Button

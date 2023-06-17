@@ -6,7 +6,7 @@ import { PendingChanges } from "types";
 
 export const CONFESSION_SHEET_TYPE_METADATA_KEY = "cfs_sheet_type";
 
-export const MAX_CFS_PER_LOAD = 100;
+export const MAX_CFS_PER_LOAD = 50;
 
 export const FETCH_TRIGGER_Y_OFFSET = 1500;
 
@@ -23,14 +23,14 @@ export const PENDING_CHANGES_CONFESSION_ARRAY_KEYS: (keyof PendingChanges)[] = [
   "accepts",
   "declines",
   "cancels",
-  "post",
 ];
 
 export const DISCOVERY_DOCS = [
   "https://sheets.googleapis.com/$discovery/rest?version=v4",
 ];
 
-export const SCOPES = "https://www.googleapis.com/auth/drive";
+export const GOOGLE_API_SCOPES =
+  "https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/forms https://www.googleapis.com/auth/script.scriptapp https://www.googleapis.com/auth/script.external_request";
 
 export const APP_SCRIPT_RUN_URL =
   "https://script.googleapis.com/v1/scripts/AKfycbx1z61KgHlJxPtJjUp1LS4N9BK-4BDnySVLj2ESrUCEaSZg6kaE4a4e6nTvizmHkxdC:run";
@@ -54,6 +54,11 @@ export const LOCAL_KEY_PENDING_NOTIFICATIONS = "pending_notifications";
 
 export const NOTIFICATION_TOPIC =
   "projects/confession-manager/topics/confession-notification";
+
+export enum ConfessionStoreType {
+  DESCENDING = 0,
+  ASCENDING = 1,
+}
 
 export { default as DEFAULT_AVATAR_URL } from "../assets/images/default-avatar.jpg";
 export { default as SETTINGS_ICON_URL } from "../assets/icons/gear-six-icon.svg";
