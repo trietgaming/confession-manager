@@ -30,7 +30,7 @@ export const DISCOVERY_DOCS = [
 ];
 
 export const GOOGLE_API_SCOPES =
-  "https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/forms https://www.googleapis.com/auth/script.scriptapp https://www.googleapis.com/auth/script.external_request";
+  "https://www.googleapis.com/auth/drive.resource https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/forms https://www.googleapis.com/auth/script.scriptapp https://www.googleapis.com/auth/script.external_request";
 
 export const APP_SCRIPT_RUN_URL =
   "https://script.googleapis.com/v1/scripts/AKfycbx1z61KgHlJxPtJjUp1LS4N9BK-4BDnySVLj2ESrUCEaSZg6kaE4a4e6nTvizmHkxdC:run";
