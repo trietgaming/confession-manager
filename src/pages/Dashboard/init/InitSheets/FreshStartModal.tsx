@@ -18,8 +18,10 @@ const FreshStartModal: Component<{
   const [sheetTitle, setSheetTitle] = createSignal("");
   const [isLoading, setLoading] = createSignal(false);
 
-  const handleChange: JSX.ChangeEventHandler<HTMLInputElement, Event> = (e) => {
-    setSheetTitle(e.target.value);
+  const handleChange: JSX.EventHandlerUnion<HTMLInputElement, InputEvent> = (
+    e
+  ) => {
+    setSheetTitle(e.currentTarget.value);
   };
 
   const handleSubmit = async () => {

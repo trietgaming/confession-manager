@@ -8,6 +8,7 @@ import {
   setScrollY,
   scrollY,
   sheetsLastRow,
+  hiddenConfessionRows,
 } from "store/index";
 import Button from "ui-components/Button";
 import hadChanges from "app-hooks/hadChanges";
@@ -27,15 +28,15 @@ const ChangesPanel: Component = () => {
         i < n;
         ++i
       ) {
-        const el = (pendingChanges[key]! as Confession[])[i];
-        el.ref!.hidden = false;
+        const cfs = (pendingChanges[key]! as Confession[])[i];
+        cfs.setHidden(false);
       }
       pendingChanges[key] = [];
     }
   };
   const handleSaveChanges = async () => {
     setSubmitting(true);
-    console.log(pendingChanges);
+    // console.log(pendingChanges);
     const sheetMap: {
       [key in keyof PendingChanges]: number; // SheetId
     } = {
@@ -133,6 +134,7 @@ const ChangesPanel: Component = () => {
     }
     batch(() => {
       setSubmitting(false);
+      hiddenConfessionRows.hidden = {};
       resetConfessions();
       resetPendingChanges();
     });
@@ -154,7 +156,7 @@ const ChangesPanel: Component = () => {
                       class="my-0 inline-flex space-x-2 w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 sm:ml-3 sm:w-auto"
                       disabled={isSubmitting()}
                     >
-                      Lưu
+                      <p>Lưu</p>
                       <Show when={isSubmitting()}>
                         <LoadingCircle />
                       </Show>

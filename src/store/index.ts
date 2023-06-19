@@ -2,6 +2,7 @@ import {
   LOCAL_KEY_CACHED_NOTIFICATIONS,
   PENDING_CHANGES_CONFESSION_ARRAY_KEYS,
 } from "app-constants";
+import Confession from "classes/Confesison";
 import { MessagePayload, NotificationPayload } from "firebase/messaging";
 import { userResourceDatabase } from "local-database";
 import { createSignal } from "solid-js";
@@ -9,6 +10,9 @@ import { createMutable, createStore } from "solid-js/store";
 import {
   ConfessionSpreadsheetMetadata,
   Confessions,
+  FacebookConfessionPageMetadata,
+  FacebookPage,
+  FacebookUser,
   PendingChanges,
   SheetTypeKeys,
 } from "types";
@@ -74,6 +78,31 @@ export const [pendingNotification, setPendingNotification] = createSignal<
 export const sheetsLastRow = createMutable<{
   [key in SheetTypeKeys]?: number;
 }>({});
+
+export const [facebookUser, setFacebookUser] = createSignal<
+  FacebookUser | null | undefined
+>();
+
+export const [accessibleFacebookPages, setAccessibleFacebookPages] =
+  createStore<FacebookPage[]>([]);
+
+export const [currentConfessionPage, setCurrentConfessionPage] =
+  createSignal<FacebookPage | null>();
+
+export const [confessionPageMetadata, setConfessionPageMetadata] =
+  createStore<FacebookConfessionPageMetadata>({
+    hashtag: "",
+    replyHashtag: "",
+  });
+
+export const hiddenConfessionRows = createMutable<{
+  hidden: {
+    [key: number]: boolean;
+  };
+}>({ hidden: {} });
+
+
+export const pendingPost = createMutable<Confession[]>([]);
 
 // EVENTS
 window.addEventListener("scroll", () => {

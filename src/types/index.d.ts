@@ -156,3 +156,20 @@ export type ActionButtonMetadata = {
   key: keyof PendingChanges | "post";
   title: string;
 };
+
+export interface FacebookUser {
+  id: string;
+  name: string;
+}
+
+export interface FacebookPage {
+  id: string;
+  name: string;
+  tasks: string[];
+}
+
+export interface FacebookConfessionPageMetadata {
+  hashtag: string;
+  replyHashtag: string;
+  lastestConfessionNumber?: number;
+}

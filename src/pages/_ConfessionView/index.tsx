@@ -2,11 +2,11 @@ import ConfessionComponent from "components/ConfessionComponent";
 import {
   Component,
   For,
-  createEffect,
-  createSignal,
   Show,
   batch,
+  createEffect,
   createMemo,
+  createSignal,
 } from "solid-js";
 import {
   confessionMetadata,
@@ -23,17 +23,14 @@ import {
   SheetTypeKeys,
 } from "types";
 // import cachedConfesison from "../../caching/confession";
+import Confession from "classes/Confesison";
+import { Portal } from "solid-js/web";
 import LoadingCircle from "ui-components/LoadingCircle";
 import {
   ConfessionStoreType,
   FETCH_TRIGGER_Y_OFFSET,
   MAX_CFS_PER_LOAD,
-  RIGHT_ARROW_ICON_URL,
 } from "../../constants";
-import getLastRowPositionHasValue from "methods/getLastRowPositionHasValue";
-import Confession from "classes/Confesison";
-import Button from "ui-components/Button";
-import { Portal } from "solid-js/web";
 
 const VIEW_METADATA: {
   [key in keyof Confessions]?: {
@@ -90,11 +87,12 @@ const View: Component<{
   ascending?: boolean;
   postPage?: boolean;
   metadata?: typeof VIEW_METADATA;
+  handleChange?: HandleAction;
 }> = (props) => {
+  const sheetType = (props.key + "Sheet") as SheetTypeKeys;
   const metadata =
     (props.metadata && props.metadata[props.key]) || VIEW_METADATA[props.key]!;
-  const currentSheet =
-    confessionMetadata[(props.key + "Sheet") as SheetTypeKeys]!;
+  const currentSheet = confessionMetadata[sheetType]!;
 
   const [isAscending, setAscending] = createSignal(!!props.ascending);
   const currentConfessions = createMemo(
@@ -107,7 +105,7 @@ const View: Component<{
         (isAscending() ? 1 : -1)
       : isAscending()
       ? 2
-      : sheetsLastRow[(props.key + "Sheet") as SheetTypeKeys]! || -1
+      : sheetsLastRow[sheetType]! || -1
   ); // first row is the frozen row which is the form item, not response
   const [isFetching, setFetching] = createSignal(false);
   const [isEnd, setEnd] = createSignal(false);
@@ -115,20 +113,24 @@ const View: Component<{
   let cfsContainer: HTMLUListElement | undefined;
 
   createEffect(() => {
-    if (
-      !isAscending() &&
-      !sheetsLastRow[(props.key + "Sheet") as SheetTypeKeys]
-    ) {
+    if (!isAscending() && sheetsLastRow[sheetType] === undefined) {
       setFetching(true);
     } else {
       setFetching(false);
     }
+    // Fetch real data to make sure it's end
+    if (!currentConfessions().length) setEnd(false);
   });
 
   const handleScroll = async () => {
     if (isFetching() || isEnd()) return;
     const currentFirstCfsRow = nextFirstCfsRow();
-    if (currentFirstCfsRow <= 1) return;
+    if (
+      currentFirstCfsRow <= 1 ||
+      (sheetsLastRow[sheetType] !== undefined &&
+        currentFirstCfsRow > sheetsLastRow[sheetType]!)
+    )
+      return setEnd(true);
     if (
       scrollY() + window.innerHeight >=
       cfsContainer!.clientHeight -
@@ -230,16 +232,21 @@ const View: Component<{
 
   createEffect(handleScroll);
 
-  const handleAction: HandleAction = (actionType, confession) => {
-    pendingChanges[actionType]?.push(confession);
-    handleScroll();
-    confession.ref!.hidden = true;
-  };
+  const handleAction: HandleAction =
+    props.handleChange ||
+    ((actionType, confession) => {
+      pendingChanges[actionType]?.push(confession);
+      handleScroll();
+      confession.setHidden(true);
+    });
 
   const handleSort = (_isAscending: boolean) => {
     batch(() => {
       setAscending(_isAscending);
       setEnd(false);
+    });
+    window.scrollTo({
+      top: 0,
     });
     handleScroll();
   };

@@ -1,4 +1,11 @@
-import { setFacebookLoaded } from "store/index";
+import fetchFacebookUserFromAuthResponse from "methods/fetchFacebookUserFromAuthResponse";
+import { reconcile } from "solid-js/store";
+import {
+  accessibleFacebookPages,
+  facebookUser,
+  setAccessibleFacebookPages,
+  setFacebookLoaded,
+} from "store/index";
 
 const createAndMountScript = (src: string) => {
   const script = document.createElement("script");
@@ -20,9 +27,11 @@ const createFacebook = () => {
       version: "v17.0",
       status: true,
     });
-    FB.getLoginStatus(function (response) {
-      console.log(response);
+
+    FB.getLoginStatus(async (response) => {
+      await fetchFacebookUserFromAuthResponse(response);
     });
+
     console.log("FB loaded");
   };
   createAndMountScript("https://connect.facebook.net/vi_VN/sdk.js");

@@ -18,9 +18,9 @@
     <!-- Privacy Policy Start here -->
     <h1>Chính sách quyền riêng tư</h1>
     <p>
-      Confession Manager là ứng dụng quản lí những bài viết Confession mà thu
-      thập câu trả lời bằng Google Biểu mẫu và Google Trang tính đồng thời đăng
-      tải bài viết bằng trang Facebook.
+      Confession Manager là ứng dụng mã nguồn mở quản lí những bài viết
+      Confession mà thu thập câu trả lời bằng Google Biểu mẫu và Google Trang
+      tính đồng thời đăng tải bài viết bằng trang Facebook.
     </p>
     <p>
       Chính sách quyền riêng tư này giải thích cách Ứng dụng thu thập, sử dụng
@@ -32,6 +32,16 @@
       quyền cho Ứng dụng để truy cập những thông tin của bạn được cung cấp bởi
       các nhà cung cấp Google hoặc Facebook, hoặc bạn tự nguyện cung cấp cho
       chúng tôi những thông tin cần thiết qua các biểu mẫu.
+    </p>
+    <p>
+      Toàn bộ Chính sách mô tả đúng hành vi thực tế của Ứng dụng. Bạn có thể
+      tham khảo mã nguồn của Ứng dụng để xác nhận điều này.
+    </p>
+    <p>
+      Mã nguồn của Ứng dụng:
+      <a href="https://github.com/trietgaming/confession-manager"
+        >https://github.com/trietgaming/confession-manager</a
+      >
     </p>
     <p>
       Bằng việc đăng nhập vào Ứng dụng bằng tài khoản Google của bạn, bạn đã
@@ -114,15 +124,17 @@
     </p>
     <ul>
       <li>
-        <p>
-          Chỉ xem, chỉnh sửa, tạo và xóa các tệp Google Drive bạn sử dụng với
-          ứng dụng này
-        </p>
+        <p>Xem thông tin về các tệp của bạn trên Google Drive</p>
       </li>
       <li>
         <p>Xem và chỉnh sửa tất cả bảng tính của bạn trên Google Trang Tính</p>
       </li>
-      <li><p>Xem và quản lý biểu mẫu của bạn trong Google Drive</p></li>
+      <li>
+        <p>
+          Xem, chỉnh sửa, tạo và xóa tất cả biểu mẫu của bạn trên Google Biểu
+          mẫu
+        </p>
+      </li>
       <li>
         <p>Kết nối với dịch vụ bên ngoài</p>
       </li>
@@ -150,10 +162,7 @@
     <h3>Giải thích các quyền truy cập</h3>
     <ul>
       <li>
-        <h4>
-          Chỉ xem, chỉnh sửa, tạo và xóa các tệp Google Drive bạn sử dụng với
-          ứng dụng này
-        </h4>
+        <h4>Xem thông tin về các tệp của bạn trên Google Drive</h4>
         <p>
           Bản chất của một Bảng tính hoặc một Biểu mẫu là một tệp trên Google
           Drive. Để biết Bảng tính hay Biểu mẫu nào của bạn chứa hay nhận câu
@@ -163,8 +172,18 @@
           thể chọn được Bảng tính hay Biểu mẫu cần dùng.
         </p>
         <p>
-          Ứng dụng chỉ có thể xem và chỉnh sửa được các Bảng tính hoặc Biểu mẫu
-          mà bạn chọn.
+          Nhờ quyền truy cập này, bạn chỉ cần chọn một Bảng tính hoặc một Biểu
+          mẫu, Ứng dụng sẽ tự động nhận dạng được Biểu mẫu hoặc Bảng tính đã
+          liên kết với Bảng tính hoặc Biểu mẫu mà bạn chọn mà không cần chọn
+          thêm lần thứ hai. Đồng thời quyền này còn giúp xác thực quyền truy cập
+          của người dùng đối với một Bảng tính nào đó, nhằm gửi thông báo về câu
+          trả lời mới và tránh gửi thông báo đến nhầm thiết bị, tránh tình trạng
+          kẻ tấn công spam thông báo đến thiết bị của người dùng khác.
+        </p>
+        <p>
+          Chúng tôi đảm bảo chỉ sử dụng quyền này đối với các tệp mà chính bạn
+          đã chọn trên Ứng dụng, hoàn toàn không tác động đến bất kì tệp nào
+          khác mà không có sự cho phép của bạn.
         </p>
       </li>
       <li>
@@ -207,12 +226,16 @@
         </ul>
       </li>
       <li>
-        <h4>Xem và quản lý biểu mẫu của bạn trong Google Drive</h4>
+        <h4>
+          Xem, chỉnh sửa, tạo và xóa tất cả biểu mẫu của bạn trên Google Biểu
+          mẫu
+        </h4>
         <p>
           Ứng dụng cần quyền này để biết được Bảng tính nào chứa câu trả lời của
-          Biểu mẫu và thực hiện chức năng của Ứng dụng đối với Bảng tính đó đồng
-          thời liên kết Biểu mẫu đó với một Bảng tính để nhận câu trả lời trong
-          trường hợp Biểu mẫu đó chưa liên kết với Bảng tính nào.
+          Biểu mẫu hoặc Biểu mẫu nào gửi câu trả lời đến Bảng tính và thực hiện
+          chức năng của Ứng dụng đối với Bảng tính đó đồng thời liên kết Biểu
+          mẫu đó với một Bảng tính để nhận câu trả lời trong trường hợp Biểu mẫu
+          đó chưa liên kết với Bảng tính nào.
         </p>
       </li>
       <li>

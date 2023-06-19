@@ -1,7 +1,7 @@
 import { IS_SHEETS_INITED_METADATA_KEY, SHEETS_INITED_TYPES } from "app-constants";
 import { confessionMetadata, confessionSpreadsheet } from "store/index";
 
-export const checkSheetInited = () => {
+export default function checkSheetInited() {
   if (!confessionSpreadsheet || !confessionSpreadsheet.developerMetadata)
     return false;
   const metadata = confessionSpreadsheet!.developerMetadata!.find(

@@ -1,71 +1,58 @@
+import { Outlet, Route, Routes } from "@solidjs/router";
+import ChangesPanel from "components/ChangesPanel";
 import {
   Component,
   Match,
   Switch,
   batch,
-  createEffect,
-  onMount,
+  onMount
 } from "solid-js";
+import Login from "./pages/Login";
 import {
+  confessionMetadata,
+  confessionSpreadsheet,
+  isGapiLoaded,
+  isSheetInited,
   loggedIn,
   setGapiLoaded,
-  isGapiLoaded,
-  setConfessionSpreadsheet,
-  setPicker,
-  setConfessionForm,
-  setPicking,
-  confesisonForm,
-  picker,
-  confessions,
-  setPendingNotification,
   setMessagingTokenRegistered,
-  confessionSpreadsheet,
-  confessionMetadata,
-  isSheetInited,
-  // setPushEnabled,
+  setPicker
 } from "./store";
-import { Routes, Route, Outlet } from "@solidjs/router";
-import Login from "./pages/Login";
-import ChangesPanel from "components/ChangesPanel";
 // import LoadingCircle from "ui-components/LoadingCircle";
+import {
+  APP_SERVER_URL,
+  DISCOVERY_DOCS,
+  LOCAL_KEY_CONFESSION_FORM_ID,
+  LOCAL_KEY_CONFESSION_SPREADSHEET_ID,
+  LOCAL_KEY_NOTIFICATION_TOKEN,
+  LOCAL_KEY_PENDING_NOTIFICATIONS
+} from "app-constants";
+import createFacebook from "app-hooks/createFacebook";
+import createGoogleApi from "app-hooks/createGoogleApi";
+import axios from "axios";
+import LinkResponses from "components/LinkResponses";
+import NavBar from "components/NavBar";
 import { initializeApp } from "firebase/app";
 import {
   MessagePayload,
   getMessaging,
-  getToken,
-  onMessage,
+  onMessage
 } from "firebase/messaging";
-import {
-  APP_SERVER_URL,
-  BASE_URL,
-  DISCOVERY_DOCS,
-  LOCAL_KEY_CACHED_NOTIFICATIONS,
-  LOCAL_KEY_CONFESSION_FORM_ID,
-  LOCAL_KEY_CONFESSION_SPREADSHEET_ID,
-  LOCAL_KEY_NOTIFICATION_TOKEN,
-  LOCAL_KEY_PENDING_NOTIFICATIONS,
-} from "app-constants";
-import axios from "axios";
-import CenteredLoadingCircle from "ui-components/CenteredLoadingCircle";
-import PopupCallback from "pages/PopupCallback";
-import createGoogleApi from "app-hooks/createGoogleApi";
-import setAccessToken from "methods/setAccessToken";
-import NavBar from "components/NavBar";
 import { localData, userResourceDatabase } from "local-database";
-import Settings from "pages/Settings";
-import getMessagingToken from "methods/getMessagingToken";
 import buildPicker from "methods/buildPicker";
 import fetchAndInitSpreadsheet from "methods/fetchAndInitSpreadsheet";
-import { PushMessageData } from "types";
+import getMessagingToken from "methods/getMessagingToken";
 import handlePushMessage from "methods/handlePushMessage";
-import SelectSpreadsheet from "pages/Dashboard/init/SelectSpreadsheet";
-import SelectSheets from "pages/Dashboard/init/SelectSheets";
+import setAccessToken from "methods/setAccessToken";
 import InitSheets from "pages/Dashboard/init/InitSheets";
-import View from "pages/_ConfessionView";
-import Posting from "pages/Posting";
-import LinkResponses from "components/LinkResponses";
-import createFacebook from "app-hooks/createFacebook";
+import SelectSheets from "pages/Dashboard/init/SelectSheets";
+import SelectSpreadsheet from "pages/Dashboard/init/SelectSpreadsheet";
 import FbCallback from "pages/FbCallback";
+import PopupCallback from "pages/PopupCallback";
+import Posting from "pages/Posting";
+import Settings from "pages/Settings";
+import View from "pages/_ConfessionView";
+import CenteredLoadingCircle from "ui-components/CenteredLoadingCircle";
 
 const NavBarWrapper: Component = () => {
   return (
@@ -76,6 +63,7 @@ const NavBarWrapper: Component = () => {
 };
 
 const AuthenticatedRoute: Component = () => {
+  createFacebook();
   onMount(async () => {
     /// TODO: FIRE SNACKBAR
     await fetchAndInitSpreadsheet({
@@ -167,7 +155,6 @@ const App: Component = () => {
   };
 
   createGoogleApi(handleGapiLoaded);
-  createFacebook();
 
   onMount(() => {
     const refreshAccessToken = async () => {

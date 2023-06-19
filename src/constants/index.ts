@@ -14,6 +14,13 @@ export const LOCAL_KEY_CONFESSION_SPREADSHEET_ID = "confession_spreadsheet_id";
 
 export const IS_SHEETS_INITED_METADATA_KEY = "confession_manager_inited";
 
+export const CONFESSION_PAGE_REPLY_HASHTAG_METADATA_KEY =
+  "cfs_page_reply_hashtag";
+export const CONFESSION_PAGE_HASHTAG_METADATA_KEY = "cfs_page_hashtag";
+export const CONFESSION_LASTEST_HASHTAG_NUMBER_METADATA_KEY =
+  "cfs_page_lastest_hashtag";
+export const CURRENT_CONFESSION_PAGE_ID_METADATA_KEY = "cfs_current_page_id";
+
 export enum SHEETS_INITED_TYPES {
   FRESH = "fresh",
   FILTERED = "filtered",
@@ -30,7 +37,10 @@ export const DISCOVERY_DOCS = [
 ];
 
 export const GOOGLE_API_SCOPES =
-  "https://www.googleapis.com/auth/drive.resource https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/forms https://www.googleapis.com/auth/script.scriptapp https://www.googleapis.com/auth/script.external_request";
+  "https://www.googleapis.com/auth/drive.metadata.readonly https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/forms.body https://www.googleapis.com/auth/script.scriptapp https://www.googleapis.com/auth/script.external_request";
+
+export const FACEBOOK_API_SCOPES =
+  "public_profile,pages_show_list,pages_manage_posts,pages_read_engagement";
 
 export const APP_SCRIPT_RUN_URL =
   "https://script.googleapis.com/v1/scripts/AKfycbx1z61KgHlJxPtJjUp1LS4N9BK-4BDnySVLj2ESrUCEaSZg6kaE4a4e6nTvizmHkxdC:run";
@@ -73,6 +83,10 @@ export { default as CROSS_ICON_URL } from "../assets/icons/cross-icon.svg";
 export { default as PAPER_PLANE_ICON_URL } from "../assets/icons/paper-plane-tilt-icon.svg";
 export { default as RIGHT_ARROW_ICON_URL } from "../assets/icons/right-arrow-icon.svg";
 export { default as APP_LOGO_URL } from "../assets/icons/confession-manager-icon.svg";
+export { default as HASHTAG_LOGO_URL }  from "../assets/icons/hashtag-icon.svg";
+export { default as NUMBER_LIST_ICON_URL } from "../assets/icons/number-list-icon.svg";
+export { default as RELOAD_ICON_URL } from "../assets/icons/reload-icon.svg";
+export { default as RETURN_ICON_URL } from "../assets/icons/return-icon.svg";
 
 export const GOOGLE_SHEET_FAVICON_URL =
   "https://ssl.gstatic.com/docs/doclist/images/mediatype/icon_1_spreadsheet_x64.png";

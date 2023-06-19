@@ -20,6 +20,7 @@ import {
 } from "app-constants";
 import { reconcile } from "solid-js/store";
 import resetConfessions from "./resetConfessions";
+import initCurrentPage from "./initCurrentPage";
 
 const updateStates = (
   spreadsheet: gapi.client.sheets.Spreadsheet,
@@ -104,8 +105,7 @@ const fetchAndInitSpreadsheet = async ({
         spreadsheetId: spreadsheetId || form.linkedSheetId!,
       })
       .then((response) => {
-        updateStates(response.result, form);
-        updateCached(response.result, form);
+        fetchAndInitSpreadsheet({ updatedSpreadsheet: response.result });
       });
   }
   if (!spreadsheet)
@@ -116,6 +116,7 @@ const fetchAndInitSpreadsheet = async ({
     ).result;
 
   updateStates(spreadsheet, form);
+  initCurrentPage();
   updateCached(spreadsheet, form);
 };
 
