@@ -2,18 +2,21 @@ import { CURRENT_CONFESSION_PAGE_ID_METADATA_KEY } from "app-constants";
 import fetchAndInitSpreadsheet from "methods/fetchAndInitSpreadsheet";
 import refreshSpreadsheet from "methods/refreshSpreadsheet";
 import updateSpreadsheetMetadata from "methods/updateSpreadsheetMetadata";
-import { Component, For, JSX, createMemo, createSignal } from "solid-js";
+import { Component, For, JSX, batch, createMemo, createSignal } from "solid-js";
 import {
   accessibleFacebookPages,
   confessionSpreadsheet,
   currentConfessionPage,
+  setAccessibleFacebookPages,
   setCurrentConfessionPage,
 } from "store/index";
 
 const FacebookPageSelector: Component = () => {
   const [isLoading, setLoading] = createSignal(false);
   const defaultSelectedIndex = createMemo(() =>
-    accessibleFacebookPages.indexOf(currentConfessionPage()!)
+    accessibleFacebookPages.findIndex(
+      (page) => page.id === currentConfessionPage()?.id
+    )
   );
   const handleSelect: JSX.EventHandlerUnion<
     HTMLSelectElement,
@@ -28,7 +31,29 @@ const FacebookPageSelector: Component = () => {
           value: page.id,
         },
       ]);
-      setCurrentConfessionPage(page);
+      if (!page.pictureUrl)
+        FB.api(
+          `/${page.id}/picture?access_token=${page.access_token}`,
+          "get",
+          { redirect: 0 },
+          function (response: {
+            data?: {
+              height: number;
+              is_silhouette: boolean;
+              url: string;
+              width: 50;
+            };
+            error?: any;
+          }) {
+            let _page = { ...page };
+            console.log(response);
+            if (!response.error) {
+              _page.pictureUrl = response.data!.url;
+            }
+
+            setCurrentConfessionPage(_page);
+          }
+        );
     } catch (err) {
       alert("Đã có lỗi xảy ra");
       console.error(err);

@@ -1,26 +1,28 @@
 import {
   APP_SERVER_URL,
-  LOCAL_KEY_CONFESSION_FORM_ID,
-  LOCAL_KEY_CONFESSION_SPREADSHEET_ID,
   LOCAL_KEY_NOTIFICATION_SUBSCRIBED_SPREADSHEETS,
 } from "app-constants";
 import axios from "axios";
-import setAccessToken from "./setAccessToken";
+import { userResourceDatabase } from "local-database";
+import { batch } from "solid-js";
+import { reconcile } from "solid-js/store";
 import {
-  confessions,
+  hiddenConfessionRows,
+  pendingPost,
   resetPendingChanges,
   setConfessionForm,
   setConfessionMetadata,
+  setConfessionPageMetadata,
   setConfessionSpreadsheet,
   setLoggedIn,
   setPendingNotification,
   setSheetInited,
+  sheetsLastRow,
 } from "store/index";
-import { reconcile } from "solid-js/store";
-import { batch } from "solid-js";
-import { userResourceDatabase } from "local-database";
-import unsubscribeToNotification from "./unsubscribeToNotification";
+import handleFBLogout from "./handleFbLogout";
 import resetConfessions from "./resetConfessions";
+import setAccessToken from "./setAccessToken";
+import unsubscribeToNotification from "./unsubscribeToNotification";
 
 export default async function handleLogout() {
   //TODO: RESET all state of prev user
@@ -44,7 +46,9 @@ export default async function handleLogout() {
           )
         );
       }
-      batch(() => {
+
+      await batch(async () => {
+        await handleFBLogout();
         setAccessToken(null);
         setLoggedIn(false);
         setPendingNotification([]);
@@ -52,6 +56,13 @@ export default async function handleLogout() {
         setConfessionMetadata(reconcile({}));
         setConfessionSpreadsheet(reconcile({}));
         setConfessionForm(reconcile({}));
+        setConfessionPageMetadata(reconcile({ replyHashtag: "", hashtag: "" }));
+        sheetsLastRow.acceptedSheet = undefined;
+        sheetsLastRow.pendingSheet = undefined;
+        sheetsLastRow.postedSheet = undefined;
+        sheetsLastRow.declinedSheet = undefined;
+        hiddenConfessionRows.hidden = {};
+        pendingPost.length = 0;
         resetPendingChanges();
         resetConfessions();
       });

@@ -1,12 +1,6 @@
 import { Outlet, Route, Routes } from "@solidjs/router";
 import ChangesPanel from "components/ChangesPanel";
-import {
-  Component,
-  Match,
-  Switch,
-  batch,
-  onMount
-} from "solid-js";
+import { Component, Match, Switch, batch, onMount } from "solid-js";
 import Login from "./pages/Login";
 import {
   confessionMetadata,
@@ -16,7 +10,7 @@ import {
   loggedIn,
   setGapiLoaded,
   setMessagingTokenRegistered,
-  setPicker
+  setPicker,
 } from "./store";
 // import LoadingCircle from "ui-components/LoadingCircle";
 import {
@@ -25,7 +19,7 @@ import {
   LOCAL_KEY_CONFESSION_FORM_ID,
   LOCAL_KEY_CONFESSION_SPREADSHEET_ID,
   LOCAL_KEY_NOTIFICATION_TOKEN,
-  LOCAL_KEY_PENDING_NOTIFICATIONS
+  LOCAL_KEY_PENDING_NOTIFICATIONS,
 } from "app-constants";
 import createFacebook from "app-hooks/createFacebook";
 import createGoogleApi from "app-hooks/createGoogleApi";
@@ -33,11 +27,7 @@ import axios from "axios";
 import LinkResponses from "components/LinkResponses";
 import NavBar from "components/NavBar";
 import { initializeApp } from "firebase/app";
-import {
-  MessagePayload,
-  getMessaging,
-  onMessage
-} from "firebase/messaging";
+import { MessagePayload, getMessaging, onMessage } from "firebase/messaging";
 import { localData, userResourceDatabase } from "local-database";
 import buildPicker from "methods/buildPicker";
 import fetchAndInitSpreadsheet from "methods/fetchAndInitSpreadsheet";
@@ -109,6 +99,20 @@ const AuthenticatedRoute: Component = () => {
             <Route path={"/"} element={<View key="pending" ascending />} />
             <Route path={"/accepted"} element={<View key="accepted" />} />
             <Route path={"/declined"} element={<View key="declined" />} />
+            <Route
+              path={"/posted"}
+              element={
+                <View
+                  key="posted"
+                  metadata={{
+                    posted: {
+                      title: "Các Confession đã đăng",
+                      actions: {},
+                    },
+                  }}
+                />
+              }
+            />
             <Route path={"/posting"} element={<Posting />} />
           </Match>
         </Switch>

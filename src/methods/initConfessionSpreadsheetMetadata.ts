@@ -11,6 +11,7 @@ import checkSheetInited from "./checkSheetInited";
 import { batch } from "solid-js";
 import getLastRowPositionHasValue from "./getLastRowPositionHasValue";
 import initFacebookPageMetadata from "./initFacebookPageMetadata";
+import initPostTemplates from "./initPostTemplates";
 
 export default function initConfessionSpreadsheetMetadata(
   spreadsheet?: gapi.client.sheets.Spreadsheet
@@ -53,6 +54,11 @@ export default function initConfessionSpreadsheetMetadata(
     setConfessionMetadata(sheetsMetadata);
   } else {
     setConfessionMetadata(reconcile({}));
+  }
+  if (sheetsMetadata.postSettingTemplatesSheet) {
+    initPostTemplates(
+      sheetsMetadata.postSettingTemplatesSheet.properties?.title
+    );
   }
   setSheetInited(checkSheetInited());
   initFacebookPageMetadata();

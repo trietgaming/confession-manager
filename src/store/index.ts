@@ -14,6 +14,7 @@ import {
   FacebookPage,
   FacebookUser,
   PendingChanges,
+  PostTemplateSettings,
   SheetTypeKeys,
 } from "types";
 
@@ -49,6 +50,7 @@ export const pendingChanges = createMutable<PendingChanges>({
   accepts: [],
   declines: [],
   cancels: [],
+  posts: [],
 });
 
 export const resetPendingChanges = () => {
@@ -69,6 +71,7 @@ export const confessions = createMutable<Confessions>({
   pending: [[], []],
   declined: [[], []],
   accepted: [[], []],
+  posted: [[], []],
 });
 
 export const [pendingNotification, setPendingNotification] = createSignal<
@@ -101,8 +104,9 @@ export const hiddenConfessionRows = createMutable<{
   };
 }>({ hidden: {} });
 
-
 export const pendingPost = createMutable<Confession[]>([]);
+
+export const postSettingTemplates = createMutable<PostTemplateSettings[]>([]);
 
 // EVENTS
 window.addEventListener("scroll", () => {

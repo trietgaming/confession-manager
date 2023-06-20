@@ -13,16 +13,15 @@ export default function fetchFacebookUserFromAuthResponse(
 ) {
   return new Promise((resolve) => {
     if (response.status === "connected") {
-      FB.api("/me", { fields: ["name", "id", "link"] }, (user) => {
+      FB.api("/me", { fields: ["name", "id"] }, (user) => {
         setFacebookUser(user as unknown as typeof facebookUser);
         console.log(user);
         FB.api(
           `me/accounts`,
           {
-            fields: [],
+            fields: ["id", "name", "tasks", "access_token"],
           },
           (response: { data: typeof accessibleFacebookPages }) => {
-            console.log(response);
             setAccessibleFacebookPages(reconcile(response.data));
             initCurrentPage();
           }

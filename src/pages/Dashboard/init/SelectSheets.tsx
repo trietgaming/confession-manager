@@ -349,7 +349,7 @@ const SelectSheets: Component<{
                 when={selected()[payload.key] === null && isEmpty()}
                 fallback={
                   <select
-                    class="bg-gray-50 border border-gray-500 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 max-w-md text-ellipsis block p-2.5"
+                    class="bg-gray-50 border border-gray-500 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 text-ellipsis block p-2.5 max-w-[50%]"
                     onChange={(change) => {
                       handleChange(+change.target.value, payload.key);
                     }}

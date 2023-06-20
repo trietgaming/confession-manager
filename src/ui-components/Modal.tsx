@@ -10,6 +10,7 @@ const Modal: ParentComponent<{
   handleSubmit?: () => any;
   handleClose?: () => any;
   loading?: boolean;
+  submitDisabled?: boolean;
 }> = (props) => {
   return (
     <Show when={props.isShow}>
@@ -43,7 +44,7 @@ const Modal: ParentComponent<{
                   <Button
                     class="inline-flex w-full items-center space-x-2 justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 sm:ml-3 sm:w-auto"
                     onClick={props.handleSubmit}
-                    disabled={props.loading}
+                    disabled={props.loading || props.submitDisabled}
                   >
                     <p>Xác nhận</p>
                     <Show when={props.loading}>

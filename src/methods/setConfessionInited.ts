@@ -31,7 +31,6 @@ export default async function setConfessionInited(
               deleteDeveloperMetadata: {
                 dataFilter: {
                   developerMetadataLookup: {
-                    locationMatchingStrategy: "EXACT",
                     metadataKey: IS_SHEETS_INITED_METADATA_KEY,
                     metadataValue: initType,
                     visibility: "PROJECT",

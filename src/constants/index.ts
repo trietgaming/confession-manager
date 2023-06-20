@@ -1,4 +1,4 @@
-import { PendingChanges } from "types";
+import { PendingChanges, PostTemplateSettings } from "types";
 
 // export const POSTED_COLOR = "#74b9ff";
 // export const DECLINED_COLOR = "#fc5c65";
@@ -20,6 +20,7 @@ export const CONFESSION_PAGE_HASHTAG_METADATA_KEY = "cfs_page_hashtag";
 export const CONFESSION_LASTEST_HASHTAG_NUMBER_METADATA_KEY =
   "cfs_page_lastest_hashtag";
 export const CURRENT_CONFESSION_PAGE_ID_METADATA_KEY = "cfs_current_page_id";
+// cfs manager post templates sheet id
 
 export enum SHEETS_INITED_TYPES {
   FRESH = "fresh",
@@ -30,6 +31,7 @@ export const PENDING_CHANGES_CONFESSION_ARRAY_KEYS: (keyof PendingChanges)[] = [
   "accepts",
   "declines",
   "cancels",
+  "posts",
 ];
 
 export const DISCOVERY_DOCS = [
@@ -70,6 +72,23 @@ export enum ConfessionStoreType {
   ASCENDING = 1,
 }
 
+export const BASE_POST_SETTING_TEMPLATE_OBJ_KEYS = [
+  "_name",
+  "header",
+  "footer",
+  "divider",
+  "dividerEnabled",
+  "embed",
+  "formLinkAtFooterDisabled",
+  "formLinkEnabled",
+  "formLinkTitle",
+  "showTimestamp",
+  "showTime",
+  "showDate",
+] as (keyof PostTemplateSettings)[];
+
+export const DEFAULT_DIVIDER = "--------------------";
+
 export { default as DEFAULT_AVATAR_URL } from "../assets/images/default-avatar.jpg";
 export { default as SETTINGS_ICON_URL } from "../assets/icons/gear-six-icon.svg";
 export { default as BELL_ICON_URL } from "../assets/icons/bell-icon.svg";
@@ -83,10 +102,11 @@ export { default as CROSS_ICON_URL } from "../assets/icons/cross-icon.svg";
 export { default as PAPER_PLANE_ICON_URL } from "../assets/icons/paper-plane-tilt-icon.svg";
 export { default as RIGHT_ARROW_ICON_URL } from "../assets/icons/right-arrow-icon.svg";
 export { default as APP_LOGO_URL } from "../assets/icons/confession-manager-icon.svg";
-export { default as HASHTAG_LOGO_URL }  from "../assets/icons/hashtag-icon.svg";
+export { default as HASHTAG_LOGO_URL } from "../assets/icons/hashtag-icon.svg";
 export { default as NUMBER_LIST_ICON_URL } from "../assets/icons/number-list-icon.svg";
 export { default as RELOAD_ICON_URL } from "../assets/icons/reload-icon.svg";
 export { default as RETURN_ICON_URL } from "../assets/icons/return-icon.svg";
+export { default as CHAT_QUOTE_ICON } from "../assets/icons/chat-quote-icon.svg";
 
 export const GOOGLE_SHEET_FAVICON_URL =
   "https://ssl.gstatic.com/docs/doclist/images/mediatype/icon_1_spreadsheet_x64.png";

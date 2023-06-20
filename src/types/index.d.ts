@@ -27,6 +27,7 @@ export interface ConfessionSpreadsheetMetadata {
   postedSheet?: gapi.client.sheets.Sheet;
   pendingSheet?: gapi.client.sheets.Sheet;
   archivedSheet?: gapi.client.sheets.Sheet;
+  postSettingTemplatesSheet?: gapi.client.sheets.Sheet;
   inited?: boolean;
 }
 
@@ -34,6 +35,7 @@ export interface PendingChanges {
   accepts?: Confession[];
   declines?: Confession[];
   cancels?: Confession[];
+  posts?: Confession[];
 }
 
 export type HandleAction = (
@@ -115,7 +117,7 @@ export type FilteredSheetMetadata = {
 
 export type SheetTypeKeys = keyof Omit<
   ConfessionSpreadsheetMetadata,
-  "inited" | "archivedSheet"
+  "inited" | "archivedSheet" | "postSettingTemplatesSheet"
 >;
 export type SelectedObject = Record<SheetTypeKeys, number | null>;
 
@@ -139,6 +141,7 @@ export interface Confessions {
   pending: [Confession[], Confession[]];
   declined: [Confession[], Confession[]];
   accepted: [Confession[], Confession[]];
+  posted: [Confession[], Confession[]];
 }
 
 export interface PushMessageData {
@@ -163,13 +166,31 @@ export interface FacebookUser {
 }
 
 export interface FacebookPage {
+  access_token: string;
   id: string;
   name: string;
   tasks: string[];
+  pictureUrl?: string;
 }
 
 export interface FacebookConfessionPageMetadata {
   hashtag: string;
   replyHashtag: string;
   lastestConfessionNumber?: number;
+}
+
+export interface PostTemplateSettings {
+  _name?: string;
+  _row?: number;
+  header?: string;
+  footer?: string;
+  embed?: string;
+  dividerEnabled?: boolean;
+  divider?: string;
+  formLinkEnabled?: boolean;
+  formLinkAtFooterDisabled?: boolean;
+  formLinkTitle?: string;
+  showTimestamp?: boolean;
+  showTime?: boolean;
+  showDate?: boolean;
 }

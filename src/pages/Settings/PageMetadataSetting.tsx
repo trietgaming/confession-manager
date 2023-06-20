@@ -22,6 +22,8 @@ const PageMetadataSetting: Component = () => {
   const [isLastestNumberSubmitting, setLastestNumberSubmitting] =
     createSignal(false);
 
+  const [isSyncing, setSyncing] = createSignal(false);
+
   const [hashtagInputValue, setHashtagInputValue] = createSignal(
     confessionPageMetadata.hashtag
   );
@@ -72,9 +74,38 @@ const PageMetadataSetting: Component = () => {
     setSubmitting(false);
   };
 
-  const handleSubmitLastestNumber = async () => {
+  const handleSync = async () => {
+    setSyncing(true);
+
+    FB.api(
+      `/${currentConfessionPage()?.id}/feed?access_token=${
+        currentConfessionPage()?.access_token
+      }`,
+      "get",
+      { fields: ["message"] },
+      async (response: { error?: any; data: { message: string }[] }) => {
+        console.log(response);
+        if (!response?.error) {
+          for (const messageData of response.data) {
+            const found = messageData.message.match(
+              new RegExp(`#${confessionPageMetadata.hashtag}([0-9])\\w+`, "g")
+            );
+            if (found) {
+              const num = +found[found.length - 1].match(/\d+$/)![0];
+              if (!num) continue;
+              await handleSubmitLastestNumber(null, num);
+              break;
+            }
+          }
+        }
+        setSyncing(false);
+      }
+    );
+  };
+
+  const handleSubmitLastestNumber = async (e?: any, num?: number) => {
     setLastestNumberSubmitting(true);
-    const value = lastestConfessionNumberInputValue();
+    const value = num ?? lastestConfessionNumberInputValue();
     if (typeof value === "number") {
       try {
         await updateSpreadsheetMetadata([
@@ -176,11 +207,7 @@ const PageMetadataSetting: Component = () => {
       <hr />
       <div class={settingContainerClass}>
         <div class={doubleTitleContainerClass}>
-          <img
-            src={NUMBER_LIST_ICON_URL}
-            alt="Hashtag"
-            class={titleIconClass}
-          />
+          <img src={NUMBER_LIST_ICON_URL} alt="number" class={titleIconClass} />
           <p class="whitespace-nowrap">Số hashtag gần nhất</p>
         </div>
         <div class="relative">
@@ -195,6 +222,13 @@ const PageMetadataSetting: Component = () => {
             }
           />
         </div>
+      </div>
+      <div class={settingContainerClass}>
+        <span class="text-sm">
+          Đồng bộ từ Trang: Ứng dụng sẽ xem các bài viết của Trang và tìm bài
+          viết mới nhất có chứa hashtag của confession và lấy số lớn nhất đứng
+          sau hashtag.
+        </span>
       </div>
       <div class="flex space-x-4 justify-center">
         <Button
@@ -213,10 +247,18 @@ const PageMetadataSetting: Component = () => {
           Hủy
         </Button>
         <Button
-          class="whitespace-nowrap"
-          disabled={!currentConfessionPage() || isLastestNumberSubmitting()}
+          class="whitespace-nowrap flex items-center space-x-2"
+          disabled={
+            !currentConfessionPage() ||
+            isLastestNumberSubmitting() ||
+            isSyncing()
+          }
+          onClick={handleSync}
         >
-          Đồng bộ từ Trang
+          <p>Đồng bộ từ Trang</p>
+          <Show when={isSyncing()}>
+            <LoadingCircle />
+          </Show>
         </Button>
         <Button
           class="whitespace-nowrap"
