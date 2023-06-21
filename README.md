@@ -11,19 +11,15 @@
 
 ## Features 🚀
 
-- **Google Sheets Integration:** This application integrates with the Google Sheets API v4 to store and manage all confession posts in specific sheets such as "posted" sheet, "accepted" sheet, "declined" sheet and "pending" sheet. This ensures that all data is securely stored and easily to handle from anywhere.
+- **Google Sheets Integration:** This application integrates with the Google Sheets API v4 to store and manage all confession posts in specific sheets such as "posted" sheet, "accepted" sheet, "declined" sheet and "pending" sheet. This ensures that all data is easily to handle from anywhere.
 
-- **Post Management:** The application allows users to create new confession posts, edit existing posts and delete posts that are no longer needed. Users can create a template for their posts and view all existing posts in a simple and organized format, making it easy to keep track of all posts.
-
-- **Notification for new confessions**: You will receive notifications on your device when a new confession is posted on your form, ensuring that you can stay updated and respond promptly to new submissions.
+- **Notification for new confessions**: You will receive push notifications on your device when a new confession is posted on your form, ensuring that you can stay updated and respond promptly to new submissions.
 
 - **Facebook Integration:** The application provides a seamless integration with Facebook, allowing users to easily publish new confession posts directly from the application without the need to switch between multiple applications or platforms.
 
 - **User-Friendly Interface:** The application features a clean and intuitive interface that is easy to navigate.
 
-- **Easy Content Review and Removal:** The application provides a simple and efficient way for users to review and remove confessions. Users can easily browse through all existing confessions as well as pending confessions, and remove any confessions that they no longer wish to have on their Facebook page.
-
-- **Automatic Hashtagging:** The application automatically generates hashtags for each new confession post, based on the time and order in which they are approved the application of the post. This helps to ensure a properly and orderly publishing process, without the need for manual numbering or management.
+- **Automatic Hashtagging:** The application automatically generates hashtags for each new confession post, based on the time and order in which they are approved the application of the post. Users can also sync the newest hashtag from their page right on the application. This helps to ensure a properly and orderly publishing process, without the need for manual numbering or management.
 
 - **Free to Use, No Ads:** The application is completely free to use, without any hidden costs or fees. Additionally, the application is ad-free, ensuring that users are not bombarded with unwanted advertisements.
 
@@ -33,7 +29,7 @@
 
 - **Beautiful and User-Friendly Interface:** The application features a modern and visually appealing interface, with easy-to-use controls and intuitive navigation. This ensures that users can easily accomplish their tasks without any confusion or frustration.
 
-- **Secure and Private:** The application is designed with security and privacy in mind. All data is stored securely on the user's Google account, and the application does not store any personal information or data. Additionally, the application uses Google's OAuth authentication protocol to ensure that only authorized users can access the application.
+- **Secure and Private:** The application is designed with security and privacy in mind. All data is stored securely on the user's Google account, and the application does not store any personal information or data.
 
 ## Usage 💻
 
