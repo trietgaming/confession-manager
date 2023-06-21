@@ -1,6 +1,6 @@
 import { Outlet, Route, Routes } from "@solidjs/router";
 import ChangesPanel from "components/ChangesPanel";
-import { Component, Match, Switch, batch, onMount } from "solid-js";
+import { Component, Match, Show, Switch, batch, onMount } from "solid-js";
 import Login from "./pages/Login";
 import {
   confessionMetadata,
@@ -37,20 +37,13 @@ import setAccessToken from "methods/setAccessToken";
 import InitSheets from "pages/Dashboard/init/InitSheets";
 import SelectSheets from "pages/Dashboard/init/SelectSheets";
 import SelectSpreadsheet from "pages/Dashboard/init/SelectSpreadsheet";
-import FbCallback from "pages/FbCallback";
 import PopupCallback from "pages/PopupCallback";
 import Posting from "pages/Posting";
 import Settings from "pages/Settings";
 import View from "pages/_ConfessionView";
 import CenteredLoadingCircle from "ui-components/CenteredLoadingCircle";
-
-const NavBarWrapper: Component = () => {
-  return (
-    <div class="md:translate-y-14">
-      <Outlet />
-    </div>
-  );
-};
+import Donation from "pages/Donation";
+import { Portal } from "solid-js/web";
 
 const AuthenticatedRoute: Component = () => {
   createFacebook();
@@ -69,7 +62,10 @@ const AuthenticatedRoute: Component = () => {
   });
   return (
     <>
-      <Route path={"/*"} element={<NavBarWrapper />}>
+      <Route path={"/*"}>
+        <Portal mount={document.getElementById("root-top")!}>
+          <div class="h-14 w-full top-0">{"\u200B"}</div>
+        </Portal>
         <Switch>
           <Match when={!confessionSpreadsheet.spreadsheetId}>
             <Route path={"/*"} element={<SelectSpreadsheet />} />
@@ -235,9 +231,6 @@ const App: Component = () => {
 
   return (
     <Routes>
-      <Route path={"/callback"} element={<PopupCallback />} />
-      <Route path={"/fbcallback"} element={<FbCallback />} />
-      <Route path={"/about"} element={<div>hello</div>} />
       <Switch fallback={<CenteredLoadingCircle />}>
         <Match when={isGapiLoaded()}>
           <Switch>
@@ -250,6 +243,9 @@ const App: Component = () => {
           </Switch>
         </Match>
       </Switch>
+      <Route path={"/callback"} element={<PopupCallback />} />
+      <Route path={"/about"} element={<div>hello</div>} />
+      <Route path={"/donation"} element={<Donation />}></Route>
     </Routes>
   );
 };

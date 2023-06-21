@@ -86,6 +86,7 @@ const PageMetadataSetting: Component = () => {
       async (response: { error?: any; data: { message: string }[] }) => {
         console.log(response);
         if (!response?.error) {
+          let foundAny = false;
           for (const messageData of response.data) {
             const found = messageData.message.match(
               new RegExp(`#${confessionPageMetadata.hashtag}([0-9])\\w+`, "g")
@@ -93,10 +94,17 @@ const PageMetadataSetting: Component = () => {
             if (found) {
               const num = +found[found.length - 1].match(/\d+$/)![0];
               if (!num) continue;
+              foundAny = true;
+              setLastestConfessionNumberInputValue(num);
               await handleSubmitLastestNumber(null, num);
               break;
             }
           }
+          if (!foundAny)
+            alert(
+              "Không tìm thấy Confession mới nhất nào có chứa hashtag #" +
+                confessionPageMetadata.hashtag
+            );
         }
         setSyncing(false);
       }
@@ -211,11 +219,10 @@ const PageMetadataSetting: Component = () => {
           <p class="whitespace-nowrap">Số hashtag gần nhất</p>
         </div>
         <div class="relative">
-          <p class="absolute inset-y-0 flex items-center pl-3">#</p>
           <input
             type="number"
             placeholder="1000"
-            class="block p-4 pl-6 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 sm:text-md focus:ring-blue-500 focus:border-blue-500"
+            class="block p-4 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 sm:text-md focus:ring-blue-500 focus:border-blue-500"
             value={lastestConfessionNumberInputValue()}
             onInput={(e) =>
               setLastestConfessionNumberInputValue(+e.currentTarget.value)

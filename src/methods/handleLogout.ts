@@ -9,6 +9,7 @@ import { reconcile } from "solid-js/store";
 import {
   hiddenConfessionRows,
   pendingPost,
+  postSettingTemplates,
   resetPendingChanges,
   setConfessionForm,
   setConfessionMetadata,
@@ -65,6 +66,7 @@ export default async function handleLogout() {
         pendingPost.length = 0;
         resetPendingChanges();
         resetConfessions();
+        postSettingTemplates.length = 0;
       });
       await userResourceDatabase.clear();
       // await localforage.removeItem(confesisonForm.formId + "_doctitle");

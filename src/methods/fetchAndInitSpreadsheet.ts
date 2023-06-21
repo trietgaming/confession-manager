@@ -6,7 +6,9 @@ import {
   confesisonForm,
   confessionSpreadsheet,
   confessions,
+  hiddenConfessionRows,
   pendingChanges,
+  pendingPost,
   resetPendingChanges,
   setConfessionForm,
   setConfessionSpreadsheet,
@@ -21,6 +23,7 @@ import {
 import { reconcile } from "solid-js/store";
 import resetConfessions from "./resetConfessions";
 import initCurrentPage from "./initCurrentPage";
+import initPostTemplates from "./initPostTemplates";
 
 const updateStates = (
   spreadsheet: gapi.client.sheets.Spreadsheet,
@@ -34,6 +37,8 @@ const updateStates = (
     setConfessionSpreadsheet(spreadsheet);
     initConfessionSpreadsheetMetadata(spreadsheet);
     setConfessionForm(form);
+    pendingPost.length = 0;
+    hiddenConfessionRows.hidden = {};
   });
 
 const updateCached = async (

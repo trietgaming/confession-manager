@@ -168,7 +168,7 @@ const Posting: Component = () => {
             </A>
           </p>
           <p class="text-sm text-gray-600">
-            Cài đặt #hashtag, số thứ tự của confession tại{" "}
+            Cài đặt Trang, #hashtag, số thứ tự của confession tại{" "}
             <A href="/settings" class="text-blue-500">
               Cài đặt
             </A>
@@ -240,12 +240,7 @@ const Posting: Component = () => {
               </div>
             </div>
             <div ref={postContainer}>
-              <div
-                hidden={!postSettings.header?.length}
-                class={
-                  postSettings.dividerEnabled ? "" : "after:content-['\\0200B']"
-                }
-              >
+              <div hidden={!postSettings.header?.length}>
                 {postSettings.header}
                 {postSettings.header?.length &&
                   (postSettings.dividerEnabled ? (
@@ -253,11 +248,12 @@ const Posting: Component = () => {
                   ) : (
                     <br />
                   ))}
+                {!postSettings.dividerEnabled && "\u200B"}
               </div>
               <For each={pendingPost}>
                 {(confession, index) => {
                   return (
-                    <div class="after:content-['\\0200B']">
+                    <div>
                       <PreviewPostConfession
                         showDate={postSettings.showDate}
                         showTime={postSettings.showTime}
@@ -289,6 +285,7 @@ const Posting: Component = () => {
                         }}
                       />
                       {index() !== pendingPost.length - 1 && <br />}
+                      {"\u200B"}
                     </div>
                   );
                 }}

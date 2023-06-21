@@ -58,20 +58,21 @@ const PreviewPostConfession: Component<{
           </button>
         </div>
       </span>
-      <span>
-        #{confessionPageMetadata.hashtag}
-        {confessionNumber}{" "}
-        {props.showDate && props.showTime
-          ? props.confession.getTimestamp()
-          : props.showDate
-          ? date
-          : props.showTime
-          ? time
-          : ""}{" "}
-        {props.confession.getData()}
+      <span contentEditable class="outline-none">
+        {`#${confessionPageMetadata.hashtag}${confessionNumber}${" "}${
+          props.showDate && props.showTime
+            ? props.confession.getTimestamp()
+            : props.showDate
+            ? date
+            : props.showTime
+            ? time
+            : ""
+        }${" "}${props.confession.getData()}`.trim()}
+        {"\u200B"}
       </span>
+
       <Show when={isReplyEnabled()}>
-        <span class="after:content-['\\0200B']">
+        <span>
           <br />
           <br />
         </span>
@@ -79,7 +80,13 @@ const PreviewPostConfession: Component<{
           <span>
             #{confessionPageMetadata.replyHashtag + confessionNumber}{" "}
           </span>
-          <span class="outline-none border-none" contentEditable ref={cfsReplyRef}></span>
+          <span
+            class="outline-none border-none"
+            contentEditable
+            ref={cfsReplyRef}
+          >
+            {"\u200B"}
+          </span>
         </span>
       </Show>
     </>
