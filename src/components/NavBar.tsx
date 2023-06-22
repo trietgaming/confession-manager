@@ -78,28 +78,31 @@ const NavBar: Component = () => {
 
   onMount(async () => {
     const userInfoResponse = (
-      await axios.get(
-        `https://people.googleapis.com/v1/people/me?personFields=photos,names,emailAddresses&key=${
-          import.meta.env.VITE_GOOGLE_API_KEY
-        }`,
+      await axios.get<{
+        email: string,
+        email_verified: boolean,
+        given_name: string,
+        locale: string,
+        name: string,
+        picture: string,
+        sub: string
+      }>(
+        `https://www.googleapis.com/oauth2/v3/userinfo`,
         {
           headers: {
             Authorization: `Bearer ${gapi.client.getToken().access_token}`,
           },
         }
       )
-    ).data as gapi.client.people.Person;
+    ).data;
     // console.log(userInfoResponse);
     setUserData({
       email:
-        userInfoResponse.emailAddresses?.find((email) => email.metadata.primary)
-          ?.value || "user@gmail.com",
+        userInfoResponse.email,
       displayName:
-        userInfoResponse.names?.find((name) => name.metadata.primary)
-          ?.displayName || "Google User",
+        userInfoResponse.name,
       photoUrl:
-        userInfoResponse.photos?.find((photo) => photo.metadata.primary)?.url ||
-        DEFAULT_AVATAR_URL,
+        userInfoResponse.picture,
     });
   });
 
@@ -192,9 +195,8 @@ const NavBar: Component = () => {
           
         </div> */}
         <div
-          class={`fixed top-[56px] flex flex-col left-0 z-[1] h-screen overflow-y-auto transition-transform bg-white ${
-            isVerticalNavExtended() ? "w-max" : "w-[64px]"
-          } space-y-4 px-2`}
+          class={`fixed top-[56px] flex flex-col left-0 z-[1] h-screen overflow-y-auto transition-transform bg-white ${isVerticalNavExtended() ? "w-max" : "w-[64px]"
+            } space-y-4 px-2`}
           tabindex="-1"
           aria-labelledby="drawer-left-label"
         >

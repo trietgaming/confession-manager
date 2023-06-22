@@ -21,7 +21,6 @@ export default function buildPicker() {
     .addView(google.picker.ViewId.FORMS)
     .setMaxItems(1)
     .setOAuthToken(gapi.client.getToken().access_token)
-    .setDeveloperKey(import.meta.env.VITE_GOOGLE_API_KEY)
     .setCallback(pickerCallback)
     .setTitle(
       "Chọn bảng tính hoặc biểu mẫu nhận câu trả lời Confession của bạn"

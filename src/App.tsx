@@ -44,6 +44,7 @@ import View from "pages/_ConfessionView";
 import CenteredLoadingCircle from "ui-components/CenteredLoadingCircle";
 import Donation from "pages/Donation";
 import { Portal } from "solid-js/web";
+import Ticket from "pages/Ticket";
 
 const AuthenticatedRoute: Component = () => {
   createFacebook();
@@ -113,6 +114,7 @@ const AuthenticatedRoute: Component = () => {
           </Match>
         </Switch>
         <Route path={"/settings"} element={<Settings />} />
+        <Route path={"/ticket"} element={<Ticket />} />
       </Route>
       <NavBar />
       <ChangesPanel />
@@ -124,20 +126,20 @@ const AuthenticatedRoute: Component = () => {
 let initSetTokenFunction:
   | (() => (obj: { accessToken?: string; isGapi?: boolean }) => any)
   | null = () => {
-  let _accessToken: string | false = false;
-  let _gapi: boolean | null = null;
-  return ({ accessToken, isGapi }) => {
-    if (accessToken !== undefined) _accessToken = accessToken;
-    if (isGapi) _gapi = isGapi;
-    if ((_accessToken === null || _accessToken) && _gapi) {
-      batch(() => {
-        setGapiLoaded(true);
-        setAccessToken(_accessToken as string | null);
-      });
-      initSetTokenFunction = null;
-    }
+    let _accessToken: string | false = false;
+    let _gapi: boolean | null = null;
+    return ({ accessToken, isGapi }) => {
+      if (accessToken !== undefined) _accessToken = accessToken;
+      if (isGapi) _gapi = isGapi;
+      if ((_accessToken === null || _accessToken) && _gapi) {
+        batch(() => {
+          setGapiLoaded(true);
+          setAccessToken(_accessToken as string | null);
+        });
+        initSetTokenFunction = null;
+      }
+    };
   };
-};
 
 const App: Component = () => {
   const setTokenFunction = initSetTokenFunction!();

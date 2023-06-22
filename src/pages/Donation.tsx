@@ -18,6 +18,10 @@ const Donation: Component = () => {
         liên lạc của bạn kèm "Donate CFSMANAGER" để chúng tôi có thể cảm ơn và
         vinh danh bạn. Xin cảm ơn!
       </div>
+      <p>
+        Hãy nhớ kiểm tra họ và tên người nhận trước khi chuyển tiền! (Trương Minh
+        Triết)
+      </p>
       <div class="bg-white rounded-md flex flex-col w-full p-4 space-y-4 shadow-md">
         <img
           src="https://www.mbbank.com.vn/images/logo.png"
