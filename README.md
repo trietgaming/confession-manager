@@ -37,7 +37,7 @@ To use this application, you will need to log in to your Google account that con
 
 ## Issues 🐛
 
-If you encounter any issues or bugs while using the application, please feel free to open an issue on the repository. We will take a look at it as soon as possible. 😊
+If you encounter any issues or bugs while using the application, please feel free to open an issue on the repository or submit a ticket on [https://confession-manager.app/ticket](https://confession-manager.app/ticket) (requires login). We will take a look at it as soon as possible. 😊
 
 ## Contact 📩
 
