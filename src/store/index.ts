@@ -1,10 +1,8 @@
 import {
-  LOCAL_KEY_CACHED_NOTIFICATIONS,
-  PENDING_CHANGES_CONFESSION_ARRAY_KEYS,
+  PENDING_CHANGES_CONFESSION_ARRAY_KEYS
 } from "app-constants";
 import Confession from "classes/Confesison";
-import { MessagePayload, NotificationPayload } from "firebase/messaging";
-import { userResourceDatabase } from "local-database";
+import { MessagePayload } from "firebase/messaging";
 import { createSignal } from "solid-js";
 import { createMutable, createStore } from "solid-js/store";
 import {
@@ -16,6 +14,7 @@ import {
   PendingChanges,
   PostTemplateSettings,
   SheetTypeKeys,
+  UserInfo,
 } from "types";
 
 export const [isGapiLoaded, setGapiLoaded] = createSignal(false);
@@ -107,6 +106,8 @@ export const hiddenConfessionRows = createMutable<{
 export const pendingPost = createMutable<Confession[]>([]);
 
 export const postSettingTemplates = createMutable<PostTemplateSettings[]>([]);
+
+export const [userData, setUserData] = createStore<UserInfo>({});
 
 // EVENTS
 window.addEventListener("scroll", () => {

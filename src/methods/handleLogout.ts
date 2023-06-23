@@ -18,6 +18,7 @@ import {
   setLoggedIn,
   setPendingNotification,
   setSheetInited,
+  setUserData,
   sheetsLastRow,
 } from "store/index";
 import handleFBLogout from "./handleFbLogout";
@@ -50,6 +51,7 @@ export default async function handleLogout() {
 
       await batch(async () => {
         await handleFBLogout();
+        setUserData({});
         setAccessToken(null);
         setLoggedIn(false);
         setPendingNotification([]);

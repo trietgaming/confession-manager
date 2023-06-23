@@ -11,6 +11,13 @@ import {
 import { PendingChanges, SheetTypeKeys } from "types";
 import resetConfessions from "./resetConfessions";
 
+const sheetTypeMap: { [key in keyof PendingChanges]: SheetTypeKeys } = {
+  accepts: "acceptedSheet",
+  cancels: "pendingSheet",
+  declines: "declinedSheet",
+  posts: "postedSheet",
+};
+
 export default async function savePendingChanges() {
   const sheetMap: {
     [key in keyof PendingChanges]: number; // SheetId
@@ -20,12 +27,7 @@ export default async function savePendingChanges() {
     declines: confessionMetadata.declinedSheet?.properties?.sheetId!,
     posts: confessionMetadata.postedSheet?.properties?.sheetId!,
   };
-  const sheetTypeMap: { [key in keyof PendingChanges]: SheetTypeKeys } = {
-    accepts: "acceptedSheet",
-    cancels: "pendingSheet",
-    declines: "declinedSheet",
-    posts: "postedSheet",
-  };
+
   const batchRequests: gapi.client.sheets.Request[] = [];
 
   for (const changeKey in pendingChanges) {
@@ -66,20 +68,44 @@ export default async function savePendingChanges() {
       });
     }
 
-    batchRequests.push({
-      appendDimension: {
-        sheetId,
-        length: rows.length,
-        dimension: "ROWS",
-      },
-    });
-    batchRequests.push({
-      appendCells: {
-        sheetId,
-        rows,
-        fields: "userEnteredValue",
-      },
-    });
+    if (sheetTypeMap[changeKey as keyof PendingChanges] === "pendingSheet") {
+      batchRequests.push({
+        insertDimension: {
+          range: {
+            sheetId,
+            dimension: "ROWS",
+            startIndex: 1,
+            endIndex: rows.length + 1,
+          },
+        },
+      });
+      batchRequests.push({
+        updateCells: {
+          fields: "userEnteredValue",
+          rows,
+          start: {
+            rowIndex: 1,
+            sheetId,
+          },
+        },
+      });
+    } else {
+      batchRequests.push({
+        appendDimension: {
+          sheetId,
+          length: rows.length,
+          dimension: "ROWS",
+        },
+      });
+      batchRequests.push({
+        appendCells: {
+          sheetId,
+          rows,
+          fields: "userEnteredValue",
+        },
+      });
+    }
+
     if (
       typeof sheetsLastRow[
         sheetTypeMap[changeKey as keyof PendingChanges] as SheetTypeKeys
@@ -96,9 +122,10 @@ export default async function savePendingChanges() {
           b.deleteDimension.range!.startIndex! -
           a.deleteDimension.range!.startIndex!
         );
-      if (a.appendCells) return 1;
+      if (a.appendCells || a.updateCells) return 1;
       return -1;
     });
+    // console.log(batchRequests);
     try {
       await gapi.client.sheets.spreadsheets.batchUpdate(
         {

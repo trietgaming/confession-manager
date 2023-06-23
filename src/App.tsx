@@ -1,6 +1,6 @@
-import { Outlet, Route, Routes } from "@solidjs/router";
+import { Route, Routes } from "@solidjs/router";
 import ChangesPanel from "components/ChangesPanel";
-import { Component, Match, Show, Switch, batch, onMount } from "solid-js";
+import { Component, Match, Switch, batch, onMount } from "solid-js";
 import Login from "./pages/Login";
 import {
   confessionMetadata,
@@ -11,6 +11,7 @@ import {
   setGapiLoaded,
   setMessagingTokenRegistered,
   setPicker,
+  setUserData,
 } from "./store";
 // import LoadingCircle from "ui-components/LoadingCircle";
 import {
@@ -37,17 +38,40 @@ import setAccessToken from "methods/setAccessToken";
 import InitSheets from "pages/Dashboard/init/InitSheets";
 import SelectSheets from "pages/Dashboard/init/SelectSheets";
 import SelectSpreadsheet from "pages/Dashboard/init/SelectSpreadsheet";
+import Donation from "pages/Donation";
 import PopupCallback from "pages/PopupCallback";
 import Posting from "pages/Posting";
 import Settings from "pages/Settings";
-import View from "pages/_ConfessionView";
-import CenteredLoadingCircle from "ui-components/CenteredLoadingCircle";
-import Donation from "pages/Donation";
-import { Portal } from "solid-js/web";
 import Ticket from "pages/Ticket";
+import View from "pages/_ConfessionView";
+import { Portal } from "solid-js/web";
+import CenteredLoadingCircle from "ui-components/CenteredLoadingCircle";
 
 const AuthenticatedRoute: Component = () => {
   createFacebook();
+  onMount(async () => {
+    const userInfoResponse = (
+      await axios.get<{
+        email: string;
+        email_verified: boolean;
+        given_name: string;
+        locale: string;
+        name: string;
+        picture: string;
+        sub: string;
+      }>(`https://www.googleapis.com/oauth2/v3/userinfo`, {
+        headers: {
+          Authorization: `Bearer ${gapi.client.getToken().access_token}`,
+        },
+      })
+    ).data;
+    // console.log(userInfoResponse);
+    setUserData({
+      email: userInfoResponse.email,
+      displayName: userInfoResponse.name,
+      photoUrl: userInfoResponse.picture,
+    });
+  });
   onMount(async () => {
     /// TODO: FIRE SNACKBAR
     await fetchAndInitSpreadsheet({
@@ -126,20 +150,20 @@ const AuthenticatedRoute: Component = () => {
 let initSetTokenFunction:
   | (() => (obj: { accessToken?: string; isGapi?: boolean }) => any)
   | null = () => {
-    let _accessToken: string | false = false;
-    let _gapi: boolean | null = null;
-    return ({ accessToken, isGapi }) => {
-      if (accessToken !== undefined) _accessToken = accessToken;
-      if (isGapi) _gapi = isGapi;
-      if ((_accessToken === null || _accessToken) && _gapi) {
-        batch(() => {
-          setGapiLoaded(true);
-          setAccessToken(_accessToken as string | null);
-        });
-        initSetTokenFunction = null;
-      }
-    };
+  let _accessToken: string | false = false;
+  let _gapi: boolean | null = null;
+  return ({ accessToken, isGapi }) => {
+    if (accessToken !== undefined) _accessToken = accessToken;
+    if (isGapi) _gapi = isGapi;
+    if ((_accessToken === null || _accessToken) && _gapi) {
+      batch(() => {
+        setGapiLoaded(true);
+        setAccessToken(_accessToken as string | null);
+      });
+      initSetTokenFunction = null;
+    }
   };
+};
 
 const App: Component = () => {
   const setTokenFunction = initSetTokenFunction!();

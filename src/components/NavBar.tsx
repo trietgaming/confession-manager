@@ -1,6 +1,5 @@
 import { A } from "@solidjs/router";
 import {
-  BELL_ICON_URL,
   BUG_ICON_URL,
   CHECK_ICON_URL,
   CROSS_ICON_URL,
@@ -17,18 +16,18 @@ import {
 } from "app-constants";
 import axios from "axios";
 import handleLogout from "methods/handleLogout";
-import { Component, Show, createEffect, createSignal, onMount } from "solid-js";
-import { createStore } from "solid-js/store";
+import { Component, Show, createSignal, onMount } from "solid-js";
 import { Portal } from "solid-js/web";
 import {
   confesisonForm,
   confessionSpreadsheet,
   isSheetInited,
+  setUserData,
+  userData,
 } from "store/index";
-import { UserInfo, VerticalNavBarMetadata } from "types";
+import { VerticalNavBarMetadata } from "types";
 import AppLogo from "ui-components/AppLogo";
 import NotificationBell from "./NotificationBell";
-import checkNotificationSubscribed from "methods/checkNotificationSubscribed";
 
 const verticalNavBarMetadatas: VerticalNavBarMetadata[] = [
   {
@@ -61,11 +60,6 @@ const NavBar: Component = () => {
   const [isVerticalNavExtended, setVerticalNavExtended] = createSignal(false);
 
   const [isAccountDropdownShow, setAccountDropdownShow] = createSignal(false);
-  const [userData, setUserData] = createStore<UserInfo>({
-    photoUrl: DEFAULT_AVATAR_URL,
-    displayName: "Loading...",
-    email: "loading...@gmail.com",
-  });
 
   const handleLogoutClick = async () => {
     setLoggingOut(true);
@@ -75,36 +69,6 @@ const NavBar: Component = () => {
   };
   const handleToggleAccountDropdownShow = () =>
     setAccountDropdownShow((prev) => !prev);
-
-  onMount(async () => {
-    const userInfoResponse = (
-      await axios.get<{
-        email: string,
-        email_verified: boolean,
-        given_name: string,
-        locale: string,
-        name: string,
-        picture: string,
-        sub: string
-      }>(
-        `https://www.googleapis.com/oauth2/v3/userinfo`,
-        {
-          headers: {
-            Authorization: `Bearer ${gapi.client.getToken().access_token}`,
-          },
-        }
-      )
-    ).data;
-    // console.log(userInfoResponse);
-    setUserData({
-      email:
-        userInfoResponse.email,
-      displayName:
-        userInfoResponse.name,
-      photoUrl:
-        userInfoResponse.picture,
-    });
-  });
 
   return (
     <Portal>
@@ -147,12 +111,14 @@ const NavBar: Component = () => {
               >
                 <img
                   class="w-9 h-9 rounded-full cursor-pointer"
-                  src={userData.photoUrl}
+                  src={userData.photoUrl || DEFAULT_AVATAR_URL}
                   alt="Avatar"
                 />
                 <div class="font-md text-sm">
-                  <div>{userData.displayName}</div>
-                  <div class="text-sm text-gray-500">{userData.email}</div>
+                  <div>{userData.displayName || "Loading..."}</div>
+                  <div class="text-sm text-gray-500">
+                    {userData.email || "loading...@email.com"}
+                  </div>
                 </div>
               </button>
               {/* Dropdown */}
@@ -195,8 +161,9 @@ const NavBar: Component = () => {
           
         </div> */}
         <div
-          class={`fixed top-[56px] flex flex-col left-0 z-[1] h-screen overflow-y-auto transition-transform bg-white ${isVerticalNavExtended() ? "w-max" : "w-[64px]"
-            } space-y-4 px-2`}
+          class={`fixed top-[56px] flex flex-col left-0 z-[1] h-screen overflow-y-auto transition-transform bg-white ${
+            isVerticalNavExtended() ? "w-max" : "w-[64px]"
+          } space-y-4 px-2`}
           tabindex="-1"
           aria-labelledby="drawer-left-label"
         >

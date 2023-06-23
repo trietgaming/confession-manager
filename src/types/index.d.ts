@@ -5,7 +5,6 @@ import ConditionalFilteringModal from "../pages/Dashboard/init/InitSheets/Condit
 import Confession from "classes/Confesison";
 
 interface ImportMetaEnv {
-  readonly VITE_GOOGLE_API_KEY: string;
   readonly VITE_GOOGLE_CLIENT_ID: string;
   readonly VITE_VAPID_PUBLIC_KEY: string;
   readonly VITE_FIREBASE_API_KEY: string;
