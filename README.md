@@ -37,7 +37,7 @@ To use this application, you will need to log in to your Google account that con
 
 ## Issues 🐛
 
-If you encounter any issues or bugs while using the application, please feel free to open an issue on the repository. We will take a look at it as soon as possible. 😊
+If you encounter any issues or bugs while using the application, please feel free to open an issue on the repository or submit a ticket on [https://confession-manager.app/ticket](https://confession-manager.app/ticket) (requires login). We will take a look at it as soon as possible. 😊
 
 ## Contact 📩
 
@@ -51,6 +51,7 @@ This application is licensed under the [MIT license][license-url]. You are free 
 
 Our application is provided completely free of charge and does not generate any profit. To contribute to the maintenance of servers and the development of the application, you can support us financially through the following methods:
 
+- Website: [https://confession-manager.app/donation](https://confession-manager.app/donation)
 - PayPal: [paypal.me/trietgaming](https://paypal.me/trietgaming)
 - Momo: [me.momo.vn/dQIMuOU6TyIQT5txiGf5](https://me.momo.vn/dQIMuOU6TyIQT5txiGf5)
 
