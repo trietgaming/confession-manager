@@ -1,7 +1,6 @@
 import { Route, Routes } from "@solidjs/router";
 import ChangesPanel from "components/ChangesPanel";
 import { Component, Match, Switch, batch, onMount } from "solid-js";
-import Login from "./pages/Login";
 import {
   confessionMetadata,
   confessionSpreadsheet,
@@ -39,6 +38,7 @@ import InitSheets from "pages/Dashboard/init/InitSheets";
 import SelectSheets from "pages/Dashboard/init/SelectSheets";
 import SelectSpreadsheet from "pages/Dashboard/init/SelectSpreadsheet";
 import Donation from "pages/Donation";
+import Homepage from "pages/Homepage";
 import PopupCallback from "pages/PopupCallback";
 import Posting from "pages/Posting";
 import Settings from "pages/Settings";
@@ -261,7 +261,7 @@ const App: Component = () => {
         <Match when={isGapiLoaded()}>
           <Switch>
             <Match when={!loggedIn()}>
-              <Route path={"/*"} element={<Login />} />
+              <Route path={"/*"} element={<Homepage />} />
             </Match>
             <Match when={loggedIn()}>
               <AuthenticatedRoute />
