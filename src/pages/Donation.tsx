@@ -41,7 +41,7 @@ const Donation: Component = () => {
       </div>
       <div class="bg-white rounded-md flex flex-col w-full p-4 space-y-4 shadow-md">
         <img
-          src="https://bidv.com.vn/wps/wcm/connect/48a10028-99d9-4b2c-9e19-5541dbb16a73/Header.png?MOD=AJPERES&amp;attachment=true&amp;id=1648629012586"
+          src="https://upload.wikimedia.org/wikipedia/commons/6/69/Logo_BIDV.svg"
           alt="BIDV"
           class="mx-auto"
           width={128}
