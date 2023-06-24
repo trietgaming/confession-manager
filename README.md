@@ -9,6 +9,9 @@
 
 [Confession Manager](https://confession-manager.app) is a web application that helps users to create and manage confession posts that are published on Facebook. The application uses the [Google Sheet API V4][gsheet-api-link] to manage all the confessions in specific sheets in a centralized spreadsheet. The application provides an easy-to-use interface that allows users to create, edit, and delete confession posts, as well as view all existing posts in a simple and organized format.
 
+** **Notice**: This app can't use Facebook API feature because I am under 18. I do not have any bussiness so I can't verify it with Facebook. Please help! (If anyone has a verified bussiness and want to help me, please contact me via email and add me to the bussiness account, so I can link my app with that account and use the Facebook API. Thank you very much!).
+If anyone want to use all of the feature, please contact me, I will add you as Test User so you can use feature like Facebook Login. 
+
 ## Features 🚀
 
 - **Google Sheets Integration:** This application integrates with the Google Sheets API v4 to store and manage all confession posts in specific sheets such as "posted" sheet, "accepted" sheet, "declined" sheet and "pending" sheet. This ensures that all data is easily to handle from anywhere.
