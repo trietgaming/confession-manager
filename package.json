@@ -1,6 +1,6 @@
 {
   "name": "confession-manager",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "The web application interacts with Google Sheet API V4 to manage confessions for applications that use Google Form to collect confessions.",
   "scripts": {
     "start": "vite",
