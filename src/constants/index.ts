@@ -42,7 +42,7 @@ export const GOOGLE_API_SCOPES =
   "https://www.googleapis.com/auth/drive.metadata.readonly https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/forms.body https://www.googleapis.com/auth/script.scriptapp https://www.googleapis.com/auth/script.external_request";
 
 export const FACEBOOK_API_SCOPES =
-  "public_profile,pages_show_list,pages_manage_posts,pages_read_engagement";
+  "pages_manage_posts,pages_read_engagement";
 
 export const APP_SCRIPT_RUN_URL =
   "https://script.googleapis.com/v1/scripts/AKfycbx1z61KgHlJxPtJjUp1LS4N9BK-4BDnySVLj2ESrUCEaSZg6kaE4a4e6nTvizmHkxdC:run";
@@ -109,6 +109,6 @@ export { default as RETURN_ICON_URL } from "../assets/icons/return-icon.svg";
 export { default as CHAT_QUOTE_ICON } from "../assets/icons/chat-quote-icon.svg";
 
 export const GOOGLE_SHEET_FAVICON_URL =
-  "https://ssl.gstatic.com/docs/doclist/images/mediatype/icon_1_spreadsheet_x64.png";
+  "https://ssl.gstatic.com/docs/doclist/images/mediatype/icon_1_spreadsheet_x128.png";
 export const GOOGLE_FORMS_FAVICON_URL =
-  "https://ssl.gstatic.com/docs/doclist/images/mediatype/icon_2_form_x64.png";
+  "https://ssl.gstatic.com/docs/doclist/images/mediatype/icon_2_form_x128.png";

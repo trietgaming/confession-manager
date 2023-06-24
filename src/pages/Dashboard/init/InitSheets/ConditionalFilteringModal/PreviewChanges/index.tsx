@@ -69,6 +69,13 @@ const PreviewChanges: Component<{
       { includeValuesInResponse: false, data: [], valueInputOption: "RAW" };
 
     batchRequests.push({
+      duplicateSheet: {
+        insertSheetIndex: confessionSpreadsheet.sheets?.length,
+        newSheetName: "Đã lưu trữ",
+        sourceSheetId: confessionMetadata.pendingSheet!.properties!.sheetId!,
+      },
+    });
+    batchRequests.push({
       deleteDimension: {
         range: {
           dimension: "ROWS",

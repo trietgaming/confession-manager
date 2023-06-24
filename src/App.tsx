@@ -46,6 +46,7 @@ import Ticket from "pages/Ticket";
 import View from "pages/_ConfessionView";
 import { Portal } from "solid-js/web";
 import CenteredLoadingCircle from "ui-components/CenteredLoadingCircle";
+import About from "pages/About";
 
 const AuthenticatedRoute: Component = () => {
   createFacebook();
@@ -270,7 +271,7 @@ const App: Component = () => {
         </Match>
       </Switch>
       <Route path={"/callback"} element={<PopupCallback />} />
-      <Route path={"/about"} element={<div>hello</div>} />
+      <Route path={"/about"} element={<About />} />
       <Route path={"/donation"} element={<Donation />}></Route>
     </Routes>
   );
