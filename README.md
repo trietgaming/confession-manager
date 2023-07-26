@@ -46,6 +46,10 @@ If you encounter any issues or bugs while using the application, please feel fre
 
 If you have any questions or feedback about this application, please feel free to contact us at [triet123vn@gmail.com](mailto:triet123vn@gmail.com).
 
+## Contributing 🤝
+
+We welcome contributions from the community! If you would like to contribute to this project, please read our [Contribution Guidelines](.github/CONTRIBUTING.md) for more information on how to get started.
+
 ## License 📜
 
 This application is licensed under the [MIT license][license-url]. You are free to use, modify, and distribute the source code as long as you include the license file with any distributed copies.
