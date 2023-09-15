@@ -7,40 +7,28 @@ import initPostTemplates from "methods/initPostTemplates";
 import refreshSpreadsheet from "methods/refreshSpreadsheet";
 import { plusSvgPathDraw } from "pages/Dashboard/init/InitSheets/ConditionalFilteringModal/ConditionSelector";
 import {
-  Component,
-  Context,
-  For,
-  Show,
-  batch,
-  createEffect,
-  createSignal,
-  useContext,
-} from "solid-js";
-import { SetStoreFunction, reconcile } from "solid-js/store";
-import {
   confesisonForm,
   confessionMetadata,
   confessionSpreadsheet,
   postSettingTemplates,
 } from "store/index";
+import { Component, For, Show, batch, createSignal } from "solid-js";
+import { reconcile } from "solid-js/store";
 import { PostTemplateSettings } from "types";
 import Button from "ui-components/Button";
 import MainTitle from "ui-components/MainTitle";
 import Modal from "ui-components/Modal";
 import Toggle from "ui-components/Toggle";
+import { usePostingContext } from "./Context";
 
 const inputClasss =
   "block w-full p-4 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 sm:text-md focus:ring-blue-500 focus:outline-blue-500";
 
-const PostSetting: Component<{
-  context: Context<{
-    storeSetter: SetStoreFunction<PostTemplateSettings>;
-    store: PostTemplateSettings;
-  }>;
-}> = (props) => {
+const PostSetting: Component = () => {
   const [isModalShow, setModalShow] = createSignal(false);
   const [isSaving, setSaving] = createSignal(false);
-  const { store, storeSetter } = useContext(props.context);
+  const { postTemplateSettings, setPostTemplateSettings } =
+    usePostingContext()!;
 
   const PostSettingToggle: Component<{
     key: keyof PostTemplateSettings;
@@ -48,21 +36,26 @@ const PostSetting: Component<{
   }> = (props) => {
     return (
       <Toggle
-        checked={(props.not ? !store[props.key] : store[props.key]) as boolean}
-        handleToggle={() => storeSetter(props.key, (prev) => !prev)}
+        checked={
+          (props.not
+            ? !postTemplateSettings[props.key]
+            : postTemplateSettings[props.key]) as boolean
+        }
+        handleToggle={() => setPostTemplateSettings(props.key, (prev) => !prev)}
       />
     );
   };
 
   const handleCreateTemplate = async () => {
-    if (!store._name || !store._name.length) return;
+    if (!postTemplateSettings._name || !postTemplateSettings._name.length)
+      return;
     setSaving(true);
-    const _store = { ...store };
+    const _store = { ...postTemplateSettings };
     await createNewPostTemplate(_store);
     batch(() => {
-      storeSetter(
+      setPostTemplateSettings(
         postSettingTemplates.findLast(
-          (template) => template._name === store._name
+          (template) => template._name === postTemplateSettings._name
         )!
       );
       setSaving(false);
@@ -71,8 +64,8 @@ const PostSetting: Component<{
   };
 
   const handleSaveClick = async () => {
-    if (store._row !== undefined) {
-      const value = { ...store };
+    if (postTemplateSettings._row !== undefined) {
+      const value = { ...postTemplateSettings };
       setSaving(true);
       try {
         await gapi.client.sheets.spreadsheets.values.update(
@@ -80,7 +73,7 @@ const PostSetting: Component<{
             spreadsheetId: confessionSpreadsheet.spreadsheetId!,
             includeValuesInResponse: true,
             valueInputOption: "USER_ENTERED",
-            range: `${confessionMetadata.postSettingTemplatesSheet?.properties?.title}!${store._row}:${store._row}`,
+            range: `${confessionMetadata.postSettingTemplatesSheet?.properties?.title}!${postTemplateSettings._row}:${postTemplateSettings._row}`,
           },
           {
             majorDimension: "ROWS",
@@ -89,7 +82,7 @@ const PostSetting: Component<{
                 return `${value[key] || ""}`;
               }),
             ],
-            range: `${confessionMetadata.postSettingTemplatesSheet?.properties?.title}!${store._row}:${store._row}`,
+            range: `${confessionMetadata.postSettingTemplatesSheet?.properties?.title}!${postTemplateSettings._row}:${postTemplateSettings._row}`,
           }
         );
         postSettingTemplates[value._row! - 1] = value;
@@ -118,8 +111,8 @@ const PostSetting: Component<{
               deleteDimension: {
                 range: {
                   dimension: "ROWS",
-                  startIndex: store._row! - 1,
-                  endIndex: store._row,
+                  startIndex: postTemplateSettings._row! - 1,
+                  endIndex: postTemplateSettings._row,
                   sheetId:
                     confessionMetadata.postSettingTemplatesSheet?.properties
                       ?.sheetId,
@@ -133,7 +126,7 @@ const PostSetting: Component<{
       await initPostTemplates(
         confessionMetadata.postSettingTemplatesSheet?.properties?.title
       );
-      storeSetter(reconcile({}));
+      setPostTemplateSettings(reconcile({}));
     } catch (err) {
       alert("đã có lỗi xảy ra");
       console.error(err);
@@ -148,7 +141,7 @@ const PostSetting: Component<{
       <div class="flex rounded-md border w-max">
         <button
           class="p-1 hover:bg-gray-200"
-          onclick={() => storeSetter(reconcile({}))}
+          onclick={() => setPostTemplateSettings(reconcile({}))}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -165,10 +158,10 @@ const PostSetting: Component<{
               <>
                 <button
                   class={`p-1 border-l hover:bg-gray-200 rounded-md min-w-[1.75em] ${
-                    store._row === template._row &&
+                    postTemplateSettings._row === template._row &&
                     "bg-blue-400 hover:bg-blue-400"
                   }`}
-                  onClick={() => storeSetter(template)}
+                  onClick={() => setPostTemplateSettings(template)}
                 >
                   {template._name}
                 </button>
@@ -192,8 +185,10 @@ const PostSetting: Component<{
         <textarea
           placeholder="Confession hôm nay..."
           class={inputClasss}
-          value={store.header || ""}
-          onInput={(e) => storeSetter("header", e.currentTarget.value)}
+          value={postTemplateSettings.header || ""}
+          onInput={(e) =>
+            setPostTemplateSettings("header", e.currentTarget.value)
+          }
         />
       </div>
       <div>
@@ -201,22 +196,26 @@ const PostSetting: Component<{
         <textarea
           placeholder="Cảm ơn đã đọc, lưu ý: ..."
           class={inputClasss}
-          value={store.footer || ""}
-          onInput={(e) => storeSetter("footer", e.currentTarget.value)}
+          value={postTemplateSettings.footer || ""}
+          onInput={(e) =>
+            setPostTemplateSettings("footer", e.currentTarget.value)
+          }
         />
       </div>
       <div class="flex justify-between">
         <h3 class="text-md font-semibold">Phân chia các mục?</h3>
         <PostSettingToggle key="dividerEnabled" />
       </div>
-      <Show when={store.dividerEnabled}>
+      <Show when={postTemplateSettings.dividerEnabled}>
         <div>
           <h3 class="text-lg font-semibold">Đường chia</h3>
           <input
-            value={store.divider || ""}
+            value={postTemplateSettings.divider || ""}
             placeholder={`Mặc định: ${DEFAULT_DIVIDER}`}
             type="text"
-            onInput={(e) => storeSetter("divider", e.currentTarget.value)}
+            onInput={(e) =>
+              setPostTemplateSettings("divider", e.currentTarget.value)
+            }
             class={inputClasss}
           />
         </div>
@@ -224,33 +223,34 @@ const PostSetting: Component<{
       <div class="flex justify-between">
         <h3 class="text-md font-semibold">Chèn liên kết biểu mẫu?</h3>
         <Toggle
-          checked={store.formLinkEnabled}
+          checked={postTemplateSettings.formLinkEnabled}
           handleToggle={() => {
-            storeSetter("formLinkEnabled", (prev) => !prev);
+            setPostTemplateSettings("formLinkEnabled", (prev) => !prev);
             if (
-              (!store.embed || store.embed.length === 0) &&
-              store.formLinkEnabled
+              (!postTemplateSettings.embed ||
+                postTemplateSettings.embed.length === 0) &&
+              postTemplateSettings.formLinkEnabled
             ) {
-              storeSetter("embed", confesisonForm.responderUri);
+              setPostTemplateSettings("embed", confesisonForm.responderUri);
             } else if (
-              store.embed === confesisonForm.responderUri &&
-              !store.formLinkEnabled
+              postTemplateSettings.embed === confesisonForm.responderUri &&
+              !postTemplateSettings.formLinkEnabled
             )
-              storeSetter("embed", undefined);
+              setPostTemplateSettings("embed", undefined);
           }}
         />
       </div>
-      <Show when={store.formLinkEnabled}>
-        <Show when={!store.formLinkAtFooterDisabled}>
+      <Show when={postTemplateSettings.formLinkEnabled}>
+        <Show when={!postTemplateSettings.formLinkAtFooterDisabled}>
           <div>
             <h3 class="text-lg font-semibold">Chú thích liên kết biểu mẫu</h3>
             <input
               placeholder="Gửi confession tại đây: "
               type="text"
-              value={store.formLinkTitle || ""}
+              value={postTemplateSettings.formLinkTitle || ""}
               class={inputClasss}
               onInput={(e) =>
-                storeSetter("formLinkTitle", e.currentTarget.value)
+                setPostTemplateSettings("formLinkTitle", e.currentTarget.value)
               }
             />
           </div>
@@ -264,20 +264,22 @@ const PostSetting: Component<{
         <h3 class="text-lg font-semibold">Link đính kèm</h3>
         <input
           value={
-            store.embed !== undefined
-              ? store.embed
-              : store.formLinkEnabled
+            postTemplateSettings.embed !== undefined
+              ? postTemplateSettings.embed
+              : postTemplateSettings.formLinkEnabled
               ? confesisonForm.responderUri
               : ""
           }
-          onInput={(e) => storeSetter("embed", e.currentTarget.value)}
+          onInput={(e) =>
+            setPostTemplateSettings("embed", e.currentTarget.value)
+          }
           placeholder="Mặc định là liên kết biểu mẫu (nếu bật)"
           type="text"
           class={inputClasss}
         />
       </div>
       <div class="flex justify-center space-x-2">
-        <Show when={store._row !== undefined}>
+        <Show when={postTemplateSettings._row !== undefined}>
           <Button
             class="bg-red-500 hover:bg-red-800"
             onClick={handleDeleteTemplate}
@@ -296,20 +298,25 @@ const PostSetting: Component<{
         isShow={isModalShow()}
         handleClose={() => {
           setModalShow(false);
-          if (!store._row) storeSetter("_name", undefined);
+          if (!postTemplateSettings._row)
+            setPostTemplateSettings("_name", undefined);
         }}
         handleSubmit={handleCreateTemplate}
         loading={isSaving()}
-        submitDisabled={!store._name || !store._name.length}
+        submitDisabled={
+          !postTemplateSettings._name || !postTemplateSettings._name.length
+        }
       >
         <h3 class="text-lg font-semibold">Tên cài đặt</h3>
         <input
-          onInput={(e) => storeSetter("_name", e.currentTarget.value)}
+          onInput={(e) =>
+            setPostTemplateSettings("_name", e.currentTarget.value)
+          }
           placeholder="Cài đặt X"
           type="text"
           class={inputClasss}
           maxLength={20}
-          value={store._name || ""}
+          value={postTemplateSettings._name || ""}
         />
       </Modal>
     </>

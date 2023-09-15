@@ -136,11 +136,13 @@ export interface VerticalNavBarMetadata {
   title: string;
 }
 
+type ConfessionsMap = [descending: Confession[], ascending: Confession[]];
+
 export interface Confessions {
-  pending: [Confession[], Confession[]];
-  declined: [Confession[], Confession[]];
-  accepted: [Confession[], Confession[]];
-  posted: [Confession[], Confession[]];
+  pending: ConfessionsMap;
+  declined: ConfessionsMap;
+  accepted: ConfessionsMap;
+  posted: ConfessionsMap;
 }
 
 export interface PushMessageData {
@@ -192,4 +194,9 @@ export interface PostTemplateSettings {
   showTimestamp?: boolean;
   showTime?: boolean;
   showDate?: boolean;
+}
+
+export interface PostingData {
+  isPosting: boolean;
+  newPostLink: string;
 }
