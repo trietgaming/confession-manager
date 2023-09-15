@@ -1,18 +1,12 @@
+import Color from "classes/Color";
+import getColorFromCell from "methods/getColorFromCell";
 import {
   Component,
-  For,
-  createSignal,
-  JSXElement,
-  Show,
-  createContext,
-  useContext,
-  onMount,
-  Accessor,
   batch,
+  createContext,
+  onMount,
+  useContext
 } from "solid-js";
-import MainTitle from "ui-components/MainTitle";
-import FreshStartModal from "./FreshStartModal";
-import ConditionalFilteringModal from "./ConditionalFilteringModal";
 import { createMutable, createStore, produce } from "solid-js/store";
 import { confessionMetadata, confessionSpreadsheet } from "store/index";
 import {
@@ -21,14 +15,11 @@ import {
   ConfessionSpreadsheetGridData,
   FilteredSheetMetadata,
   InitOptionsMetadatas,
-  RGB,
-  TextFormat,
-  ThemeMap,
+  ThemeMap
 } from "types";
-import rgbToHex from "methods/rgbToHex";
-import Color from "classes/Color";
-import hexToRgb from "methods/hexToRgb";
-import getColorFromCell from "methods/getColorFromCell";
+import MainTitle from "ui-components/MainTitle";
+import ConditionalFilteringModal from "./ConditionalFilteringModal";
+import FreshStartModal from "./FreshStartModal";
 
 function setFrom<T extends unknown[]>(
   arr: T,

@@ -1,11 +1,10 @@
 import {
   CONFESSION_SHEET_TYPE_METADATA_KEY,
-  IS_SHEETS_INITED_METADATA_KEY,
-  SHEETS_INITED_TYPES,
+  SHEETS_INITED_TYPES
 } from "app-constants";
 import refreshSpreadsheet from "methods/refreshSpreadsheet";
 import setConfessionInited from "methods/setConfessionInited";
-import { Component, createEffect, createSignal, JSX } from "solid-js";
+import { Component, JSX, createSignal } from "solid-js";
 import { confessionMetadata, confessionSpreadsheet } from "store/index";
 import { ConfessionSpreadsheetMetadata } from "types";
 import Modal from "ui-components/Modal";

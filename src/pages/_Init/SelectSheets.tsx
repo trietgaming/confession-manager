@@ -1,26 +1,4 @@
 import {
-  Component,
-  For,
-  createSignal,
-  Show,
-  batch,
-  onMount,
-  createMemo,
-  createEffect,
-} from "solid-js";
-import {
-  confessionSpreadsheet,
-  setConfessionForm,
-  setConfessionSpreadsheet,
-} from "store/index";
-import {
-  ConfessionSpreadsheetMetadata,
-  SelectedObject,
-  SheetTypeKeys,
-} from "types";
-import Button from "ui-components/Button";
-import { Portal } from "solid-js/web";
-import {
   CHECK_ICON_URL,
   CONFESSION_SHEET_TYPE_METADATA_KEY,
   CROSS_ICON_URL,
@@ -29,12 +7,32 @@ import {
   LOCAL_KEY_CONFESSION_SPREADSHEET_ID,
   PAPER_PLANE_ICON_URL,
 } from "app-constants";
-import LoadingCircle from "ui-components/LoadingCircle";
+import { userResourceDatabase } from "local-database";
+import refreshSpreadsheet from "methods/refreshSpreadsheet";
+import {
+  Component,
+  For,
+  Show,
+  batch,
+  createEffect,
+  createMemo,
+  createSignal,
+  onMount,
+} from "solid-js";
 import { reconcile } from "solid-js/store";
+import {
+  confessionSpreadsheet,
+  setConfessionForm,
+  setConfessionSpreadsheet,
+} from "store/index";
+import {
+  SelectedObject,
+  SheetTypeKeys
+} from "types";
+import Button from "ui-components/Button";
+import LoadingCircle from "ui-components/LoadingCircle";
 import MainTitle from "ui-components/MainTitle";
 import Modal from "ui-components/Modal";
-import refreshSpreadsheet from "methods/refreshSpreadsheet";
-import { userResourceDatabase } from "local-database";
 
 const selectElementsPayload: {
   iconUrl: string;

@@ -1,3 +1,6 @@
+import createSignalObjectEmptyChecker from "methods/createSignalObjectEmptyChecker";
+import getColorFromCell from "methods/getColorFromCell";
+import hashTextFormat from "methods/hashTextFormat";
 import {
   Component,
   For,
@@ -6,24 +9,20 @@ import {
   createMemo,
   createSignal,
 } from "solid-js";
-import Button from "ui-components/Button";
-import Modal from "ui-components/Modal";
 import {
   CellColor,
   CellTextFormat,
+  Conditions,
   ConfessionSpreadsheetGridData,
   FilteredSheetMetadata,
   PreviewSheetKeys,
 } from "types";
-import DownArrowSvg from "ui-components/DownArrowSvg";
-import AddFilteringCondition from "./AddFilteringCondition";
-import { useSpreadsheetData } from "..";
+import Button from "ui-components/Button";
 import CenteredLoadingCircle from "ui-components/CenteredLoadingCircle";
-import createSignalObjectEmptyChecker from "methods/createSignalObjectEmptyChecker";
-import { Conditions } from "types";
-import { confessionMetadata } from "store/index";
-import hashTextFormat from "methods/hashTextFormat";
-import getColorFromCell from "methods/getColorFromCell";
+import DownArrowSvg from "ui-components/DownArrowSvg";
+import Modal from "ui-components/Modal";
+import { useSpreadsheetData } from "..";
+import AddFilteringCondition from "./AddFilteringCondition";
 import PreviewChanges from "./PreviewChanges";
 
 const addFilteredSheetMetadata: FilteredSheetMetadata[] = [
@@ -94,7 +93,7 @@ const ConditionalFilteringModal: Component<{
     ) as (keyof ConfessionSpreadsheetGridData["selected"])[];
 
     const styleMap: {
-      [key in keyof ConfessionSpreadsheetGridData["selected"]]: {
+      [key in keyof Omit<ConfessionSpreadsheetGridData["selected"], "">]: {
         [key in keyof Conditions]: {
           [key: string]: true | "";
         };

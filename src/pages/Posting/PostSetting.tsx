@@ -5,7 +5,7 @@ import {
 import createNewPostTemplate from "methods/createNewPostTemplate";
 import initPostTemplates from "methods/initPostTemplates";
 import refreshSpreadsheet from "methods/refreshSpreadsheet";
-import { plusSvgPathDraw } from "pages/Dashboard/init/InitSheets/ConditionalFilteringModal/ConditionSelector";
+import { plusSvgPathDraw } from "pages/_Init/InitSheets/ConditionalFilteringModal/ConditionSelector";
 import {
   confesisonForm,
   confessionMetadata,

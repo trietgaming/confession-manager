@@ -5,7 +5,7 @@ import {
   LOCAL_KEY_NOTIFICATION_TOKEN,
 } from "app-constants";
 import handlePick from "methods/handlePick";
-import SelectSheets from "pages/Dashboard/init/SelectSheets";
+import SelectSheets from "pages/_Init/SelectSheets";
 import { Component, Show, createEffect, createSignal } from "solid-js";
 import {
   isSheetInited,

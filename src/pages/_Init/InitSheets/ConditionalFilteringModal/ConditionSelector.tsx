@@ -124,7 +124,7 @@ const ConditionSelector: Component<{
                 {(colorOrFormat) => {
                   const onClickHandler = () => {
                     (selected[props.conditionMetadata.key] as CellColor[]).push(
-                      colorOrFormat
+                      colorOrFormat as CellColor
                     );
                     handleToggleSelector();
                   };

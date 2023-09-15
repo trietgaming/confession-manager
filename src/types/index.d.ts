@@ -1,8 +1,8 @@
 /// <reference types="vite/client" />
-import FreshStartModal from "../pages/Dashboard/init/InitSheets/FreshStartModal";
-import Color from "../classes/Color";
-import ConditionalFilteringModal from "../pages/Dashboard/init/InitSheets/ConditionalFilteringModal";
 import Confession from "classes/Confesison";
+import Color from "../classes/Color";
+import ConditionalFilteringModal from "../pages/_Init/InitSheets/ConditionalFilteringModal";
+import FreshStartModal from "../pages/_Init/InitSheets/FreshStartModal";
 
 interface ImportMetaEnv {
   readonly VITE_GOOGLE_CLIENT_ID: string;
@@ -109,7 +109,7 @@ export type ConfessionSpreadsheetGridData = {
 export type FilteredSheetMetadata = {
   key: keyof Omit<
     ConfessionSpreadsheetMetadata,
-    "inited" | "archivedSheet" | "pendingSheet"
+    "inited" | "archivedSheet" | "pendingSheet" | "postSettingTemplatesSheet"
   >;
   title: string;
 };
