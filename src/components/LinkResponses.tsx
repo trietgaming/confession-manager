@@ -1,13 +1,12 @@
 import axios from "axios";
-import callAppScriptApi from "methods/callAppScriptApi";
+import AppScriptApi from "controllers/AppScriptApi";
 import fetchAndInitSpreadsheet from "methods/fetchAndInitSpreadsheet";
 import {
   Component,
-  Show,
+  JSX,
   createEffect,
   createMemo,
-  createSignal,
-  JSX,
+  createSignal
 } from "solid-js";
 import { linkResponsesShow, setLinkResponsesShow } from "store/index";
 import Modal from "ui-components/Modal";
@@ -46,10 +45,10 @@ const LinkResponses: Component<{}> = (props) => {
             }
           )
         ).result;
-        await callAppScriptApi("linkFormToSpreadsheet", [
+        await AppScriptApi.linkFormToSpreadsheet(
           formId,
-          newSpreadsheet.spreadsheetId!,
-        ]);
+          newSpreadsheet.spreadsheetId!
+        );
         await fetchAndInitSpreadsheet({
           spreadsheetId: newSpreadsheet.spreadsheetId,
           formId,
@@ -72,10 +71,10 @@ const LinkResponses: Component<{}> = (props) => {
             }
           )
         ).data;
-        await callAppScriptApi("linkFormToSpreadsheet", [
+        await AppScriptApi.linkFormToSpreadsheet(
           newForm.formId!,
-          spreadsheetId,
-        ]);
+          spreadsheetId
+        );
         await fetchAndInitSpreadsheet({
           spreadsheetId,
           formId: newForm.formId,

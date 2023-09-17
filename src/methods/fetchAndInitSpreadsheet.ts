@@ -1,29 +1,24 @@
-import { userResourceDatabase } from "local-database";
-import getLinkedFormIdFromSheet from "./getLinkedFormIdFromSheet";
+import {
+  LOCAL_KEY_CONFESSION_FORM_ID,
+  LOCAL_KEY_CONFESSION_SPREADSHEET_ID,
+} from "app-constants";
 import axios from "axios";
+import ConfessionsManager from "controllers/ConfessionsManager";
+import { userResourceDatabase } from "local-database";
 import { batch } from "solid-js";
 import {
   confesisonForm,
   confessionSpreadsheet,
-  confessions,
   hiddenConfessionRows,
-  pendingChanges,
   pendingPost,
   resetPendingChanges,
   setConfessionForm,
   setConfessionSpreadsheet,
   setLinkResponsesShow,
 } from "store/index";
+import getLinkedFormIdFromSheet from "./getLinkedFormIdFromSheet";
 import initConfessionSpreadsheetMetadata from "./initConfessionSpreadsheetMetadata";
-import {
-  LOCAL_KEY_CONFESSION_FORM_ID,
-  LOCAL_KEY_CONFESSION_SPREADSHEET_ID,
-  PENDING_CHANGES_CONFESSION_ARRAY_KEYS,
-} from "app-constants";
-import { reconcile } from "solid-js/store";
-import resetConfessions from "./resetConfessions";
-import initCurrentPage from "./initCurrentPage";
-import initPostTemplates from "./initPostTemplates";
+import FacebookPageManager from "controllers/FacebookPageManager";
 
 const updateStates = (
   spreadsheet: gapi.client.sheets.Spreadsheet,
@@ -32,7 +27,7 @@ const updateStates = (
   batch(() => {
     resetPendingChanges();
     if (confessionSpreadsheet?.spreadsheetId !== spreadsheet.spreadsheetId) {
-      resetConfessions();
+      ConfessionsManager.clearAll();
     }
     setConfessionSpreadsheet(spreadsheet);
     initConfessionSpreadsheetMetadata(spreadsheet);
@@ -79,6 +74,9 @@ const getLocalSpreadsheet = async (spreadsheetId: string) =>
       )) as gapi.client.sheets.Spreadsheet)
     : {};
 
+/**
+ * @deprecated
+ */
 const fetchAndInitSpreadsheet = async ({
   spreadsheetId,
   formId,
@@ -121,7 +119,7 @@ const fetchAndInitSpreadsheet = async ({
     ).result;
 
   updateStates(spreadsheet, form);
-  initCurrentPage();
+  FacebookPageManager.initCurrentPage();
   updateCached(spreadsheet, form);
 };
 

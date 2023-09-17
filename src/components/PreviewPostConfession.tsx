@@ -3,7 +3,7 @@ import {
   RETURN_ICON_URL,
   RIGHT_ARROW_ICON_URL,
 } from "app-constants";
-import Confession from "classes/Confesison";
+import Confession from "models/Confession";
 import { Component, JSX, Show, createSignal } from "solid-js";
 import { confessionPageMetadata } from "store/index";
 

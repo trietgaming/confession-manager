@@ -1,4 +1,4 @@
-import columnToLetter from "methods/columnToLetter";
+import { columnToLetter } from "utils/gsheet";
 import { Component, createEffect, createMemo, onMount } from "solid-js";
 import { confessionMetadata } from "store/index";
 import { PreviewSheetKeys } from "types";

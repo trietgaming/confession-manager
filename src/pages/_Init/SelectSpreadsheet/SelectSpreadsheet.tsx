@@ -1,4 +1,4 @@
-import handlePick from "methods/handlePick";
+import PickerManager from "controllers/PickerManager";
 import { Component, Show } from "solid-js";
 import Button from "ui-components/Button";
 import LoadingCircle from "ui-components/LoadingCircle";
@@ -14,7 +14,7 @@ const SelectSpreadsheet: Component<{
           Confession để bắt đầu
         </h1>
         <Button
-          onClick={handlePick}
+          onClick={PickerManager.showPicker}
           disabled={props.isLoading}
           class="text-xl text-white bg-[#4285F4] hover:bg-[#4285F4]/90 px-7 py-5 text-center inline-flex items-center"
         >

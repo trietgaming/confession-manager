@@ -1,9 +1,3 @@
-import { Component, Show, batch, createEffect, createSignal } from "solid-js";
-import {
-  doubleTitleContainerClass,
-  settingContainerClass,
-  titleIconClass,
-} from ".";
 import {
   CONFESSION_LASTEST_HASHTAG_NUMBER_METADATA_KEY,
   CONFESSION_PAGE_HASHTAG_METADATA_KEY,
@@ -12,10 +6,16 @@ import {
   NUMBER_LIST_ICON_URL,
   RELOAD_ICON_URL,
 } from "app-constants";
+import AppSpreadsheetManager from "controllers/AppSpreadsheetManager";
+import { Component, Show, batch, createEffect, createSignal } from "solid-js";
 import { confessionPageMetadata, currentConfessionPage } from "store/index";
 import Button from "ui-components/Button";
-import updateSpreadsheetMetadata from "methods/updateSpreadsheetMetadata";
 import LoadingCircle from "ui-components/LoadingCircle";
+import {
+  doubleTitleContainerClass,
+  settingContainerClass,
+  titleIconClass,
+} from ".";
 
 const PageMetadataSetting: Component = () => {
   const [isSubmitting, setSubmitting] = createSignal(false);
@@ -52,7 +52,7 @@ const PageMetadataSetting: Component = () => {
 
     try {
       const metadataPayload: Parameters<
-        typeof updateSpreadsheetMetadata
+        typeof AppSpreadsheetManager.updateMetadata
       >[number] = [];
       if (hashtagValue.length)
         metadataPayload.push({
@@ -66,7 +66,7 @@ const PageMetadataSetting: Component = () => {
           value: replyHashtagValue,
         });
 
-      await updateSpreadsheetMetadata(metadataPayload);
+      await AppSpreadsheetManager.updateMetadata(metadataPayload);
     } catch (err) {
       alert("Đã có lỗi xảy ra");
       console.error(err);
@@ -116,7 +116,7 @@ const PageMetadataSetting: Component = () => {
     const value = num ?? lastestConfessionNumberInputValue();
     if (typeof value === "number") {
       try {
-        await updateSpreadsheetMetadata([
+        await AppSpreadsheetManager.updateMetadata([
           {
             key: CONFESSION_LASTEST_HASHTAG_NUMBER_METADATA_KEY,
             value: value + "",

@@ -1,15 +1,17 @@
+import AppScriptApi from "controllers/AppScriptApi";
 import { confessionSpreadsheet, sheetsLastRow } from "store/index";
-import callAppScriptApi from "./callAppScriptApi";
 import { ConfessionSpreadsheetMetadata, SheetTypeKeys } from "types";
 
+/**
+ * @deprecated
+ */
 export default async function getLastRowPositionHasValue(
   confessionMetadata: ConfessionSpreadsheetMetadata,
   sheetType: SheetTypeKeys
 ) {
-  return (sheetsLastRow[sheetType] = (
-    await callAppScriptApi("getLastRowPositionHasValue", [
+  return (sheetsLastRow[sheetType] =
+    await AppScriptApi.getLastRowPositionHasValue(
       confessionSpreadsheet.spreadsheetId!,
-      confessionMetadata[sheetType]?.properties?.title!,
-    ])
-  ).data.response?.result);
+      confessionMetadata[sheetType]?.properties?.title!
+    ));
 }

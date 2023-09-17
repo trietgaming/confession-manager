@@ -15,7 +15,6 @@ import {
   SETTINGS_ICON_URL,
 } from "app-constants";
 import axios from "axios";
-import handleLogout from "methods/handleLogout";
 import { Component, Show, createSignal, onMount } from "solid-js";
 import { Portal } from "solid-js/web";
 import {
@@ -28,6 +27,7 @@ import {
 import { VerticalNavBarMetadata } from "types";
 import AppLogo from "ui-components/AppLogo";
 import NotificationBell from "./NotificationBell";
+import GoogleAccountManager from "controllers/GoogleAccountManager";
 
 const verticalNavBarMetadatas: VerticalNavBarMetadata[] = [
   {
@@ -63,7 +63,7 @@ const NavBar: Component = () => {
 
   const handleLogoutClick = async () => {
     setLoggingOut(true);
-    await handleLogout();
+    await GoogleAccountManager.logout();
     // await new Promise((resolve) => setTimeout(resolve, 1000));
     setLoggingOut(false);
   };

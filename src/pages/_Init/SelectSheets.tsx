@@ -7,8 +7,8 @@ import {
   LOCAL_KEY_CONFESSION_SPREADSHEET_ID,
   PAPER_PLANE_ICON_URL,
 } from "app-constants";
+import AppSpreadsheetManager from "controllers/AppSpreadsheetManager";
 import { userResourceDatabase } from "local-database";
-import refreshSpreadsheet from "methods/refreshSpreadsheet";
 import {
   Component,
   For,
@@ -25,10 +25,7 @@ import {
   setConfessionForm,
   setConfessionSpreadsheet,
 } from "store/index";
-import {
-  SelectedObject,
-  SheetTypeKeys
-} from "types";
+import { SelectedObject, SheetTypeKeys } from "types";
 import Button from "ui-components/Button";
 import LoadingCircle from "ui-components/LoadingCircle";
 import MainTitle from "ui-components/MainTitle";
@@ -300,7 +297,7 @@ const SelectSheets: Component<{
       console.log(batchRequests);
 
       // console.log(
-      await refreshSpreadsheet(
+      await AppSpreadsheetManager.refresh(
         (
           await gapi.client.sheets.spreadsheets.batchUpdate(
             {

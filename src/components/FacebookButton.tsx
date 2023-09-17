@@ -1,22 +1,16 @@
-import fetchFacebookUserFromAuthResponse from "methods/fetchFacebookUserFromAuthResponse";
-import handleFbLogin from "methods/handleFbLogin";
-import handleFBLogout from "methods/handleFbLogout";
+
+import FacebookAccountManager from "controllers/FacebookAccountManager";
 import {
   Component,
   Match,
   Show,
   Switch,
-  batch,
   createEffect,
-  createSignal,
+  createSignal
 } from "solid-js";
-import { reconcile } from "solid-js/store";
 import {
-  accessibleFacebookPages,
   facebookUser,
-  isFacebookLoaded,
-  setAccessibleFacebookPages,
-  setFacebookUser,
+  isFacebookLoaded
 } from "store/index";
 import Button from "ui-components/Button";
 import LoadingCircle from "ui-components/LoadingCircle";
@@ -31,13 +25,13 @@ const FacebookButton: Component = () => {
 
   const handleLogoutClick = async () => {
     setButtonLoading(true);
-    await handleFBLogout();
+    await FacebookAccountManager.logout();
     setButtonLoading(false);
   };
 
   const handleLoginClick = async () => {
     setButtonLoading(true);
-    await handleFbLogin();
+    await FacebookAccountManager.login();
     setButtonLoading(false);
   };
   return (

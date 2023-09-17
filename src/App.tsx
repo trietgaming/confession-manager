@@ -21,19 +21,15 @@ import {
   LOCAL_KEY_NOTIFICATION_TOKEN,
   LOCAL_KEY_PENDING_NOTIFICATIONS,
 } from "app-constants";
-import createFacebook from "app-hooks/createFacebook";
-import createGoogleApi from "app-hooks/createGoogleApi";
+import createFacebook from "methods/createFacebook";
+import createGoogleApi from "methods/createGoogleApi";
 import axios from "axios";
 import LinkResponses from "components/LinkResponses";
 import NavBar from "components/NavBar";
 import { initializeApp } from "firebase/app";
 import { MessagePayload, getMessaging, onMessage } from "firebase/messaging";
 import { localData, userResourceDatabase } from "local-database";
-import buildPicker from "methods/buildPicker";
 import fetchAndInitSpreadsheet from "methods/fetchAndInitSpreadsheet";
-import getMessagingToken from "methods/getMessagingToken";
-import handlePushMessage from "methods/handlePushMessage";
-import setAccessToken from "methods/setAccessToken";
 import InitSheets from "pages/_Init/InitSheets";
 import SelectSheets from "pages/_Init/SelectSheets";
 import SelectSpreadsheet from "pages/_Init/SelectSpreadsheet";
@@ -47,6 +43,9 @@ import View from "pages/_ConfessionView";
 import { Portal } from "solid-js/web";
 import CenteredLoadingCircle from "ui-components/CenteredLoadingCircle";
 import About from "pages/About";
+import NotificationManager from "controllers/NotificationManager";
+import PickerManager from "controllers/PickerManager";
+import GoogleAccessTokenManager from "controllers/GoogleAccessTokenManager";
 
 const AuthenticatedRoute: Component = () => {
   createFacebook();
@@ -83,7 +82,7 @@ const AuthenticatedRoute: Component = () => {
     });
 
     gapi.load("picker", async () => {
-      setPicker(buildPicker());
+      setPicker(PickerManager.build());
     });
   });
   return (
@@ -159,7 +158,7 @@ let initSetTokenFunction:
     if ((_accessToken === null || _accessToken) && _gapi) {
       batch(() => {
         setGapiLoaded(true);
-        setAccessToken(_accessToken as string | null);
+        GoogleAccessTokenManager.setToken(_accessToken as string | null);
       });
       initSetTokenFunction = null;
     }
@@ -240,7 +239,7 @@ const App: Component = () => {
     onMessage(messaging, async (payload) => {
       if (payload.data && !payload.data?.publishTime)
         payload.data.publishTime = new Date().toISOString();
-      handlePushMessage(payload);
+      NotificationManager.handlePushMessage(payload);
       const backgroundPendings = await userResourceDatabase.getItem(
         LOCAL_KEY_PENDING_NOTIFICATIONS
       );
@@ -253,7 +252,7 @@ const App: Component = () => {
 
     // If the token is different from local token, this will make a request to firebase api
     // and the service worker will catch the request to handle it
-    await getMessagingToken();
+    await NotificationManager.getMessagingToken();
   });
 
   return (

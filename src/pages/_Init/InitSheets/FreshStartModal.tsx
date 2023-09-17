@@ -2,8 +2,7 @@ import {
   CONFESSION_SHEET_TYPE_METADATA_KEY,
   SHEETS_INITED_TYPES
 } from "app-constants";
-import refreshSpreadsheet from "methods/refreshSpreadsheet";
-import setConfessionInited from "methods/setConfessionInited";
+import AppSpreadsheetManager from "controllers/AppSpreadsheetManager";
 import { Component, JSX, createSignal } from "solid-js";
 import { confessionMetadata, confessionSpreadsheet } from "store/index";
 import { ConfessionSpreadsheetMetadata } from "types";
@@ -133,8 +132,8 @@ const FreshStartModal: Component<{
         }
       );
 
-      await refreshSpreadsheet(
-        await setConfessionInited(SHEETS_INITED_TYPES.FRESH)
+      await AppSpreadsheetManager.refresh(
+        await AppSpreadsheetManager.setConfessionInited(SHEETS_INITED_TYPES.FRESH)
       );
     } catch (err) {
       console.error(err);

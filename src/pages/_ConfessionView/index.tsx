@@ -23,7 +23,7 @@ import {
   SheetTypeKeys,
 } from "types";
 // import cachedConfesison from "../../caching/confession";
-import Confession from "classes/Confesison";
+import Confession from "models/Confession";
 import { Portal } from "solid-js/web";
 import LoadingCircle from "ui-components/LoadingCircle";
 import {

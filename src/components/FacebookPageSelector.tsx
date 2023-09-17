@@ -1,13 +1,9 @@
 import { CURRENT_CONFESSION_PAGE_ID_METADATA_KEY } from "app-constants";
-import fetchAndInitSpreadsheet from "methods/fetchAndInitSpreadsheet";
-import refreshSpreadsheet from "methods/refreshSpreadsheet";
-import updateSpreadsheetMetadata from "methods/updateSpreadsheetMetadata";
-import { Component, For, JSX, batch, createMemo, createSignal } from "solid-js";
+import AppSpreadsheetManager from "controllers/AppSpreadsheetManager";
+import { Component, For, JSX, createMemo, createSignal } from "solid-js";
 import {
   accessibleFacebookPages,
-  confessionSpreadsheet,
   currentConfessionPage,
-  setAccessibleFacebookPages,
   setCurrentConfessionPage,
 } from "store/index";
 
@@ -25,7 +21,7 @@ const FacebookPageSelector: Component = () => {
     const page = accessibleFacebookPages[+e.currentTarget.value];
     setLoading(true);
     try {
-      await updateSpreadsheetMetadata([
+      await AppSpreadsheetManager.updateMetadata([
         {
           key: CURRENT_CONFESSION_PAGE_ID_METADATA_KEY,
           value: page.id,

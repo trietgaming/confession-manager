@@ -33,7 +33,10 @@
       "app-constants": ["./src/constants/index.ts"],
       "local-database": ["./src/constants/database.ts"],
       "classes/*": ["./src/classes/*"],
-      "assets/*": ["./src/assets/*"]
+      "assets/*": ["./src/assets/*"],
+      "utils/*": ["./src/utils/*"],
+      "controllers/*": ["./src/controllers/*"],
+      "models/*": ["./src/models/*"]
     }
   }
 }

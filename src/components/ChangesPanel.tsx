@@ -1,24 +1,12 @@
-import { Component, Show, batch, createSignal } from "solid-js";
-import { Portal } from "solid-js/web";
-import {
-  confessionMetadata,
-  confessionSpreadsheet,
-  pendingChanges,
-  resetPendingChanges,
-  setScrollY,
-  scrollY,
-  sheetsLastRow,
-  hiddenConfessionRows,
-  pendingPost,
-} from "store/index";
-import Button from "ui-components/Button";
 import hadChanges from "app-hooks/hadChanges";
-import { PENDING_CHANGES_CONFESSION_ARRAY_KEYS } from "../constants";
-import Confession from "classes/Confesison";
-import { PendingChanges, SheetTypeKeys } from "types";
-import resetConfessions from "methods/resetConfessions";
+import Confession from "models/Confession";
+import { Component, Show, createSignal } from "solid-js";
+import { Portal } from "solid-js/web";
+import { pendingChanges } from "store/index";
+import Button from "ui-components/Button";
 import LoadingCircle from "ui-components/LoadingCircle";
-import savePendingChanges from "methods/savePendingChanges";
+import { PENDING_CHANGES_CONFESSION_ARRAY_KEYS } from "../constants";
+import ConfessionsManager from "controllers/ConfessionsManager";
 
 const ChangesPanel: Component = () => {
   const [isSubmitting, setSubmitting] = createSignal(false);
@@ -39,7 +27,7 @@ const ChangesPanel: Component = () => {
   const handleSaveChanges = async () => {
     setSubmitting(true);
     // console.log(pendingChanges);
-    await savePendingChanges();
+    await ConfessionsManager.savePendingChanges();
     setSubmitting(false);
   };
   return (

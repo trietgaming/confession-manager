@@ -1,8 +1,8 @@
 import { Component } from "solid-js";
 import AppLogo from "ui-components/AppLogo";
-import handleLogin from "methods/handleLogin";
 import { A } from "@solidjs/router";
 import { BELL_ICON_URL, GOOGLE_SHEET_FAVICON_URL } from "app-constants";
+import GoogleAccountManager from "controllers/GoogleAccountManager";
 
 const Homepage: Component = () => {
   return (
@@ -28,7 +28,7 @@ const Homepage: Component = () => {
           </a>
         </div>
         <button
-          onClick={handleLogin}
+          onClick={GoogleAccountManager.login}
           class="flex items-center space-x-4 shadow-md p-2 rounded-md bg-gray-100 hover:bg-gray-300 hover:cursor-pointer"
         >
           <img
@@ -56,7 +56,7 @@ const Homepage: Component = () => {
               Tự động hóa những công việc thủ công lằn nhằn
             </div>
             <button
-              onClick={handleLogin}
+              onClick={GoogleAccountManager.login}
               class="flex items-center space-x-4 shadow-md p-6 rounded-md bg-gray-200 hover:bg-gray-300 hover:cursor-pointer"
             >
               <img
@@ -157,7 +157,7 @@ const Homepage: Component = () => {
         <div class="flex h-[100vh] items-center px-[18%] justify-center">
           <div class="flex flex-col items-center space-y-12">
             <button
-              onClick={handleLogin}
+              onClick={GoogleAccountManager.login}
               class="flex items-center space-x-8 shadow-lg py-8 px-16 rounded-md bg-gray-100 hover:bg-gray-300 hover:cursor-pointer"
             >
               <img
@@ -171,8 +171,9 @@ const Homepage: Component = () => {
               Miễn phí, an toàn, mã nguồn mở
             </p>
             <p class="text-center">
-              Ứng dụng được phát triển một cách phi lợi nhuận, không quảng cáo, không lưu trữ bất kì dữ liệu nào của bạn.
-              Xem mã nguồn tại Github của ứng dụng
+              Ứng dụng được phát triển một cách phi lợi nhuận, không quảng cáo,
+              không lưu trữ bất kì dữ liệu nào của bạn. Xem mã nguồn tại Github
+              của ứng dụng
             </p>
           </div>
         </div>

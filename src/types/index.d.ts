@@ -1,6 +1,6 @@
 /// <reference types="vite/client" />
-import Confession from "classes/Confesison";
-import Color from "../classes/Color";
+import Confession from "models/Confession";
+import Color from "models/Color";
 import ConditionalFilteringModal from "../pages/_Init/InitSheets/ConditionalFilteringModal";
 import FreshStartModal from "../pages/_Init/InitSheets/FreshStartModal";
 

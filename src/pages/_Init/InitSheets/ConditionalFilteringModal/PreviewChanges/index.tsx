@@ -1,15 +1,6 @@
-import {
-  Component,
-  For,
-  ParentComponent,
-  Show,
-  batch,
-  createEffect,
-  createMemo,
-  createSignal,
-  onMount,
-} from "solid-js";
-import { createMutable } from "solid-js/store";
+import { SHEETS_INITED_TYPES } from "app-constants";
+import AppSpreadsheetManager from "controllers/AppSpreadsheetManager";
+import { Component, Show, batch, createEffect, createSignal } from "solid-js";
 import { Portal } from "solid-js/web";
 import { confessionMetadata, confessionSpreadsheet } from "store/index";
 import { twMerge } from "tailwind-merge";
@@ -19,12 +10,9 @@ import {
   PreviewSheetKeys,
 } from "types";
 import Button from "ui-components/Button";
-import TableComponent from "./TableComponent";
-import { useSpreadsheetData } from "../..";
-import setConfessionInited from "methods/setConfessionInited";
-import { SHEETS_INITED_TYPES } from "app-constants";
-import refreshSpreadsheet from "methods/refreshSpreadsheet";
 import LoadingCircle from "ui-components/LoadingCircle";
+import { useSpreadsheetData } from "../..";
+import TableComponent from "./TableComponent";
 
 export const MAX_CELL_HEIGHT = 20;
 export const MAX_CELL_WIDTH = 225;
@@ -137,8 +125,10 @@ const PreviewChanges: Component<{
         },
         valueBatchUpdateRequest
       );
-      await refreshSpreadsheet(
-        await setConfessionInited(SHEETS_INITED_TYPES.FILTERED)
+      await AppSpreadsheetManager.refresh(
+        await AppSpreadsheetManager.setConfessionInited(
+          SHEETS_INITED_TYPES.FILTERED
+        )
       );
     } catch (err) {
       console.error(err);

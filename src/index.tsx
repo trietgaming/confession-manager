@@ -15,6 +15,8 @@ const root = document.getElementById("root");
 // TODO: Make UI Responsive
 //TODO: Add sort by time in confession view
 
+// FIXME: deceperated: methods and classes folder. Methods -> Controllers. Classes -> Models 
+
 render(
   () => (
     <Router>

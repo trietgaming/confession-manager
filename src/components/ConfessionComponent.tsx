@@ -1,7 +1,7 @@
 import { Component, Show, splitProps } from "solid-js";
 import { ActionButtonMetadata, HandleAction, PendingChanges } from "types";
 import Button from "ui-components/Button";
-import Confession from "classes/Confesison";
+import Confession from "models/Confession";
 
 const ConfessionComponent: Component<{
   confession: Confession;

@@ -7,12 +7,16 @@ import {
 } from "store/index";
 import { CONFESSION_SHEET_TYPE_METADATA_KEY } from "../constants";
 import { ConfessionSpreadsheetMetadata, SheetTypeKeys } from "types";
-import checkSheetInited from "./checkSheetInited";
 import { batch } from "solid-js";
 import getLastRowPositionHasValue from "./getLastRowPositionHasValue";
-import initFacebookPageMetadata from "./initFacebookPageMetadata";
-import initPostTemplates from "./initPostTemplates";
 
+import initPostTemplates from "./initPostTemplates";
+import AppSpreadsheetManager from "controllers/AppSpreadsheetManager";
+import FacebookPageManager from "controllers/FacebookPageManager";
+
+/**
+ * @deprecated
+ */
 export default function initConfessionSpreadsheetMetadata(
   spreadsheet?: gapi.client.sheets.Spreadsheet
 ) {
@@ -60,6 +64,6 @@ export default function initConfessionSpreadsheetMetadata(
       sheetsMetadata.postSettingTemplatesSheet.properties?.title
     );
   }
-  setSheetInited(checkSheetInited());
-  initFacebookPageMetadata();
+  setSheetInited(AppSpreadsheetManager.checkSheetInited());
+  FacebookPageManager.initFacebookPageMetadata();
 }

@@ -1,12 +1,6 @@
-import Color from "classes/Color";
-import getColorFromCell from "methods/getColorFromCell";
-import {
-  Component,
-  batch,
-  createContext,
-  onMount,
-  useContext
-} from "solid-js";
+import Color from "models/Color";
+import { getColorFromCell } from "utils/color";
+import { Component, batch, createContext, onMount, useContext } from "solid-js";
 import { createMutable, createStore, produce } from "solid-js/store";
 import { confessionMetadata, confessionSpreadsheet } from "store/index";
 import {
@@ -15,7 +9,7 @@ import {
   ConfessionSpreadsheetGridData,
   FilteredSheetMetadata,
   InitOptionsMetadatas,
-  ThemeMap
+  ThemeMap,
 } from "types";
 import MainTitle from "ui-components/MainTitle";
 import ConditionalFilteringModal from "./ConditionalFilteringModal";

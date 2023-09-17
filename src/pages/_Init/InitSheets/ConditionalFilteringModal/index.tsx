@@ -1,6 +1,4 @@
-import createSignalObjectEmptyChecker from "methods/createSignalObjectEmptyChecker";
-import getColorFromCell from "methods/getColorFromCell";
-import hashTextFormat from "methods/hashTextFormat";
+import useEmpty from "app-hooks/useEmpty";
 import {
   Component,
   For,
@@ -21,6 +19,8 @@ import Button from "ui-components/Button";
 import CenteredLoadingCircle from "ui-components/CenteredLoadingCircle";
 import DownArrowSvg from "ui-components/DownArrowSvg";
 import Modal from "ui-components/Modal";
+import { getColorFromCell } from "utils/color";
+import { hashTextFormat } from "utils/gsheet";
 import { useSpreadsheetData } from "..";
 import AddFilteringCondition from "./AddFilteringCondition";
 import PreviewChanges from "./PreviewChanges";
@@ -78,9 +78,7 @@ const ConditionalFilteringModal: Component<{
   const handleCloseSheet = (index: number) => {
     setSelectedSheets((prev) => prev.filter((_, i) => i != index));
   };
-  const isDataEmpty = createSignalObjectEmptyChecker(
-    confessionSpreadsheetGridData
-  );
+  const isDataEmpty = useEmpty(confessionSpreadsheetGridData);
 
   // TODO: handle submit
   const handleSubmit = () => {

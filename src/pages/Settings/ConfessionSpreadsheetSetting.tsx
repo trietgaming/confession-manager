@@ -1,33 +1,30 @@
 import {
   BELL_ICON_URL,
-  GOOGLE_SHEET_FAVICON_URL,
   GOOGLE_FORMS_FAVICON_URL,
+  GOOGLE_SHEET_FAVICON_URL,
   LOCAL_KEY_NOTIFICATION_TOKEN,
 } from "app-constants";
-import handlePick from "methods/handlePick";
+import NotificationManager from "controllers/NotificationManager";
+import PickerManager from "controllers/PickerManager";
+import { localData } from "local-database";
 import SelectSheets from "pages/_Init/SelectSheets";
 import { Component, Show, createEffect, createSignal } from "solid-js";
 import {
-  isSheetInited,
-  confessionSpreadsheet,
   confesisonForm,
+  confessionSpreadsheet,
   isPicking,
+  isSheetInited,
   picker,
 } from "store/index";
 import Button from "ui-components/Button";
 import LoadingCircle from "ui-components/LoadingCircle";
 import Toggle from "ui-components/Toggle";
 import {
-  settingContainerClass,
   doubleTitleContainerClass,
-  titleIconClass,
   middleTitleClass,
+  settingContainerClass,
+  titleIconClass,
 } from ".";
-import { localData } from "local-database";
-import checkNotificationSubscribed from "methods/checkNotificationSubscribed";
-import getMessagingToken from "methods/getMessagingToken";
-import subscribeToNotification from "methods/subscribeToNotification";
-import unsubscribeToNotification from "methods/unsubscribeToNotification";
 
 const ConfessionSpreadsheetSetting: Component = () => {
   const [
@@ -40,7 +37,9 @@ const ConfessionSpreadsheetSetting: Component = () => {
   >(null);
 
   createEffect(async () => {
-    setNotificationSubscribed(await checkNotificationSubscribed());
+    setNotificationSubscribed(
+      await NotificationManager.checkCurrentSpreadsheetSubscribed()
+    );
   });
 
   const handleToggleNotification = async () => {
@@ -50,11 +49,11 @@ const ConfessionSpreadsheetSetting: Component = () => {
       setNotificationSubscribed(!isNotificationSubscribed());
       await localData.setItem(
         LOCAL_KEY_NOTIFICATION_TOKEN,
-        await getMessagingToken()
+        await NotificationManager.getMessagingToken()
       );
       currentSubscriptionState
-        ? await unsubscribeToNotification()
-        : await subscribeToNotification();
+        ? await NotificationManager.unsubscribe()
+        : await NotificationManager.subscribe();
     } catch (err) {
       if (!("serviceWorker" in navigator)) {
         alert(
@@ -134,7 +133,7 @@ const ConfessionSpreadsheetSetting: Component = () => {
           </div>
         </div>
         <Button
-          onClick={handlePick}
+          onClick={PickerManager.showPicker}
           disabled={isPicking() || !picker()}
           class="group whitespace-nowrap flex space-x-2 items-center"
         >

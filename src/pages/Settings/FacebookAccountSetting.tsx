@@ -7,9 +7,9 @@ import {
 import { FACEBOOK_API_SCOPES, PAPER_PLANE_ICON_URL } from "app-constants";
 import FacebookPageSelector from "components/FacebookPageSelector";
 import Button from "ui-components/Button";
-import fetchFacebookUserFromAuthResponse from "methods/fetchFacebookUserFromAuthResponse";
 import FacebookButton from "components/FacebookButton";
 import { accessibleFacebookPages } from "store/index";
+import FacebookAccountManager from "controllers/FacebookAccountManager";
 
 const FacebookAccountSetting: Component = () => {
   return (
@@ -47,7 +47,9 @@ const FacebookAccountSetting: Component = () => {
             onClick={() => {
               FB.login(
                 (response) => {
-                  fetchFacebookUserFromAuthResponse(response);
+                  FacebookAccountManager.fetchFacebookUserFromAuthResponse(
+                    response
+                  );
                 },
                 {
                   auth_type: "reauthorize",

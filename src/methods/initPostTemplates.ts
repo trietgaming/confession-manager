@@ -6,6 +6,9 @@ import {
 } from "store/index";
 import { PostTemplateSettings } from "types";
 
+/**
+ * @deprecated
+ */
 export default async function initPostTemplates(sheetName?: string) {
   if (!sheetName)
     sheetName = confessionMetadata.postSettingTemplatesSheet?.properties?.title;

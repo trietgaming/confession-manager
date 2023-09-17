@@ -6,8 +6,8 @@ import {
   PENDING_CHANGES_CONFESSION_ARRAY_KEYS,
 } from "app-constants";
 import PreviewPostConfession from "components/PreviewPostConfession";
-import savePendingChanges from "methods/savePendingChanges";
-import updateSpreadsheetMetadata from "methods/updateSpreadsheetMetadata";
+import AppSpreadsheetManager from "controllers/AppSpreadsheetManager";
+import ConfessionsManager from "controllers/ConfessionsManager";
 import View from "pages/_ConfessionView";
 import { Component, For, Show, batch, createSignal } from "solid-js";
 import {
@@ -96,7 +96,7 @@ const Posting: Component = () => {
           alert("Đã có lỗi xảy ra");
           console.error(response.error);
         } else {
-          await updateSpreadsheetMetadata([
+          await AppSpreadsheetManager.updateMetadata([
             {
               key: CONFESSION_LASTEST_HASHTAG_NUMBER_METADATA_KEY,
               value: `${
@@ -112,7 +112,7 @@ const Posting: Component = () => {
             };
             resetPendingChanges();
             pendingChanges.posts = pendingPost;
-            await savePendingChanges();
+            await ConfessionsManager.savePendingChanges();
             for (const key of PENDING_CHANGES_CONFESSION_ARRAY_KEYS) {
               pendingChanges[key] = oldPendingChanges[key];
             }

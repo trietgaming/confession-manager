@@ -53,6 +53,9 @@ export default defineConfig({
       { find: "classes", replacement: "/src/classes" },
       { find: "assets", replacement: "/src/assets" },
       { find: "local-database", replacement: "/src/constants/database.js" },
+      { find: "utils", replacement: "/src/utils" },
+      { find: "controllers", replacement: "/src/controllers" },
+      { find: "models", replacement: "/src/models" },
     ],
   },
 });

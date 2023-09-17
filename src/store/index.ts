@@ -1,7 +1,7 @@
 import {
   PENDING_CHANGES_CONFESSION_ARRAY_KEYS
 } from "app-constants";
-import Confession from "classes/Confesison";
+import Confession from "models/Confession";
 import { MessagePayload } from "firebase/messaging";
 import { createSignal } from "solid-js";
 import { createMutable, createStore } from "solid-js/store";

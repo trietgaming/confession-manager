@@ -2,24 +2,24 @@ import {
   BASE_POST_SETTING_TEMPLATE_OBJ_KEYS,
   DEFAULT_DIVIDER,
 } from "app-constants";
-import createNewPostTemplate from "methods/createNewPostTemplate";
+import AppSpreadsheetManager from "controllers/AppSpreadsheetManager";
 import initPostTemplates from "methods/initPostTemplates";
-import refreshSpreadsheet from "methods/refreshSpreadsheet";
 import { plusSvgPathDraw } from "pages/_Init/InitSheets/ConditionalFilteringModal/ConditionSelector";
+import { Component, For, Show, batch, createSignal } from "solid-js";
+import { reconcile } from "solid-js/store";
 import {
   confesisonForm,
   confessionMetadata,
   confessionSpreadsheet,
   postSettingTemplates,
 } from "store/index";
-import { Component, For, Show, batch, createSignal } from "solid-js";
-import { reconcile } from "solid-js/store";
 import { PostTemplateSettings } from "types";
 import Button from "ui-components/Button";
 import MainTitle from "ui-components/MainTitle";
 import Modal from "ui-components/Modal";
 import Toggle from "ui-components/Toggle";
 import { usePostingContext } from "./Context";
+import ConfessionsManager from "controllers/ConfessionsManager";
 
 const inputClasss =
   "block w-full p-4 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 sm:text-md focus:ring-blue-500 focus:outline-blue-500";
@@ -51,7 +51,7 @@ const PostSetting: Component = () => {
       return;
     setSaving(true);
     const _store = { ...postTemplateSettings };
-    await createNewPostTemplate(_store);
+    await ConfessionsManager.createNewPostTemplate(_store);
     batch(() => {
       setPostTemplateSettings(
         postSettingTemplates.findLast(
@@ -122,7 +122,7 @@ const PostSetting: Component = () => {
           ],
         }
       );
-      await refreshSpreadsheet(response.result.updatedSpreadsheet);
+      await AppSpreadsheetManager.refresh(response.result.updatedSpreadsheet);
       await initPostTemplates(
         confessionMetadata.postSettingTemplatesSheet?.properties?.title
       );
