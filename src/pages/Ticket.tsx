@@ -5,13 +5,11 @@ import {
   JSX,
   Show,
   createEffect,
-  createMemo,
-  createSignal,
+  createMemo
 } from "solid-js";
 import { createStore } from "solid-js/store";
 import { userData } from "store/index";
-import Button from "ui-components/Button";
-import LoadingCircle from "ui-components/LoadingCircle";
+import LButton from "ui-components/LButton";
 import MainTitle from "ui-components/MainTitle";
 import Toggle from "ui-components/Toggle";
 
@@ -24,8 +22,8 @@ const Ticket: Component = () => {
     title: "",
     description: "",
   });
-  const [isSubmitting, setSubmitting] = createSignal(false);
   const canSubmit = createMemo(() => {
+    // This can maybe looks stupid but it's easier to read than just return
     if (
       (!inputValues.isAnonymous &&
         (!inputValues.email?.length || !inputValues.name?.length)) ||
@@ -61,8 +59,7 @@ const Ticket: Component = () => {
     >;
   };
 
-  const handleSubmit = async () => {
-    setSubmitting(true);
+  const handleSubmit = (async () => {
     try {
       await axios.post(
         APP_SERVER_URL + "/issues",
@@ -91,8 +88,7 @@ const Ticket: Component = () => {
       console.error(err);
       alert("Đã có lỗi xảy ra");
     }
-    setSubmitting(false);
-  };
+  });
 
   return (
     <div class="flex justify-center max-w-4xl mx-auto mt-2">
@@ -199,16 +195,13 @@ const Ticket: Component = () => {
             https://github.com/trietgaming/confession-manager/issues
           </a>
         </p>
-        <Button
+        <LButton
           onClick={handleSubmit}
-          disabled={!canSubmit() || isSubmitting()}
+          disabled={!canSubmit()}
           class="flex items-center space-x-2 w-max"
         >
           <p>Gửi yêu cầu</p>
-          <Show when={isSubmitting()}>
-            <LoadingCircle />
-          </Show>
-        </Button>
+        </LButton>
       </div>
     </div>
   );

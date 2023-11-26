@@ -4,6 +4,7 @@ import {
   GOOGLE_SHEET_FAVICON_URL,
   LOCAL_KEY_NOTIFICATION_TOKEN,
 } from "app-constants";
+import useLoading from "app-hooks/useLoading";
 import NotificationManager from "controllers/NotificationManager";
 import PickerManager from "controllers/PickerManager";
 import { localData } from "local-database";
@@ -28,9 +29,9 @@ import {
 
 const ConfessionSpreadsheetSetting: Component = () => {
   const [
+    wrapLoadingNotificationSubscription,
     isLoadingNotificationSubscription,
-    setLoadingNotificationSubscription,
-  ] = createSignal(false);
+  ] = useLoading(false);
 
   const [isNotificationSubscribed, setNotificationSubscribed] = createSignal<
     boolean | null
@@ -42,42 +43,44 @@ const ConfessionSpreadsheetSetting: Component = () => {
     );
   });
 
-  const handleToggleNotification = async () => {
-    setLoadingNotificationSubscription(true);
-    try {
-      const currentSubscriptionState = isNotificationSubscribed();
-      setNotificationSubscribed(!isNotificationSubscribed());
-      await localData.setItem(
-        LOCAL_KEY_NOTIFICATION_TOKEN,
-        await NotificationManager.getMessagingToken()
-      );
-      currentSubscriptionState
-        ? await NotificationManager.unsubscribe()
-        : await NotificationManager.subscribe();
-    } catch (err) {
-      if (!("serviceWorker" in navigator)) {
-        alert(
-          "Trình duyệt của bạn không hỗ trợ nhận cập nhật về confession mới!"
+  const handleToggleNotification = wrapLoadingNotificationSubscription(
+    async () => {
+      try {
+        const currentSubscriptionState = isNotificationSubscribed();
+        setNotificationSubscribed(!isNotificationSubscribed());
+        await localData.setItem(
+          LOCAL_KEY_NOTIFICATION_TOKEN,
+          await NotificationManager.getMessagingToken()
         );
-      } else if (!("showNotification" in ServiceWorkerRegistration.prototype)) {
-        alert("Trình duyệt này không hỗ trợ tính năng thông báo!");
-      } else if (!("PushManager" in window)) {
-        alert("Trình duyệt này không hỗ trợ nhận thông báo!");
-      } else if (Notification.permission !== "granted") {
-        Notification.requestPermission(() => {
-          if (Notification.permission === "denied") {
-            alert(
-              "Bạn đã chặn quyền thông báo, để sử dụng thông báo, vui lòng cấp quyền thông báo cho ứng dụng!"
-            );
-          }
-        });
-      } else {
-        console.error(err);
+        currentSubscriptionState
+          ? await NotificationManager.unsubscribe()
+          : await NotificationManager.subscribe();
+      } catch (err) {
+        if (!("serviceWorker" in navigator)) {
+          alert(
+            "Trình duyệt của bạn không hỗ trợ nhận cập nhật về confession mới!"
+          );
+        } else if (
+          !("showNotification" in ServiceWorkerRegistration.prototype)
+        ) {
+          alert("Trình duyệt này không hỗ trợ tính năng thông báo!");
+        } else if (!("PushManager" in window)) {
+          alert("Trình duyệt này không hỗ trợ nhận thông báo!");
+        } else if (Notification.permission !== "granted") {
+          Notification.requestPermission(() => {
+            if (Notification.permission === "denied") {
+              alert(
+                "Bạn đã chặn quyền thông báo, để sử dụng thông báo, vui lòng cấp quyền thông báo cho ứng dụng!"
+              );
+            }
+          });
+        } else {
+          console.error(err);
+        }
+        setNotificationSubscribed(!isNotificationSubscribed());
       }
-      setNotificationSubscribed(!isNotificationSubscribed());
     }
-    setLoadingNotificationSubscription(false);
-  };
+  );
   return (
     <>
       <div class={settingContainerClass}>

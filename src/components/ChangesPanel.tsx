@@ -1,15 +1,16 @@
 import hadChanges from "app-hooks/hadChanges";
+import useLoading from "app-hooks/useLoading";
+import ConfessionsManager from "controllers/ConfessionsManager";
 import Confession from "models/Confession";
-import { Component, Show, createSignal } from "solid-js";
+import { Component, Show } from "solid-js";
 import { Portal } from "solid-js/web";
 import { pendingChanges } from "store/index";
 import Button from "ui-components/Button";
 import LoadingCircle from "ui-components/LoadingCircle";
 import { PENDING_CHANGES_CONFESSION_ARRAY_KEYS } from "../constants";
-import ConfessionsManager from "controllers/ConfessionsManager";
 
 const ChangesPanel: Component = () => {
-  const [isSubmitting, setSubmitting] = createSignal(false);
+  const [wrapSubmitting, isSubmitting] = useLoading();
 
   const handleCancel = () => {
     for (const key of PENDING_CHANGES_CONFESSION_ARRAY_KEYS) {
@@ -24,12 +25,10 @@ const ChangesPanel: Component = () => {
       pendingChanges[key] = [];
     }
   };
-  const handleSaveChanges = async () => {
-    setSubmitting(true);
+  const handleSaveChanges = wrapSubmitting(async () => {
     // console.log(pendingChanges);
     await ConfessionsManager.savePendingChanges();
-    setSubmitting(false);
-  };
+  });
   return (
     <Show when={hadChanges()}>
       <Portal>

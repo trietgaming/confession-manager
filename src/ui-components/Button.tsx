@@ -1,11 +1,13 @@
-import { ParentComponent, splitProps } from "solid-js";
+import { ParentComponent, ParentProps, splitProps } from "solid-js";
 import { twMerge } from "tailwind-merge";
 
-const Button: ParentComponent<{
+export type ButtonProps = ParentProps<{
   onClick?: () => any;
   disabled?: boolean;
   class?: string;
-}> = (props) => {
+}>;
+
+const Button: ParentComponent<ButtonProps> = (props) => {
   const [local, others] = splitProps(props, ["children", "class"]);
   return (
     <button

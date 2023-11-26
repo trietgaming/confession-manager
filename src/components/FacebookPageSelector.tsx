@@ -1,6 +1,7 @@
 import { CURRENT_CONFESSION_PAGE_ID_METADATA_KEY } from "app-constants";
+import useLoading from "app-hooks/useLoading";
 import AppSpreadsheetManager from "controllers/AppSpreadsheetManager";
-import { Component, For, JSX, createMemo, createSignal } from "solid-js";
+import { Component, For, JSX, createMemo } from "solid-js";
 import {
   accessibleFacebookPages,
   currentConfessionPage,
@@ -8,18 +9,15 @@ import {
 } from "store/index";
 
 const FacebookPageSelector: Component = () => {
-  const [isLoading, setLoading] = createSignal(false);
   const defaultSelectedIndex = createMemo(() =>
     accessibleFacebookPages.findIndex(
       (page) => page.id === currentConfessionPage()?.id
     )
   );
-  const handleSelect: JSX.EventHandlerUnion<
-    HTMLSelectElement,
-    InputEvent
-  > = async (e) => {
+  const [wrapLoading, isLoading] = useLoading();
+
+  const handleSelect = wrapLoading((async (e) => {
     const page = accessibleFacebookPages[+e.currentTarget.value];
-    setLoading(true);
     try {
       await AppSpreadsheetManager.updateMetadata([
         {
@@ -54,8 +52,7 @@ const FacebookPageSelector: Component = () => {
       alert("Đã có lỗi xảy ra");
       console.error(err);
     }
-    setLoading(false);
-  };
+  }) as JSX.EventHandlerUnion<HTMLSelectElement, InputEvent>);
 
   return (
     <select

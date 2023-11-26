@@ -1,39 +1,33 @@
-
+import useLoading from "app-hooks/useLoading";
 import FacebookAccountManager from "controllers/FacebookAccountManager";
 import {
   Component,
   Match,
   Show,
   Switch,
-  createEffect,
-  createSignal
+  createEffect
 } from "solid-js";
-import {
-  facebookUser,
-  isFacebookLoaded
-} from "store/index";
+import { facebookUser, isFacebookLoaded } from "store/index";
 import Button from "ui-components/Button";
 import LoadingCircle from "ui-components/LoadingCircle";
 
 const FacebookButton: Component = () => {
-  const [isButtonLoading, setButtonLoading] = createSignal(true);
+  const [wrapButtonLoading, isButtonLoading, setButtonLoading] =
+    useLoading(true);
   createEffect(() => {
     if (facebookUser() !== undefined) {
       setButtonLoading(false);
     }
   });
 
-  const handleLogoutClick = async () => {
-    setButtonLoading(true);
+  const handleLogoutClick = wrapButtonLoading(async () => {
     await FacebookAccountManager.logout();
-    setButtonLoading(false);
-  };
+  });
 
-  const handleLoginClick = async () => {
-    setButtonLoading(true);
+  const handleLoginClick = wrapButtonLoading(async () => {
     await FacebookAccountManager.login();
-    setButtonLoading(false);
-  };
+  });
+
   return (
     <Show when={isFacebookLoaded()} fallback={<LoadingCircle />}>
       <Switch>

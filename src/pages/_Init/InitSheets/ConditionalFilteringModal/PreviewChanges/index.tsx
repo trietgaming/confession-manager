@@ -1,4 +1,5 @@
 import { SHEETS_INITED_TYPES } from "app-constants";
+import useLoading from "app-hooks/useLoading";
 import AppSpreadsheetManager from "controllers/AppSpreadsheetManager";
 import { Component, Show, batch, createEffect, createSignal } from "solid-js";
 import { Portal } from "solid-js/web";
@@ -32,7 +33,7 @@ const PreviewChanges: Component<{
   const [currentSheetKey, setcurrentSheetKey] = createSignal(sheetKeys[0]);
   const [tableScrollY, setTableScrollY] = createSignal(0);
   const [tableScrollX, setTableScrollX] = createSignal(0);
-  const [isSubmitting, setSubmitting] = createSignal(false);
+  const [wrapSubmitting,isSubmitting] = useLoading(false);
   const confessionSpreadsheetGridData = useSpreadsheetData();
   let tableContainer: HTMLDivElement | undefined;
 
@@ -48,8 +49,7 @@ const PreviewChanges: Component<{
     return () => tableContainer!.removeEventListener("scroll", listener);
   });
 
-  const handleSubmit = async () => {
-    setSubmitting(true);
+  const handleSubmit = wrapSubmitting(async () => {
     const gridData =
       confessionSpreadsheetGridData as ConfessionSpreadsheetGridData;
     const batchRequests: gapi.client.sheets.Request[] = [];
@@ -134,8 +134,7 @@ const PreviewChanges: Component<{
       console.error(err);
     }
 
-    setSubmitting(false);
-  };
+  });
 
   return (
     <Show when={props.show}>

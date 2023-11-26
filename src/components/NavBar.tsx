@@ -14,20 +14,19 @@ import {
   RIGHT_ARROW_ICON_URL,
   SETTINGS_ICON_URL,
 } from "app-constants";
-import axios from "axios";
-import { Component, Show, createSignal, onMount } from "solid-js";
+import useLoading from "app-hooks/useLoading";
+import GoogleAccountManager from "controllers/GoogleAccountManager";
+import { Component, Show, createSignal } from "solid-js";
 import { Portal } from "solid-js/web";
 import {
   confesisonForm,
   confessionSpreadsheet,
   isSheetInited,
-  setUserData,
-  userData,
+  userData
 } from "store/index";
 import { VerticalNavBarMetadata } from "types";
 import AppLogo from "ui-components/AppLogo";
 import NotificationBell from "./NotificationBell";
-import GoogleAccountManager from "controllers/GoogleAccountManager";
 
 const verticalNavBarMetadatas: VerticalNavBarMetadata[] = [
   {
@@ -56,17 +55,16 @@ const AccountDropDownElementClass =
   "w-full items-center flex space-x-4 hover:bg-slate-200 py-3 px-4 rounded-sm cursor-pointer disabled:text-gray-300";
 
 const NavBar: Component = () => {
-  const [isLoggingOut, setLoggingOut] = createSignal(false);
+  const [wrapLoggingOut, isLoggingOut] = useLoading();
   const [isVerticalNavExtended, setVerticalNavExtended] = createSignal(false);
 
   const [isAccountDropdownShow, setAccountDropdownShow] = createSignal(false);
 
-  const handleLogoutClick = async () => {
-    setLoggingOut(true);
+  const handleLogoutClick = wrapLoggingOut(async () => {
     await GoogleAccountManager.logout();
     // await new Promise((resolve) => setTimeout(resolve, 1000));
-    setLoggingOut(false);
-  };
+  });
+  
   const handleToggleAccountDropdownShow = () =>
     setAccountDropdownShow((prev) => !prev);
 

@@ -7,6 +7,7 @@ import {
   LOCAL_KEY_CONFESSION_SPREADSHEET_ID,
   PAPER_PLANE_ICON_URL,
 } from "app-constants";
+import useLoading from "app-hooks/useLoading";
 import AppSpreadsheetManager from "controllers/AppSpreadsheetManager";
 import { userResourceDatabase } from "local-database";
 import {
@@ -27,7 +28,7 @@ import {
 } from "store/index";
 import { SelectedObject, SheetTypeKeys } from "types";
 import Button from "ui-components/Button";
-import LoadingCircle from "ui-components/LoadingCircle";
+import LButton from "ui-components/LButton";
 import MainTitle from "ui-components/MainTitle";
 import Modal from "ui-components/Modal";
 
@@ -97,7 +98,7 @@ const SelectSheets: Component<{
   const [isCreateSheetModalOpen, setCreateSheetModalOpen] = createSignal<
     string | boolean
   >(false);
-  const [isProcessing, setProcessing] = createSignal(false);
+  const [wrapProcessing, isProcessing] = useLoading(false);
 
   ///@ts-ignore
   let sheetTitleInputRef: HTMLInputElement;
@@ -155,8 +156,7 @@ const SelectSheets: Component<{
     handleEmpty();
   };
 
-  const handleSubmit = async () => {
-    setProcessing(true);
+  const handleSubmit = wrapProcessing(async () => {
     const currentSheetsState = sheets();
     const currentSelectedState = selected();
 
@@ -314,8 +314,7 @@ const SelectSheets: Component<{
     } catch (err) {
       console.error(err);
     }
-    setProcessing(false);
-  };
+  });
 
   /// TODO: OPTIMIZE THIS
   const handleGoBack = async () => {
@@ -398,10 +397,9 @@ const SelectSheets: Component<{
         >
           Tạo trang tính
         </Button>
-        <Button
+        <LButton
           disabled={
             numberOfSelected(selected()) !== Object.keys(selected()).length ||
-            isProcessing() ||
             Object.keys(existedMetadataSheets()).reduce(
               (prev, key) =>
                 prev &&
@@ -412,13 +410,8 @@ const SelectSheets: Component<{
           }
           onClick={handleSubmit}
         >
-          <div class="flex items-center space-x-2">
-            <span>Xác nhận</span>
-            <Show when={isProcessing()}>
-              <LoadingCircle />
-            </Show>
-          </div>
-        </Button>
+          <span>Xác nhận</span>
+        </LButton>
       </div>
       <Modal
         title="Tạo trang tính mới"

@@ -1,7 +1,8 @@
 import {
   CONFESSION_SHEET_TYPE_METADATA_KEY,
-  SHEETS_INITED_TYPES
+  SHEETS_INITED_TYPES,
 } from "app-constants";
+import useLoading from "app-hooks/useLoading";
 import AppSpreadsheetManager from "controllers/AppSpreadsheetManager";
 import { Component, JSX, createSignal } from "solid-js";
 import { confessionMetadata, confessionSpreadsheet } from "store/index";
@@ -14,7 +15,7 @@ const FreshStartModal: Component<{
   handleClose?: () => any;
 }> = (props) => {
   const [sheetTitle, setSheetTitle] = createSignal("");
-  const [isLoading, setLoading] = createSignal(false);
+  const [wrapLoading, isLoading] = useLoading(false);
 
   const handleChange: JSX.EventHandlerUnion<HTMLInputElement, InputEvent> = (
     e
@@ -22,8 +23,7 @@ const FreshStartModal: Component<{
     setSheetTitle(e.currentTarget.value);
   };
 
-  const handleSubmit = async () => {
-    setLoading(true);
+  const handleSubmit = wrapLoading(async () => {
     const archivedSheetTitle = sheetTitle();
     const spreadsheetId = confessionSpreadsheet.spreadsheetId!;
     try {
@@ -133,13 +133,14 @@ const FreshStartModal: Component<{
       );
 
       await AppSpreadsheetManager.refresh(
-        await AppSpreadsheetManager.setConfessionInited(SHEETS_INITED_TYPES.FRESH)
+        await AppSpreadsheetManager.setConfessionInited(
+          SHEETS_INITED_TYPES.FRESH
+        )
       );
     } catch (err) {
       console.error(err);
     }
-    setLoading(false);
-  };
+  });
 
   return (
     <Modal

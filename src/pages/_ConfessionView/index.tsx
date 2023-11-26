@@ -26,11 +26,7 @@ import {
 import Confession from "models/Confession";
 import { Portal } from "solid-js/web";
 import LoadingCircle from "ui-components/LoadingCircle";
-import {
-  ConfessionStoreType,
-  FETCH_TRIGGER_Y_OFFSET,
-  MAX_CFS_PER_LOAD,
-} from "../../constants";
+import { FETCH_TRIGGER_Y_OFFSET, MAX_CFS_PER_LOAD } from "../../constants";
 
 const VIEW_METADATA: {
   [key in keyof Confessions]?: {
@@ -131,6 +127,7 @@ const View: Component<{
         currentFirstCfsRow > sheetsLastRow[sheetType]!)
     )
       return setEnd(true);
+
     if (
       scrollY() + window.innerHeight >=
       cfsContainer!.clientHeight -
@@ -270,17 +267,19 @@ const View: Component<{
         >
           <button
             onclick={() => handleSort(true)}
-            class={`rounded-lg p-1 ${
+            class={`rounded-lg p-1 disabled:text-white ${
               isAscending() ? "bg-blue-300" : "bg-gray-200"
             }`}
+            disabled={isFetching()}
           >
             Cũ nhất trước
           </button>
           <button
             onclick={() => handleSort(false)}
-            class={`rounded-lg p-1 ${
+            class={`rounded-lg p-1 disabled:text-white ${
               isAscending() ? "bg-gray-200" : "bg-blue-300"
             }`}
+            disabled={isFetching()}
           >
             Mới nhất trước
           </button>

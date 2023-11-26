@@ -1,3 +1,4 @@
+import useLoading from "app-hooks/useLoading";
 import axios from "axios";
 import AppScriptApi from "controllers/AppScriptApi";
 import fetchAndInitSpreadsheet from "methods/fetchAndInitSpreadsheet";
@@ -6,7 +7,7 @@ import {
   JSX,
   createEffect,
   createMemo,
-  createSignal
+  createSignal,
 } from "solid-js";
 import { linkResponsesShow, setLinkResponsesShow } from "store/index";
 import Modal from "ui-components/Modal";
@@ -19,7 +20,7 @@ const LinkResponses: Component<{}> = (props) => {
     linkResponsesShow()?.formId ? "Bảng tính" : "Biểu mẫu"
   );
   const [targetTitle, settargetTitle] = createSignal("");
-  const [isLoading, setLoading] = createSignal(false);
+  const [wrapLoading, isLoading] = useLoading();
   createEffect(() => {});
 
   const handleInput: JSX.EventHandlerUnion<HTMLInputElement, InputEvent> = (
@@ -28,8 +29,7 @@ const LinkResponses: Component<{}> = (props) => {
     settargetTitle(e.currentTarget.value);
   };
 
-  const handleSubmit = async () => {
-    setLoading(true);
+  const handleSubmit = wrapLoading(async () => {
     const title = targetTitle();
 
     try {
@@ -85,8 +85,7 @@ const LinkResponses: Component<{}> = (props) => {
       alert("Đã có lỗi xảy ra");
     }
     setLinkResponsesShow(null);
-    setLoading(false);
-  };
+  });
 
   return (
     <Modal
